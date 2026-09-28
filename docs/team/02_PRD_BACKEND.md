@@ -30,7 +30,7 @@ You write to the database with the **service role** (bypasses RLS), so you must 
 - Geo: numpy, pyproj.
 - LLM: `openai` Python SDK pointed at Groq (`https://api.groq.com/openai/v1`) and OpenRouter (`https://openrouter.ai/api/v1`).
 - Tests: pytest, pytest-asyncio, respx (mock HTTP).
-- **Node 20 + TypeScript** for `apps/web/api` with `@supabase/supabase-js` v2.
+- **Node 20 + JavaScript (ES modules, no TypeScript)** for `apps/web/api` with `@supabase/supabase-js` v2.
 - Pin versions in `requirements.txt` after the first working install (do not guess versions in advance).
 
 **Hugging Face Space notes**
@@ -811,16 +811,16 @@ rows with action alert.system.<transition>. Tests with a fake clock for every ru
 ### BE-20 Node API routes on Vercel
 
 - **Blocked by:** BE-01, DB-05. **Blocks:** BE-22, BE-24; FE-10, FE-12, FE-16 (integrate).
-- **Files:** `apps/web/api/_lib/auth.ts`, `_lib/forward.ts`, `_lib/errors.ts`, one file per route in contract §3, `apps/web/vercel.json` (functions `maxDuration`), `apps/web/api/__tests__/*.test.ts`.
+- **Files:** `apps/web/api/_lib/auth.js`, `_lib/forward.js`, `_lib/errors.js`, one file per route in contract §3, `apps/web/vercel.json` (functions `maxDuration`), `apps/web/api/__tests__/*.test.js`.
 
 **Spec**
-- `auth.ts`: `requireUser(req, allowedRoles?)` → reads `Authorization: Bearer`, `supabaseAdmin.auth.getUser(token)`, loads `profiles.role`; 401/403 with the contract error shape.
-- `forward.ts`: `forwardToSpace(req, path, {method, body, query})` → fetch `${AI_SERVICE_URL}/v1${path}` with `X-Service-Token`, `X-User-Id`, `X-User-Role`, `X-Request-Id` (uuid); pass status and JSON through; network error → 502 `NWIS_UPSTREAM`; timeout → 504.
+- `auth.js`: `requireUser(req, allowedRoles?)` → reads `Authorization: Bearer`, `supabaseAdmin.auth.getUser(token)`, loads `profiles.role`; 401/403 with the contract error shape.
+- `forward.js`: `forwardToSpace(req, path, {method, body, query})` → fetch `${AI_SERVICE_URL}/v1${path}` with `X-Service-Token`, `X-User-Id`, `X-User-Role`, `X-Request-Id` (uuid); pass status and JSON through; network error → 502 `NWIS_UPSTREAM`; timeout → 504.
 - Routes and roles exactly per contract §9.2. Node-only routes:
   - `documents/upload-url`: validate size ≤ 25 MB and MIME in the DB-06 list; `supabaseAdmin.storage.from('documents').createSignedUploadUrl('incoming/<uuid>/<sanitised filename>')`; return `{upload_id, storage_path, signed_url, token}`.
   - `admin/users/invite`: `supabaseAdmin.auth.admin.inviteUserByEmail(email, {data: {full_name}})`, then update `profiles` role and assignments; audit row.
   - `admin/users/[id]` PATCH: update role/assignments; audit row.
-- `health.ts`: public; returns own ok + the Space health (with 5 s timeout).
+- `health.js`: public; returns own ok + the Space health (with 5 s timeout).
 - Filenames sanitised (`[^a-zA-Z0-9._-]` → `_`, max 120 chars).
 - **Deploy manually** with `vercel --prod` from `apps/web` (no auto-deploy); env vars set in the Vercel dashboard.
 
@@ -832,8 +832,8 @@ rows with action alert.system.<transition>. Tests with a fake clock for every ru
 **Prompt**
 ```text
 Task BE-20. Read contract §3 (apps/web/api layout), §4 (errors), §9 (all), §13 (env vars).
-Create the Vercel Node 20 TypeScript serverless functions in apps/web/api/: _lib/auth.ts
-(requireUser), _lib/forward.ts (forwardToSpace), _lib/errors.ts, and one file per route in §3,
+Create the Vercel Node 20 JavaScript (ES module) serverless functions in apps/web/api/: _lib/auth.js
+(requireUser), _lib/forward.js (forwardToSpace), _lib/errors.js, and one file per route in §3,
 with the role lists from §9.2. Node-only routes: documents/upload-url (createSignedUploadUrl on
 'incoming/<uuid>/<sanitised>'), admin/users/invite, admin/users/[id]. Use @supabase/supabase-js v2
 with SUPABASE_SERVICE_ROLE_KEY server-side only. Add vercel.json with a functions maxDuration

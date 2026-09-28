@@ -74,25 +74,25 @@ One GitHub repository (monorepo), named `nwis`.
 nwis/
 ├── apps/
 │   └── web/                      # FRONTEND + Node API routes (one Vercel project)
-│       ├── api/                  # Vercel serverless functions (Node, TypeScript) — owned by BACKEND
-│       │   ├── _lib/             # auth.ts, forward.ts, errors.ts
-│       │   ├── documents/upload-url.ts  documents.ts
-│       │   ├── search.ts
-│       │   ├── ask.ts
-│       │   ├── wells/[wellboreId]/predict-tops.ts
-│       │   ├── wells/[wellboreId]/correlation.ts
-│       │   ├── wells/[wellboreId]/risk.ts
-│       │   ├── stream/start.ts  stream/stop.ts  stream/speed.ts  stream/drop.ts
-│       │   ├── planning/brief.ts
-│       │   ├── admin/users/invite.ts  admin/users/[id].ts  admin/retrain.ts
-│       │   └── health.ts
+│       ├── api/                  # Vercel serverless functions (Node, JavaScript ES modules) — owned by BACKEND
+│       │   ├── _lib/             # auth.js, forward.js, errors.js
+│       │   ├── documents/upload-url.js  documents.js
+│       │   ├── search.js
+│       │   ├── ask.js
+│       │   ├── wells/[wellboreId]/predict-tops.js
+│       │   ├── wells/[wellboreId]/correlation.js
+│       │   ├── wells/[wellboreId]/risk.js
+│       │   ├── stream/start.js  stream/stop.js  stream/speed.js  stream/drop.js
+│       │   ├── planning/brief.js
+│       │   ├── admin/users/invite.js  admin/users/[id].js  admin/retrain.js
+│       │   └── health.js
 │       ├── src/                  # React app — owned by FRONTEND
 │       │   ├── app/              # routes, layout
 │       │   ├── features/         # map, correlation, risk, alerts, documents, review, search, planning, admin, rig
 │       │   ├── components/       # shared UI
-│       │   ├── lib/              # supabase.ts, api.ts, types.ts (copied from §5–§10), units.ts
+│       │   ├── lib/              # supabase.js, api.js, constants.js (copied from §5–§10), units.js
 │       │   └── mocks/            # MSW handlers + fixtures
-│       ├── index.html  vite.config.ts  tailwind.config.ts  package.json  vercel.json
+│       ├── index.html  vite.config.js  tailwind.config.js  package.json  vercel.json
 ├── services/
 │   └── ai/                       # BACKEND Python FastAPI (Hugging Face Docker Space)
 │       ├── app/
@@ -151,7 +151,7 @@ nwis/
 | Duration | hours | `_h` | |
 | Coordinates | WGS84 lon/lat | PostGIS `geography(Point,4326)` | Convert Everest 1830 / UTM with pyproj at ingestion |
 
-**Naming:** tables and columns `snake_case`; TypeScript types `PascalCase`; JSON fields over HTTP are `snake_case` (same as columns, no camelCase conversion anywhere).
+**Naming:** tables and columns `snake_case`; React components `PascalCase`, JS functions/variables `camelCase`; JSON fields over HTTP are `snake_case` (same as columns, no camelCase conversion anywhere).
 **IDs:** `uuid` (`gen_random_uuid()`), except composite keys stated in §6.
 **Formation names:** always the canonical `formations.name` (e.g. `Tipam`, `Barail`). Aliases are resolved through `formation_synonyms` at ingestion.
 **Well names:** synthetic wells start with `SYN-` (e.g. `SYN-DLJ-03`). Never use real OIL well names on synthetic data.
@@ -163,7 +163,7 @@ nwis/
 
 ## 5. Enums
 
-Defined once in SQL (§6) and mirrored in TypeScript (`apps/web/src/lib/types.ts`) and Pydantic (`services/ai/app/models/enums.py`).
+Defined once in SQL (§6) and mirrored in JavaScript constants (`apps/web/src/lib/constants.js`) and Pydantic (`services/ai/app/models/enums.py`).
 
 | Enum | Values |
 | --- | --- |
@@ -1086,11 +1086,11 @@ the drill bit, using events extracted from historical reports of nearby (offset)
 
 Stack (fixed, do not change):
 - Database: Supabase (Postgres 15+, PostGIS, pgvector, Auth, Storage, Realtime).
-- Backend: Python 3.11 FastAPI in a Docker Hugging Face Space; Node 20 TypeScript
+- Backend: Python 3.11 FastAPI in a Docker Hugging Face Space; Node 20 JavaScript (ES modules)
   serverless functions in apps/web/api on Vercel; LLMs via OpenAI-compatible APIs
   (Groq primary, OpenRouter fallback); embeddings BAAI/bge-small-en-v1.5 (384 dims);
   OCR Docling + RapidOCR with Tesseract fallback.
-- Frontend: React 18 + TypeScript + Vite + Tailwind + React Router + TanStack Query +
+- Frontend: React 18 + JavaScript (JSX, no TypeScript) + Vite + Tailwind + React Router + TanStack Query +
   supabase-js v2 + react-leaflet + Plotly, hosted on Vercel.
 
 Hard rules:

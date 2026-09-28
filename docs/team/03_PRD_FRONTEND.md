@@ -14,18 +14,19 @@ Build the screens an engineer uses from login to alert feedback (`NWIS_PRD.md` �
 
 | You own | You do not own (but must use exactly) |
 | --- | --- |
-| `apps/web/src/**`, `index.html`, `vite.config.ts`, `tailwind.config.ts`, `apps/web/package.json` (frontend deps) | `apps/web/api/**` (Backend's Node routes) |
+| `apps/web/src/**`, `index.html`, `vite.config.js`, `tailwind.config.js`, `apps/web/package.json` (frontend deps) | `apps/web/api/**` (Backend's Node routes) |
 | Mock layer and fixtures | Tables, views, RPCs, RLS (Database) |
 | UI copy, design system, accessibility | Risk maths, alert generation (Backend) |
 
 ## 3. Tech and conventions
 
-- React 18 + TypeScript (strict) + Vite, Tailwind CSS, React Router 6, TanStack Query 5, `@supabase/supabase-js` v2, `react-leaflet` 4 + `leaflet` 1.9 (OpenStreetMap tiles, attribution shown), `react-plotly.js` + `plotly.js-dist-min` (**lazy-loaded**, correlation and risk charts only), `lucide-react` icons, `clsx`, `date-fns`, `react-markdown` (Ask answers), MSW 2 (mocks), Vitest + Testing Library.
-- **Types:** `src/lib/types.ts` is a hand copy of contract §5–§11 (enums, row types, API request/response types). Field names are snake_case exactly as in the contract. Any mismatch is a bug.
-- **Data access layer:** components never call `supabase` or `fetch` directly. They call functions in `src/lib/data/*.ts` (e.g. `getWellSummaries()`, `getOffsets(wellboreId, radiusM, md, mode)`, `ackAlert(id, note)`), wrapped in TanStack Query hooks in `src/lib/hooks/*.ts`. This is where mock vs real is switched.
-- **Realtime:** `src/lib/realtime.ts` exposes `subscribe(table, filter, onChange) → unsubscribe`. Real mode uses Supabase `postgres_changes`; mock mode uses an in-memory event bus plus a dev panel that emits fake alerts and stream updates.
-- **Units:** `src/lib/units.ts` formats SI values from the contract (`2395.0 m`, `1.18 SG`, `42 m³`, `15 kN·m`). No unit conversions in components.
-- **Colours for risk bands and severities (tokens in `tailwind.config.ts`):**
+- React 18 + **JavaScript with JSX (no TypeScript)** + Vite, Tailwind CSS, React Router 6, TanStack Query 5, `@supabase/supabase-js` v2, `react-leaflet` 4 + `leaflet` 1.9 (OpenStreetMap tiles, attribution shown), `react-plotly.js` + `plotly.js-dist-min` (**lazy-loaded**, correlation and risk charts only), `lucide-react` icons, `clsx`, `date-fns`, `react-markdown` (Ask answers), MSW 2 (mocks), Vitest + Testing Library.
+- **Language:** plain JavaScript (ES modules). Components are `.jsx`, everything else `.js`; `"type": "module"` in `package.json`. Code quality comes from ESLint (`eslint-plugin-react`, `eslint-plugin-react-hooks`) + Prettier, and tests.
+- **Constants and shapes:** `src/lib/constants.js` is a hand copy of contract §5–§11: every enum as a frozen array (`export const RISK_TYPES = Object.freeze([...])`), label maps, `EVENT_TO_RISK`, and JSDoc `@typedef` comments describing row and API shapes (editors show them as hints). Field names are snake_case exactly as in the contract. Any mismatch is a bug. Validate API responses you depend on with small guard functions in `src/lib/validate.js` during development.
+- **Data access layer:** components never call `supabase` or `fetch` directly. They call functions in `src/lib/data/*.js` (e.g. `getWellSummaries()`, `getOffsets(wellboreId, radiusM, md, mode)`, `ackAlert(id, note)`), wrapped in TanStack Query hooks in `src/lib/hooks/*.js`. This is where mock vs real is switched.
+- **Realtime:** `src/lib/realtime.js` exposes `subscribe(table, filter, onChange) → unsubscribe`. Real mode uses Supabase `postgres_changes`; mock mode uses an in-memory event bus plus a dev panel that emits fake alerts and stream updates.
+- **Units:** `src/lib/units.js` formats SI values from the contract (`2395.0 m`, `1.18 SG`, `42 m³`, `15 kN·m`). No unit conversions in components.
+- **Colours for risk bands and severities (tokens in `tailwind.config.js`):**
 
 | Band / severity | Token | Light | Dark (rig view) |
 | --- | --- | --- | --- |
@@ -103,30 +104,31 @@ Every prompt assumes you first pasted the **Global context block** (contract §1
 ### FE-01 Scaffold, design system, Vercel deploy
 
 - **Blocked by:** nothing. **Blocks:** FE-02, FE-03.
-- **Files:** `apps/web/` Vite React TS project; `src/app/App.tsx`, `src/app/routes.tsx`, `src/app/Layout.tsx` (top bar, side nav by role, content), `src/components/ui/` (Button, Card, Badge, Chip, Tabs, Table, Dialog, Toast, Spinner, EmptyState, ErrorState, Slider, Select), `src/lib/types.ts`, `src/lib/units.ts`, `src/lib/supabase.ts`, `src/lib/api.ts`, `tailwind.config.ts`, `.env.example` entries, `vercel.json` (SPA rewrite: all non-`/api` paths → `/index.html`).
+- **Files:** `apps/web/` Vite React (JavaScript) project (`npm create vite@latest web -- --template react`); `src/app/App.jsx`, `src/app/routes.jsx`, `src/app/Layout.jsx` (top bar, side nav by role, content), `src/components/ui/` (Button, Card, Badge, Chip, Tabs, Table, Dialog, Toast, Spinner, EmptyState, ErrorState, Slider, Select), `src/lib/constants.js`, `src/lib/units.js`, `src/lib/supabase.js`, `src/lib/api.js`, `tailwind.config.js`, `.env.example` entries, `vercel.json` (SPA rewrite: all non-`/api` paths → `/index.html`).
 
 **Spec**
-- `types.ts`: every enum in contract §5 as a TS union type + const array; row types for the tables/views the UI reads; request/response types for every §9 endpoint; `RiskBand`, `AlertSeverity` helpers; `EVENT_TO_RISK`; UI labels for risk types (contract §5).
-- `units.ts`: `fmtDepth(m)`, `fmtSG(x)`, `fmtVolume(m3)`, `fmtTorque`, `fmtDistance(m)` (m below 1,000, km above), `fmtDuration(h)`, `fmtTimeAgo(iso)`.
-- `api.ts`: `apiFetch(path, {method, body})` adding `Authorization: Bearer <session token>`, parsing the contract error shape into `NwisApiError {code, message, status}`.
+- `constants.js`: every enum in contract §5 as a frozen array; JSDoc `@typedef` blocks for the row shapes the UI reads and the request/response shapes of every §9 endpoint; `EVENT_TO_RISK`; UI labels for risk types (contract §5).
+- `units.js`: `fmtDepth(m)`, `fmtSG(x)`, `fmtVolume(m3)`, `fmtTorque`, `fmtDistance(m)` (m below 1,000, km above), `fmtDuration(h)`, `fmtTimeAgo(iso)`.
+- `api.js`: `apiFetch(path, {method, body})` adding `Authorization: Bearer <session token>`, parsing the contract error shape into `NwisApiError {code, message, status}`.
 - Theme: light theme for office screens; a `.rig` dark high-contrast theme class for the rig view.
 - Deploy **manually** with `vercel --prod` (no auto-deploy). Set `VITE_*` env vars in the Vercel dashboard.
 
 **Acceptance**
 - [ ] `npm run dev`, `npm run build`, `npm run test` all work; the deployed URL shows the layout.
-- [ ] Types compile with `strict: true`; a unit test checks `units.ts` outputs.
+- [ ] `npm run lint` passes with no errors; a unit test checks `units.js` outputs.
 
 **Prompt**
 ```text
 Task FE-01. Read contract §3 (apps/web layout), §4 (units, naming), §5 (enums + labels), §6 (row
 columns of tables/views the UI reads), §9 (all endpoint request/response shapes), §13 (VITE_ vars).
-Create a Vite + React 18 + TypeScript (strict) app in apps/web with Tailwind, React Router 6,
-TanStack Query 5, supabase-js v2. Create: src/lib/types.ts (all §5 enums as unions + const arrays,
-row types, API types — snake_case field names exactly), src/lib/units.ts (formatters listed in my
-PRD, with tests), src/lib/supabase.ts (client from VITE_SUPABASE_URL/ANON_KEY), src/lib/api.ts
-(apiFetch with bearer token and NwisApiError), src/app/{App,routes,Layout}.tsx (routes from my PRD
+Create a Vite + React 18 JavaScript app (JSX, no TypeScript, ES modules) in apps/web with Tailwind,
+React Router 6, TanStack Query 5, supabase-js v2, ESLint (react + react-hooks plugins) and Prettier.
+Create: src/lib/constants.js (all §5 enums as Object.freeze arrays, label maps, EVENT_TO_RISK, and
+JSDoc @typedef comments for row and API shapes — snake_case field names exactly), src/lib/units.js (formatters listed in my
+PRD, with tests), src/lib/supabase.js (client from VITE_SUPABASE_URL/ANON_KEY), src/lib/api.js
+(apiFetch with bearer token and NwisApiError), src/app/{App,routes,Layout}.jsx (routes from my PRD
 §4 as placeholder pages), src/components/ui/* (the listed primitives, Tailwind only, accessible),
-tailwind.config.ts with the risk colour tokens from my PRD, vercel.json SPA rewrite excluding /api.
+tailwind.config.js with the risk colour tokens from my PRD, vercel.json SPA rewrite excluding /api.
 Do NOT create anything under apps/web/api (Backend owns it).
 [paste PRD §3 colour table and §4 routes table]
 ```
@@ -136,14 +138,14 @@ Do NOT create anything under apps/web/api (Backend owns it).
 ### FE-02 Mock layer (MSW + fixtures + realtime bus)
 
 - **Blocked by:** FE-01. **Blocks:** nothing formally; it lets every other FE task start before Database/Backend.
-- **Files:** `src/mocks/browser.ts`, `src/mocks/handlers.ts`, `src/mocks/fixtures/*.json`, `src/lib/realtime.ts`, `src/lib/data/*.ts`, `src/dev/DevPanel.tsx`.
+- **Files:** `src/mocks/browser.js`, `src/mocks/handlers.js`, `src/mocks/fixtures/*.json`, `src/lib/realtime.js`, `src/lib/data/*.js`, `src/dev/DevPanel.jsx`.
 
 **Spec**
 - `VITE_USE_MOCKS=true` → start MSW before rendering.
 - **Fixtures** (follow contract shapes exactly): 8 wells (3 clusters, names `SYN-…`, 2 drilling), trajectories GeoJSON, formation tops, 40 events across formations, 6 lessons, risk_scores for the drilling wells (12 intervals × 5 risk types, a spread of bands), 4 alerts in different states, 3 documents with jobs, 10 review fields, 5 search results, 2 Ask answers (one sufficient with citations, one insufficient), a correlation response (§9.3), a planning brief (§9.4), model_runs.
 - **Handlers** for: every `/api/*` endpoint (§9.2) and the Supabase REST paths the data layer uses (`*/rest/v1/<table or view>*`, `*/rest/v1/rpc/<function>`), including RPC errors (e.g. `ack_alert` by an office engineer → 400 with message `NWIS_FORBIDDEN: …`).
 - **Mock auth:** a role picker on the login page in mock mode (creates a fake session with that role).
-- **Realtime bus:** `realtime.ts` `subscribe()` in mock mode listens to an in-memory emitter; `DevPanel` (bottom-right, dev/mock only) buttons: "Emit look-ahead alert", "Emit critical detector alert", "Advance bit 5 m", "Drop stream 45 s", "Complete job".
+- **Realtime bus:** `realtime.js` `subscribe()` in mock mode listens to an in-memory emitter; `DevPanel` (bottom-right, dev/mock only) buttons: "Emit look-ahead alert", "Emit critical detector alert", "Advance bit 5 m", "Drop stream 45 s", "Complete job".
 - **Mock state is mutable** (acknowledging an alert in mock mode really changes it) so flows can be tested end-to-end.
 
 **Acceptance**
@@ -154,13 +156,13 @@ Do NOT create anything under apps/web/api (Backend owns it).
 ```text
 Task FE-02. Read contract §6 (row shapes), §7 (RPC names + params), §9 (API shapes and examples),
 §11.6 (evidence JSON), §12 (lifecycle rules — mock RPCs must enforce them too). Create
-src/mocks/browser.ts, src/mocks/handlers.ts (MSW 2 http handlers for every /api/* endpoint and
+src/mocks/browser.js, src/mocks/handlers.js (MSW 2 http handlers for every /api/* endpoint and
 for supabase REST paths */rest/v1/<name> and */rest/v1/rpc/<fn> used by src/lib/data), fixtures in
-src/mocks/fixtures/*.json (list in my PRD), a mutable in-memory mock DB module, src/lib/realtime.ts
+src/mocks/fixtures/*.json (list in my PRD), a mutable in-memory mock DB module, src/lib/realtime.js
 (subscribe(table, filter, cb) using supabase channel postgres_changes in real mode and an
-EventEmitter in mock mode), src/lib/data/*.ts (one module per domain: wells, geo, events, risk,
-alerts, documents, review, search, planning, admin, stream) and src/dev/DevPanel.tsx with the
-buttons listed. Start MSW in main.tsx only when VITE_USE_MOCKS === 'true'.
+EventEmitter in mock mode), src/lib/data/*.js (one module per domain: wells, geo, events, risk,
+alerts, documents, review, search, planning, admin, stream) and src/dev/DevPanel.jsx with the
+buttons listed. Start MSW in main.jsx only when VITE_USE_MOCKS === 'true'.
 ```
 
 ---
@@ -168,7 +170,7 @@ buttons listed. Start MSW in main.tsx only when VITE_USE_MOCKS === 'true'.
 ### FE-03 Auth and role routing
 
 - **Blocked by (start):** FE-01. **Integrate:** DB-05. **Blocks:** FE-04, FE-10, FE-12, FE-14, FE-15.
-- **Files:** `src/features/auth/LoginPage.tsx`, `AuthProvider.tsx`, `RequireRole.tsx`, `useProfile.ts`.
+- **Files:** `src/features/auth/LoginPage.jsx`, `AuthProvider.jsx`, `RequireRole.jsx`, `useProfile.js`.
 
 **Spec**
 - Email + password login (`signInWithPassword`); show errors plainly; "Forgot password" link (`resetPasswordForEmail`).
@@ -184,8 +186,8 @@ buttons listed. Start MSW in main.tsx only when VITE_USE_MOCKS === 'true'.
 **Prompt**
 ```text
 Task FE-03. Read contract §5 (user_role), §6 (profiles), §8 (profiles RLS). Create
-src/features/auth/{LoginPage,AuthProvider,RequireRole}.tsx and useProfile.ts; wire routes in
-src/app/routes.tsx with RequireRole per my PRD §4 table and the role home redirect on "/". In mock
+src/features/auth/{LoginPage,AuthProvider,RequireRole}.jsx and useProfile.js; wire routes in
+src/app/routes.jsx with RequireRole per my PRD §4 table and the role home redirect on "/". In mock
 mode, LoginPage shows a role picker. Tests with Testing Library for redirect and 403 behaviour.
 [paste PRD §4 table]
 ```
@@ -195,7 +197,7 @@ mode, LoginPage shows a role picker. Tests with Testing Library for redirect and
 ### FE-04 Active wells list and well workspace shell
 
 - **Blocked by (start):** FE-03. **Integrate:** DB-12. **Blocks:** FE-05, FE-06, FE-07, FE-08, FE-09, FE-13, FE-16.
-- **Files:** `src/features/wells/WellsPage.tsx`, `src/features/workspace/WorkspaceLayout.tsx`, `WellHeader.tsx`, `StreamStatusPill.tsx`.
+- **Files:** `src/features/wells/WellsPage.jsx`, `src/features/workspace/WorkspaceLayout.jsx`, `WellHeader.jsx`, `StreamStatusPill.jsx`.
 
 **Spec**
 - **Wells page:** drilling wells first (cards: name, field, provenance badge, bit depth and stream status from `stream_state`, open alert count by severity, top risk now); then a searchable table of all wells (name, field, status, TD, event count, NPT total, provenance).
@@ -209,8 +211,8 @@ mode, LoginPage shows a role picker. Tests with Testing Library for redirect and
 **Prompt**
 ```text
 Task FE-04. Read contract §6 (stream_state), §6 Views (v_well_summary), §7 (formation_at_md).
-Create src/features/wells/WellsPage.tsx and src/features/workspace/{WorkspaceLayout,WellHeader,
-StreamStatusPill}.tsx per my spec, using src/lib/hooks and realtime.subscribe('stream_state',
+Create src/features/wells/WellsPage.jsx and src/features/workspace/{WorkspaceLayout,WellHeader,
+StreamStatusPill}.jsx per my spec, using src/lib/hooks and realtime.subscribe('stream_state',
 'wellbore_id=eq.<id>'). Nested routes for the five tabs. Tests: renders drilling wells first;
 status pill colours and texts for each stream_status.
 [paste FE-04 spec]
@@ -221,7 +223,7 @@ status pill colours and texts for each stream_status.
 ### FE-05 Map tab (offset wells)
 
 - **Blocked by (start):** FE-04. **Integrate:** DB-04, DB-09. **Blocks:** FE-17.
-- **Files:** `src/features/map/MapTab.tsx`, `WellMarkers.tsx`, `Trajectories.tsx`, `RadiusControl.tsx`, `OffsetList.tsx`, `WellPopup.tsx`.
+- **Files:** `src/features/map/MapTab.jsx`, `WellMarkers.jsx`, `Trajectories.jsx`, `RadiusControl.jsx`, `OffsetList.jsx`, `WellPopup.jsx`.
 
 **Spec**
 - Leaflet map with OSM tiles; fit to the active well + offsets.
@@ -252,7 +254,7 @@ the control → query parameter mapping.
 ### FE-06 Correlation tab
 
 - **Blocked by (start):** FE-04. **Integrate:** BE-13. **Blocks:** FE-17.
-- **Files:** `src/features/correlation/CorrelationTab.tsx`, `CorrelationPlot.tsx`, `CorrelationControls.tsx`.
+- **Files:** `src/features/correlation/CorrelationTab.jsx`, `CorrelationPlot.jsx`, `CorrelationControls.jsx`.
 
 **Spec**
 - Controls: offset picker (default = 4 nearest from `offsets_within`; max 6), flatten formation select (formations present in the active well's tops, default = next formation below the bit), channels multi-select (`gr_api`, `rop_m_h`, `torque_knm`, `mw_sg`, `ecd_sg`; default gr_api, rop_m_h, mw_sg).
@@ -267,7 +269,7 @@ the control → query parameter mapping.
 **Prompt**
 ```text
 Task FE-06. Read contract §9.2 (correlation query params) and §9.3 (response). Create
-src/features/correlation/{CorrelationTab,CorrelationPlot,CorrelationControls}.tsx. Lazy-load
+src/features/correlation/{CorrelationTab,CorrelationPlot,CorrelationControls}.jsx. Lazy-load
 react-plotly.js with plotly.js-dist-min. Build subplots: per well per channel, shared reversed y
 (md + shift_m), tops lines (dashed + uncertainty band for source 'predicted'), casing triangles,
 event markers coloured by risk type with hover text including true MD. Tests for the data →
@@ -280,7 +282,7 @@ trace transformation function (pure, no Plotly render).
 ### FE-07 Risk ahead tab
 
 - **Blocked by (start):** FE-04. **Integrate:** BE-17. **Blocks:** FE-17.
-- **Files:** `src/features/risk/RiskTab.tsx`, `RiskStrip.tsx`, `IntervalDetail.tsx`, `BandLegend.tsx`.
+- **Files:** `src/features/risk/RiskTab.jsx`, `RiskStrip.jsx`, `IntervalDetail.jsx`, `BandLegend.jsx`.
 
 **Spec**
 - Data: `risk_scores` for the wellbore with `md_from_m` between bit and bit + 300 (Realtime subscription on `risk_scores`), and a "Recompute" button (`POST /api/wells/{id}/risk`).
@@ -296,9 +298,9 @@ trace transformation function (pure, no Plotly render).
 **Prompt**
 ```text
 Task FE-07. Read contract §6 (risk_scores incl. reasons JSON), §11.1 (bands), §11.5 (confidence),
-§11.6 (evidence/reasons shapes). Create src/lib/risk.ts (bandFor(score), severityFor(band),
+§11.6 (evidence/reasons shapes). Create src/lib/risk.js (bandFor(score), severityFor(band),
 BAND_META with labels/meaning/colour tokens) with boundary tests, and src/features/risk/{RiskTab,
-RiskStrip,IntervalDetail,BandLegend}.tsx per my spec, subscribing to risk_scores via
+RiskStrip,IntervalDetail,BandLegend}.jsx per my spec, subscribing to risk_scores via
 realtime.subscribe. The strip is a CSS grid (no Plotly needed).
 [paste FE-07 spec + NWIS_PRD F5 band table]
 ```
@@ -308,7 +310,7 @@ realtime.subscribe. The strip is a CSS grid (no Plotly needed).
 ### FE-08 Rig view (tablet, high contrast)
 
 - **Blocked by (start):** FE-04, FE-09 (uses the alert banner and card). **Integrate:** BE-18. **Blocks:** FE-17.
-- **Files:** `src/features/rig/RigView.tsx`, `DepthPanel.tsx`, `FormationPanel.tsx`, `RiskGauges.tsx`, `LessonsPanel.tsx`.
+- **Files:** `src/features/rig/RigView.jsx`, `DepthPanel.jsx`, `FormationPanel.jsx`, `RiskGauges.jsx`, `LessonsPanel.jsx`.
 
 **Spec**
 - Dark, high-contrast (`.rig` theme), minimum body text 18 px, touch targets ≥ 48 px, landscape tablet 1024×768 first.
@@ -327,7 +329,7 @@ realtime.subscribe. The strip is a CSS grid (no Plotly needed).
 ```text
 Task FE-08. Read contract §6 (stream_state.latest keys = depth_series columns, risk_scores,
 lessons), §7 (formation_at_md), §11.1. Create src/features/rig/{RigView,DepthPanel,FormationPanel,
-RiskGauges,LessonsPanel}.tsx per my spec using the .rig theme, realtime subscriptions for
+RiskGauges,LessonsPanel}.jsx per my spec using the .rig theme, realtime subscriptions for
 stream_state, risk_scores and alerts, the AlertBanner/AlertCard from src/features/alerts (FE-09),
 and navigator.wakeLock when available. Tests for gauge max computation and the lost-stream bar.
 [paste FE-08 spec]
@@ -338,16 +340,16 @@ and navigator.wakeLock when available. Tests for gauge max computation and the l
 ### FE-09 Alerts: realtime, banner, sound, card, evidence, lifecycle actions
 
 - **Blocked by (start):** FE-04. **Integrate:** DB-05, DB-07, BE-19. **Blocks:** FE-08, FE-17.
-- **Files:** `src/features/alerts/AlertProvider.tsx`, `AlertBanner.tsx`, `AlertCard.tsx`, `EvidencePanel.tsx`, `AlertActions.tsx`, `ResolveDialog.tsx`, `DismissDialog.tsx`, `FeedbackBar.tsx`, `AlertsPage.tsx`, `WellAlertsTab.tsx`, `sound.ts`, `permissions.ts`.
+- **Files:** `src/features/alerts/AlertProvider.jsx`, `AlertBanner.jsx`, `AlertCard.jsx`, `EvidencePanel.jsx`, `AlertActions.jsx`, `ResolveDialog.jsx`, `DismissDialog.jsx`, `FeedbackBar.jsx`, `AlertsPage.jsx`, `WellAlertsTab.jsx`, `sound.js`, `permissions.js`.
 
 **Spec**
 - **AlertProvider** (app-wide): subscribes to `alerts` (all visible to the user; RLS filters for rig engineers), keeps open alerts in state, triggers banner, sound and browser notification for **new or re-notified** `warning`/`critical` alerts (a re-notification = `sent_at` changed).
-- **Sound (`sound.ts`):** Web Audio beeps (warning: 2 beeps every 20 s; critical: 3 beeps every 8 s) until acknowledged. Browsers block audio until the user interacts, so show an "Enable alert sound" button in the top bar on first load; remember the choice in `localStorage`. Info/watch never make sound.
+- **Sound (`sound.js`):** Web Audio beeps (warning: 2 beeps every 20 s; critical: 3 beeps every 8 s) until acknowledged. Browsers block audio until the user interacts, so show an "Enable alert sound" button in the top bar on first load; remember the choice in `localStorage`. Info/watch never make sound.
 - **Browser notifications:** ask permission once (button in settings), show title + well + depth; clicking focuses the app on the alert.
 - **Banner:** top of screen, colour by severity, text = title, well, "~{distance} m ahead", buttons "View" and (if allowed) "Acknowledge". Stays until acknowledged for warning/critical; `aria-live="assertive"` for critical, `polite` otherwise.
 - **Alert card:** severity + band word, confidence chip (+ reason), score, risk type, zone (from–to m), expected depth, formation, time, state timeline (Generated → Sent → Viewed → Escalated? → Acknowledged → Resolved → Feedback with timestamps and who), message, recommendation, and the **Evidence panel**. Opening the card calls `mark_alert_viewed` once per user.
 - **Evidence panel:** offsets (well, depth distance, events with NPT and source link → opens the source page viewer from FE-12), lessons (mitigation + success rate), SHAP reasons, layer values L1/L2/L3, detector signal (if any), sources list.
-- **Actions (`permissions.ts` mirrors contract §12 for showing/hiding buttons; the server still enforces):**
+- **Actions (`permissions.js` mirrors contract §12 for showing/hiding buttons; the server still enforces):**
   - Acknowledge (note optional) → `ack_alert`.
   - Resolve → dialog with outcome (`event_occurred` / `avoided` / `false_alarm`) + note → `resolve_alert`.
   - Dismiss (info/watch only) → dialog with required reason (≥ 5 chars) → `dismiss_alert`.
@@ -359,7 +361,7 @@ and navigator.wakeLock when available. Tests for gauge max computation and the l
 
 **Acceptance**
 - [ ] Mock and real: a new critical alert shows banner + sound (after enable) + notification; acknowledging stops the sound for everyone viewing (state change arrives by Realtime).
-- [ ] Buttons shown per role/state match the §12 table (unit tests for `permissions.ts` covering every row).
+- [ ] Buttons shown per role/state match the §12 table (unit tests for `permissions.js` covering every row).
 - [ ] Dismiss is not offered for warning/critical; feedback only after resolved.
 - [ ] Viewing records `viewed` once.
 
@@ -367,17 +369,17 @@ and navigator.wakeLock when available. Tests for gauge max computation and the l
 ```text
 Task FE-09 part 1 (provider, banner, sound, permissions). Read contract §6 (alerts), §6 Views
 (v_open_alerts), §7 (alert RPCs), §8 (realtime), §11.1, §12 (lifecycle + permission table — copy
-its rules into permissions.ts). Create src/features/alerts/{AlertProvider,AlertBanner}.tsx,
-sound.ts (Web Audio beeps with the cadences in my spec and an enable-sound gate), permissions.ts
+its rules into permissions.js). Create src/features/alerts/{AlertProvider,AlertBanner}.jsx,
+sound.js (Web Audio beeps with the cadences in my spec and an enable-sound gate), permissions.js
 (canAcknowledge, canResolve, canDismiss, canRate(user, alert)) with unit tests for every row of
 the §12 table, and browser Notification support.
 [paste FE-09 spec]
 ```
 ```text
 Task FE-09 part 2 (card, evidence, actions, pages). Create src/features/alerts/{AlertCard,
-EvidencePanel,AlertActions,ResolveDialog,DismissDialog,FeedbackBar,AlertsPage,WellAlertsTab}.tsx:
+EvidencePanel,AlertActions,ResolveDialog,DismissDialog,FeedbackBar,AlertsPage,WellAlertsTab}.jsx:
 state timeline, mark_alert_viewed on open, the four action flows calling the RPCs through
-src/lib/data/alerts.ts, friendly error mapping, escalated badge, system alert variant. Evidence
+src/lib/data/alerts.js, friendly error mapping, escalated badge, system alert variant. Evidence
 panel renders the §11.6 evidence JSON. Tests: actions visible per role/state, dismiss reason
 validation, feedback only after resolved.
 ```
@@ -387,7 +389,7 @@ validation, feedback only after resolved.
 ### FE-10 Documents: upload and job progress
 
 - **Blocked by (start):** FE-03. **Integrate:** BE-05, BE-20, DB-06, DB-07. **Blocks:** FE-11.
-- **Files:** `src/features/documents/DocumentsPage.tsx`, `UploadDropzone.tsx`, `JobProgress.tsx`, `DocumentList.tsx`.
+- **Files:** `src/features/documents/DocumentsPage.jsx`, `UploadDropzone.jsx`, `JobProgress.jsx`, `DocumentList.jsx`.
 
 **Spec**
 - Dropzone: multiple files; per file: client checks (≤ 25 MB, allowed types: PDF, PNG, JPG, TIFF, CSV, XLSX, XML, LAS/TXT); optional well select (from `v_well_summary`), doc type select (or "detect automatically"), provenance select (default `direct`).
@@ -403,7 +405,7 @@ validation, feedback only after resolved.
 ```text
 Task FE-10. Read contract §6 (documents, jobs), §8 (storage + realtime), §9.1 (upload rules) and
 §9.2 (/api/documents/upload-url and /api/documents shapes). Create
-src/features/documents/{DocumentsPage,UploadDropzone,JobProgress,DocumentList}.tsx implementing
+src/features/documents/{DocumentsPage,UploadDropzone,JobProgress,DocumentList}.jsx implementing
 the three-step upload flow, per-file progress, Realtime job subscription, the final states and
 retry. Tests for client-side validation and the flow state machine (mock the data layer).
 [paste FE-10 spec]
@@ -414,7 +416,7 @@ retry. Tests for client-side validation and the flow state machine (mock the dat
 ### FE-11 Review queue
 
 - **Blocked by (start):** FE-10. **Integrate:** BE-08, DB-05. **Blocks:** FE-17.
-- **Files:** `src/features/review/ReviewQueuePage.tsx`, `ReviewDocPage.tsx`, `PageViewer.tsx`, `FieldList.tsx`, `FieldEditor.tsx`.
+- **Files:** `src/features/review/ReviewQueuePage.jsx`, `ReviewDocPage.jsx`, `PageViewer.jsx`, `FieldList.jsx`, `FieldEditor.jsx`.
 
 **Spec**
 - Queue page: documents with pending fields (count, doc type, well, oldest pending age) from `v_review_queue`.
@@ -441,7 +443,7 @@ event_type), keyboard shortcuts a/e/r/j/k. Tests for bbox scaling and reason map
 ### FE-12 Search, Ask and the source viewer
 
 - **Blocked by (start):** FE-03. **Integrate:** BE-10, BE-20. **Blocks:** FE-17.
-- **Files:** `src/features/search/SearchPage.tsx`, `SearchResults.tsx`, `AskPanel.tsx`, `AnswerView.tsx`, `SourceViewer.tsx` (shared drawer).
+- **Files:** `src/features/search/SearchPage.jsx`, `SearchResults.jsx`, `AskPanel.jsx`, `AnswerView.jsx`, `SourceViewer.jsx` (shared drawer).
 
 **Spec**
 - One page, two tabs: **Ask** (default) and **Search**. Shared filters: formation, event type, field, depth range.
@@ -456,7 +458,7 @@ event_type), keyboard shortcuts a/e/r/j/k. Tests for bbox scaling and reason map
 **Prompt**
 ```text
 Task FE-12. Read contract §9.2 (/api/search and /api/ask shapes) and §8 (signed URLs). Create
-src/features/search/{SearchPage,SearchResults,AskPanel,AnswerView,SourceViewer}.tsx per my spec.
+src/features/search/{SearchPage,SearchResults,AskPanel,AnswerView,SourceViewer}.jsx per my spec.
 AnswerView parses [n] markers into citation chips linked to citations[n]. SourceViewer is a
 reusable drawer exported for alerts and review. Tests for citation parsing (including [1][3] and
 unknown numbers) and the insufficient-evidence rendering.
@@ -468,7 +470,7 @@ unknown numbers) and the insufficient-evidence rendering.
 ### FE-13 Planning page (Should)
 
 - **Blocked by (start):** FE-04. **Integrate:** BE-23. **Blocks:** FE-17.
-- **Files:** `src/features/planning/PlanningPage.tsx`, `PlanningForm.tsx`, `BriefView.tsx`, `print.css`.
+- **Files:** `src/features/planning/PlanningPage.jsx`, `PlanningForm.jsx`, `BriefView.jsx`, `print.css`.
 
 **Spec**
 - Map (reuse FE-05 components): click to set the location (or type lat/lon), planned TD, radius → "Build brief" → `POST /api/planning/brief`.
@@ -487,7 +489,7 @@ vertical mode, and print.css for an A4 brief via window.print(). Tests for form 
 ### FE-14 Admin: users and models
 
 - **Blocked by (start):** FE-03. **Integrate:** BE-24, BE-20. **Blocks:** FE-17.
-- **Files:** `src/features/admin/UsersPage.tsx`, `InviteDialog.tsx`, `EditUserDialog.tsx`, `ModelsPage.tsx`.
+- **Files:** `src/features/admin/UsersPage.jsx`, `InviteDialog.jsx`, `EditUserDialog.jsx`, `ModelsPage.jsx`.
 
 **Spec**
 - Users: table from `profiles` (email, name, role, assigned wells); invite (email, name, role, wells) → `/api/admin/users/invite`; edit role/assignments → `PATCH /api/admin/users/{id}`.
@@ -506,7 +508,7 @@ via RequireRole. Tests for the dialogs' validation.
 ### FE-15 Analytics
 
 - **Blocked by (start):** FE-03. **Integrate:** DB-12. **Blocks:** FE-17.
-- **Files:** `src/features/analytics/AnalyticsPage.tsx`.
+- **Files:** `src/features/analytics/AnalyticsPage.jsx`.
 
 **Spec**
 - Two charts (lazy Plotly or simple CSS bars): NPT hours by formation stacked by risk type (`v_npt_by_formation`); event count by field. A table below with the numbers. Filter by provenance (synthetic / direct).
@@ -514,7 +516,7 @@ via RequireRole. Tests for the dialogs' validation.
 **Prompt**
 ```text
 Task FE-15. Read contract §6 Views (v_npt_by_formation, v_well_summary). Create
-src/features/analytics/AnalyticsPage.tsx with the two charts, a numbers table and a provenance
+src/features/analytics/AnalyticsPage.jsx with the two charts, a numbers table and a provenance
 filter. Tests for the aggregation helper.
 ```
 
@@ -523,7 +525,7 @@ filter. Tests for the aggregation helper.
 ### FE-16 Replay control panel (demo)
 
 - **Blocked by (start):** FE-04. **Integrate:** BE-18, BE-20. **Blocks:** FE-17.
-- **Files:** `src/features/workspace/ReplayPanel.tsx`.
+- **Files:** `src/features/workspace/ReplayPanel.jsx`.
 
 **Spec**
 - Shown in the workspace header for rtoc/admin: source (Volve / synthetic, based on the well's provenance), speed 1× / 10× / 60×, Start, Stop, "Simulate data loss (45 s)" (`/api/stream/drop`). Shows `stream_state` status and bit depth live.
@@ -532,7 +534,7 @@ filter. Tests for the aggregation helper.
 **Prompt**
 ```text
 Task FE-16. Read contract §9.2 (stream endpoints incl. drop) and §6 (stream_state). Create
-src/features/workspace/ReplayPanel.tsx per my spec, visible only to rtoc_engineer and admin.
+src/features/workspace/ReplayPanel.jsx per my spec, visible only to rtoc_engineer and admin.
 Tests for button enable/disable by stream status.
 ```
 
@@ -541,7 +543,7 @@ Tests for button enable/disable by stream status.
 ### FE-17 Polish, states, accessibility, demo mode
 
 - **Blocked by (start):** FE-05 … FE-16. **Blocks:** nothing (final).
-- **Files:** across features; `src/app/ErrorBoundary.tsx`, `src/features/help/AboutPage.tsx`.
+- **Files:** across features; `src/app/ErrorBoundary.jsx`, `src/features/help/AboutPage.jsx`.
 
 **Checklist**
 - [ ] Every data view has loading (skeleton), empty ("No offsets within 10 km — widen the radius") and error states (retry button).
