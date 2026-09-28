@@ -4,5 +4,8 @@ pydantic
 pydantic-settings
 httpx
 orjson
+psycopg[binary]
+psycopg-pool
+supabase
 pytest
 pytest-asyncio
