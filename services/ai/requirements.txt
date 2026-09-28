@@ -7,5 +7,8 @@ orjson
 psycopg[binary]
 psycopg-pool
 supabase
+openai<3  # 3.x moved to httpx2 internally; respx (our test mocking) only supports classic httpx
+tenacity
 pytest
 pytest-asyncio
+respx
