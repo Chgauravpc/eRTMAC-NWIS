@@ -1,0 +1,20 @@
+name,basin,strat_order,lithology,typical_risks
+Alluvium,Upper Assam,1,"Unconsolidated sand, clay",{losses}
+Dhekiajuli,Upper Assam,2,"Sand, clay",{losses}
+Namsang,Upper Assam,3,"Sandstone, conglomerate",{losses}
+Girujan,Upper Assam,4,Mottled clay,{stuck_pipe}
+Tipam,Upper Assam,5,"Sandstone, minor shale","{losses,cementing}"
+Barail,Upper Assam,6,"Shale, sandstone, coal","{stuck_pipe,torque}"
+Kopili,Upper Assam,7,Shale,"{kick,stuck_pipe}"
+Sylhet,Upper Assam,8,"Limestone, shale","{losses,kick}"
+Langpar,Upper Assam,9,"Sandstone, shale",{kick}
+Basement,Upper Assam,10,"Granite, gneiss",{}
+Nordland Gp,Volve,1,"Clay, sand",{}
+Hordaland Gp,Volve,2,Claystone,{stuck_pipe}
+Rogaland Gp,Volve,3,"Claystone, tuff",{}
+Shetland Gp,Volve,4,"Chalk, limestone",{losses}
+Cromer Knoll Gp,Volve,5,Marl,{}
+Viking Gp,Volve,6,"Shale (Draupne, Heather)","{stuck_pipe,kick}"
+Hugin Fm,Volve,7,"Sandstone (reservoir)",{losses}
+Skagerrak Fm,Volve,8,"Sandstone, conglomerate",{losses}
+Smith Bank Fm,Volve,9,Claystone,{}
