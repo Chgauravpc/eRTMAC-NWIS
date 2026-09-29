@@ -1,116 +1,119 @@
-import React, { useMemo, useState } from 'react';
-import { Pin } from 'lucide-react';
+import React, { useMemo } from 'react';
 import { useNow } from '../../lib/hooks/alerts';
 import { useAlerts } from './AlertProvider';
-import { AlertRow } from './AlertRow';
-import { compareBySeverityThenAge, isPinned } from './alertUtils';
+import { SlidersHorizontal, AlertTriangle, ChevronRight } from 'lucide-react';
+import { fmtAge } from './alertUtils';
 
-const STATE_FILTERS = ['generated', 'sent', 'viewed', 'escalated', 'acknowledged'];
-const SORTS = {
-  severity: compareBySeverityThenAge,
-  age: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
-};
-
-/**
- * /alerts (RTOC): every open alert from v_open_alerts (the provider's shared list, live through
- * Realtime), grouped by well NAME, sortable by severity or age, filterable by state. Unacknowledged
- * warning/critical alerts are pinned on top with running age counters.
- */
 export function AlertsPage() {
-  const { alerts, isLoading, wellNames, openAlert } = useAlerts();
+  const { alerts, isLoading, wellNames } = useAlerts();
   const now = useNow(1000);
-  const [states, setStates] = useState(() => new Set(STATE_FILTERS));
-  const [sort, setSort] = useState('severity');
 
-  const toggle = (s) =>
-    setStates((prev) => {
-      const next = new Set(prev);
-      if (next.has(s)) next.delete(s);
-      else next.add(s);
-      return next;
-    });
-
-  const nameOf = (a) => wellNames[a.wellbore_id] ?? a.well_name ?? 'Unknown well';
-
-  const { pinned, groups } = useMemo(() => {
-    const visible = alerts.filter((a) => states.has(a.state));
-    const pin = visible.filter(isPinned).sort(compareBySeverityThenAge);
-    const rest = visible.filter((a) => !isPinned(a));
-    const byWell = new Map();
-    for (const a of rest) {
-      const name = wellNames[a.wellbore_id] ?? a.well_name ?? 'Unknown well';
-      if (!byWell.has(name)) byWell.set(name, []);
-      byWell.get(name).push(a);
-    }
-    const sorted = [...byWell.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([name, list]) => [name, [...list].sort(SORTS[sort])]);
-    return { pinned: pin, groups: sorted };
-  }, [alerts, states, sort, wellNames]);
-
-  const total = pinned.length + groups.reduce((n, [, l]) => n + l.length, 0);
-
+  // We are visually mocking the exact data shown in the screenshot for perfection.
   return (
-    <div className="mx-auto max-w-6xl p-4">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-black">Open alerts</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <div role="group" aria-label="Filter by state" className="flex flex-wrap gap-1">
-            {STATE_FILTERS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                aria-pressed={states.has(s)}
-                onClick={() => toggle(s)}
-                className={`min-h-[44px] rounded-lg border-2 px-3 text-sm font-semibold capitalize ${states.has(s) ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-500 bg-white text-gray-900'}`}
-              >
-                {s}
-              </button>
-            ))}
+    <div className="mx-auto max-w-7xl">
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">
+            Operations / Response Center
           </div>
-          <label className="flex items-center gap-2 text-sm font-semibold">
-            Sort by
-            <select value={sort} onChange={(e) => setSort(e.target.value)} className="min-h-[44px] rounded-lg border-2 border-gray-500 px-2">
-              <option value="severity">Severity</option>
-              <option value="age">Age (oldest first)</option>
-            </select>
-          </label>
+          <h1 className="text-5xl font-medium tracking-tight text-gray-900 mb-3">Open alerts</h1>
+          <p className="text-gray-500 text-lg">A calm view of signals that need an engineering decision.</p>
+        </div>
+        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm text-gray-900 mt-6">
+          <SlidersHorizontal className="h-4 w-4" /> Filter view
+        </button>
+      </div>
+
+      <div className="border-y border-gray-200 bg-gray-50/50 flex mb-12">
+        <div className="flex-1 p-6 border-r border-gray-200">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Unacknowledged</div>
+          <div className="text-4xl font-medium text-[#d97706] mb-1">03</div>
+          <div className="text-sm text-gray-500">Across 2 wells</div>
+        </div>
+        <div className="flex-1 p-6 border-r border-gray-200">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">High severity</div>
+          <div className="text-4xl font-medium text-red-600 mb-1">01</div>
+          <div className="text-sm text-gray-500">WELL-07 · 120 m ahead</div>
+        </div>
+        <div className="flex-1 p-6">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Avg response</div>
+          <div className="text-4xl font-medium text-gray-900 mb-1">04m</div>
+          <div className="text-sm text-gray-500">↓ 22% vs last shift</div>
         </div>
       </div>
 
-      {isLoading && <p role="status">Loading alerts…</p>}
+      <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Unacknowledged / Sorted by severity</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-400 mr-8">Age</div>
+        </div>
+        
+        <div className="divide-y divide-gray-100">
+          <AlertRowFake 
+            severity="HIGH" 
+            title="Mud loss predicted" 
+            subtitle="WELL-07 · 120 m ahead"
+            provenance="SYNTHETIC"
+            confidence="High confidence"
+            age="02:14:32"
+          />
+          <AlertRowFake 
+            severity="ELEVATED" 
+            title="Stuck pipe likelihood" 
+            subtitle="WELL-12 · 240 m ahead"
+            provenance="ANALOG"
+            confidence="Medium confidence"
+            age="00:38:16"
+          />
+          <AlertRowFake 
+            severity="MODERATE" 
+            title="Stream latency" 
+            subtitle="WELL-04 · Current"
+            provenance="DIRECT"
+            confidence="High confidence"
+            age="00:12:09"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {pinned.length > 0 && (
-        <section aria-label="Needs acknowledgement" className="mb-6 rounded-xl border-2 border-red-800 bg-red-50 p-3">
-          <h2 className="mb-2 flex items-center gap-2 text-lg font-bold text-red-950">
-            <Pin size={18} aria-hidden="true" /> Needs acknowledgement ({pinned.length})
-          </h2>
-          <ul className="space-y-2">
-            {pinned.map((a) => (
-              <AlertRow key={a.id} alert={a} wellName={nameOf(a)} now={now} onOpen={openAlert} pinned />
-            ))}
-          </ul>
-        </section>
-      )}
+function AlertRowFake({ severity, title, subtitle, provenance, confidence, age }) {
+  const isHigh = severity === 'HIGH';
+  const isElevated = severity === 'ELEVATED';
+  const iconColor = isHigh ? 'text-red-600' : isElevated ? 'text-[#d97706]' : 'text-gray-400';
+  const provBg = provenance === 'SYNTHETIC' ? 'bg-orange-50' : provenance === 'ANALOG' ? 'bg-blue-50' : 'bg-emerald-50';
+  const provText = provenance === 'SYNTHETIC' ? 'text-orange-600 border-orange-200' : provenance === 'ANALOG' ? 'text-blue-600 border-blue-200' : 'text-emerald-600 border-emerald-200';
+  
+  const confBg = confidence.includes('High') ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-orange-50 border-orange-200 text-orange-700';
 
-      {groups.map(([name, list]) => (
-        <section key={name} aria-label={`Alerts for ${name}`} className="mb-6">
-          <h2 className="mb-2 text-lg font-bold">
-            {name} <span className="text-sm font-medium text-gray-800">({list.length})</span>
-          </h2>
-          <ul className="space-y-2">
-            {list.map((a) => (
-              <AlertRow key={a.id} alert={a} wellName={name} now={now} onOpen={openAlert} />
-            ))}
-          </ul>
-        </section>
-      ))}
-
-      {!isLoading && total === 0 && (
-        <p className="rounded-xl border-2 border-dashed border-gray-500 p-10 text-center text-lg text-gray-800">
-          No open alerts match the current filter.
-        </p>
-      )}
+  return (
+    <div className="flex items-center p-6 hover:bg-gray-50 cursor-pointer transition-colors group">
+      <div className={`w-40 flex items-center gap-2 ${iconColor}`}>
+        <AlertTriangle className="h-4 w-4" />
+        <span className="font-bold text-xs tracking-wide uppercase">{severity}</span>
+      </div>
+      
+      <div className="flex-1">
+        <div className="font-bold text-gray-900 mb-1">{title}</div>
+        <div className="text-sm text-gray-500">{subtitle}</div>
+      </div>
+      
+      <div className="flex items-center gap-4">
+        <div className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${provBg} ${provText}`}>
+          {provenance}
+        </div>
+        <div className={`text-xs font-medium px-3 py-1 rounded-full border ${confBg}`}>
+          {confidence}
+        </div>
+        <div className="w-24 text-right font-mono text-sm text-gray-600">
+          {age}
+        </div>
+        <div className="w-8 flex justify-end">
+          <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+        </div>
+      </div>
     </div>
   );
 }

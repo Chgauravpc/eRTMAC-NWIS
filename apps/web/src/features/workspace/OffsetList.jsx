@@ -16,9 +16,9 @@ export function OffsetList({ offsets, mode, isLoading, error, onRetry, radiusM, 
 
   return (
     <div>
-      <h3 className="mb-2 text-lg font-bold">Offset wells ({sorted.length})</h3>
-      <p className="mb-2 text-xs text-gray-500">Sorted by {depthMode ? 'distance at depth' : 'distance at surface'}.</p>
-      <ol className="space-y-2" data-testid="offset-list">
+      <h3 className="mb-2 text-lg font-bold text-white">Offset wells ({sorted.length})</h3>
+      <p className="mb-4 text-xs text-gray-400">Sorted by {depthMode ? 'distance at depth' : 'distance at surface'}.</p>
+      <ol className="space-y-3" data-testid="offset-list">
         {sorted.map((o) => {
           const used = activeDistance(o, mode);
           return (
@@ -28,20 +28,25 @@ export function OffsetList({ offsets, mode, isLoading, error, onRetry, radiusM, 
                 data-testid="offset-row"
                 aria-pressed={selectedId === o.wellbore_id}
                 onClick={() => onSelect?.(o.wellbore_id)}
-                className={`w-full rounded border p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${selectedId === o.wellbore_id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+                className={`w-full rounded-lg border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${selectedId === o.wellbore_id ? 'border-blue-500/50 bg-blue-900/20' : 'border-gray-800 bg-[#0f172a] hover:border-gray-700 hover:bg-gray-800/50'}`}
               >
-                <div className="mb-1 flex items-start justify-between gap-2">
-                  <span data-testid="offset-name" className="font-medium text-blue-700">{o.well_name}</span>
+                <div className="mb-2 flex items-start justify-between gap-2">
+                  <span data-testid="offset-name" className="font-medium text-blue-400 hover:text-blue-300">{o.well_name}</span>
                   <ProvenanceBadge provenance={o.provenance} />
                 </div>
-                <div className="grid grid-cols-3 gap-1 text-xs text-gray-600">
-                  <div className={!depthMode ? 'font-semibold text-gray-900' : ''}>
-                    Surface: <span data-testid="surface-dist">{fmtDistance(o.surface_distance_m)}</span>
+                <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
+                  <div className={!depthMode ? 'font-semibold text-gray-200' : ''}>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Surface</span>
+                    <span data-testid="surface-dist">{fmtDistance(o.surface_distance_m)}</span>
                   </div>
-                  <div className={depthMode ? 'font-semibold text-gray-900' : ''}>
-                    Depth: <span data-testid="depth-dist">{o.depth_distance_m == null ? '-' : fmtDistance(o.depth_distance_m)}</span>
+                  <div className={depthMode ? 'font-semibold text-gray-200' : ''}>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Depth</span>
+                    <span data-testid="depth-dist">{o.depth_distance_m == null ? '-' : fmtDistance(o.depth_distance_m)}</span>
                   </div>
-                  <div>Events: <span className="font-medium">{o.event_count ?? 0}</span></div>
+                  <div>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Events</span>
+                    <span className="font-medium text-gray-200">{o.event_count ?? 0}</span>
+                  </div>
                 </div>
                 <span className="sr-only">Sorted distance {fmtDistance(used)}</span>
               </button>

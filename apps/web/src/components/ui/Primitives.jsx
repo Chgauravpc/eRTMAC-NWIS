@@ -30,7 +30,7 @@ export function Button({ className, variant = 'primary', size = 'md', ...props }
 }
 
 export function Card({ className, ...props }) {
-  return <div className={cn('bg-white shadow rounded-lg p-4 border border-gray-200', className)} {...props} />;
+  return <div className={cn('bg-[#111827] shadow-lg shadow-black/20 rounded-xl p-5 border border-gray-800/60', className)} {...props} />;
 }
 
 export function Badge({ className, children, ...props }) {
@@ -77,11 +77,11 @@ export function Spinner({ className }) {
  */
 export function EmptyState({ message, title, icon: Icon = Inbox, action, className }) {
   return (
-    <div className={cn('flex flex-col items-center text-center py-10 px-4 text-gray-500', className)}>
-      <Icon className="h-8 w-8 mb-3 text-gray-400" aria-hidden="true" />
-      {title && <h2 className="text-lg font-semibold text-gray-800 mb-1">{title}</h2>}
-      <p>{message || 'No data available.'}</p>
-      {action && <div className="mt-4">{action}</div>}
+    <div className={cn('flex flex-col items-center text-center py-12 px-4 text-gray-400', className)}>
+      <Icon className="h-10 w-10 mb-4 text-gray-600" aria-hidden="true" />
+      {title && <h2 className="text-lg font-semibold text-gray-200 mb-1 tracking-wide">{title}</h2>}
+      <p className="text-sm">{message || 'No data available.'}</p>
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
 }
@@ -89,14 +89,14 @@ export function EmptyState({ message, title, icon: Icon = Inbox, action, classNa
 /** Error state with an optional Retry button (onRetry). */
 export function ErrorState({ message, title, onRetry, className }) {
   return (
-    <div role="alert" className={cn('p-4 bg-red-50 text-red-700 rounded border border-red-200', className)}>
-      <div className="flex items-start gap-2">
-        <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0" aria-hidden="true" />
+    <div role="alert" className={cn('p-4 bg-red-950/30 text-red-400 rounded-lg border border-red-900/50', className)}>
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-red-500" aria-hidden="true" />
         <div>
-          {title && <div className="font-semibold">{title}</div>}
-          <div>{message || 'An error occurred.'}</div>
+          {title && <div className="font-semibold text-red-300 mb-1">{title}</div>}
+          <div className="text-sm">{message || 'An error occurred.'}</div>
           {onRetry && (
-            <Button variant="outline" size="sm" className="mt-3 bg-white" onClick={onRetry}>
+            <Button variant="outline" size="sm" className="mt-4 border-red-800 text-red-300 hover:bg-red-900/50" onClick={onRetry}>
               Retry
             </Button>
           )}
