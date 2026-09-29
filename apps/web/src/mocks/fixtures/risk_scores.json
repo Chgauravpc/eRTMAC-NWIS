@@ -1,12 +1,2524 @@
 [
   {
-    "wellbore_id": "mock-wellbore-id",
-    "md_from_m": 2400.0,
-    "md_to_m": 2425.0,
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2405.0,
+    "md_to_m": 2430.0,
     "risk_type": "losses",
-    "fused": 62.5,
+    "l1": 0.55,
+    "l2": 0.5,
+    "l3": 0.85,
+    "fused": 59.5,
+    "band": "elevated",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2430.0,
+    "md_to_m": 2455.0,
+    "risk_type": "losses",
+    "l1": 0.6,
+    "l2": 0.55,
+    "l3": null,
+    "fused": 58.1,
+    "band": "elevated",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2455.0,
+    "md_to_m": 2480.0,
+    "risk_type": "losses",
+    "l1": 0.78,
+    "l2": 0.7,
+    "l3": null,
+    "fused": 75.0,
+    "band": "high",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2480.0,
+    "md_to_m": 2505.0,
+    "risk_type": "losses",
+    "l1": 0.8,
+    "l2": 0.72,
+    "l3": null,
+    "fused": 77.0,
+    "band": "high",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2505.0,
+    "md_to_m": 2530.0,
+    "risk_type": "losses",
+    "l1": 0.7,
+    "l2": 0.66,
+    "l3": null,
+    "fused": 68.5,
+    "band": "high",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2530.0,
+    "md_to_m": 2555.0,
+    "risk_type": "losses",
+    "l1": 0.45,
+    "l2": 0.4,
+    "l3": null,
+    "fused": 43.1,
+    "band": "elevated",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2555.0,
+    "md_to_m": 2580.0,
+    "risk_type": "losses",
+    "l1": 0.3,
+    "l2": 0.28,
+    "l3": null,
+    "fused": 29.2,
+    "band": "moderate",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2580.0,
+    "md_to_m": 2605.0,
+    "risk_type": "losses",
+    "l1": 0.22,
+    "l2": 0.25,
+    "l3": null,
+    "fused": 23.1,
+    "band": "moderate",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2605.0,
+    "md_to_m": 2630.0,
+    "risk_type": "losses",
+    "l1": 0.2,
+    "l2": 0.22,
+    "l3": null,
+    "fused": 20.8,
+    "band": "moderate",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2630.0,
+    "md_to_m": 2655.0,
+    "risk_type": "losses",
+    "l1": 0.15,
+    "l2": 0.18,
+    "l3": null,
+    "fused": 16.1,
+    "band": "low",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2655.0,
+    "md_to_m": 2680.0,
+    "risk_type": "losses",
+    "l1": 0.12,
+    "l2": 0.15,
+    "l3": null,
+    "fused": 13.1,
+    "band": "low",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2680.0,
+    "md_to_m": 2705.0,
+    "risk_type": "losses",
+    "l1": 0.1,
+    "l2": 0.12,
+    "l3": null,
+    "fused": 10.7,
+    "band": "low",
+    "confidence": "high",
+    "confidence_reason": "3 offsets within 10 km; mean event confidence 0.85",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "flow_out_minus_in_trend",
+        "value": 0.14
+      },
+      {
+        "kind": "shap",
+        "feature": "formation_tipam_sand_fraction",
+        "value": 0.09
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000001",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "loss_partial",
+        "npt_h": 12.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 37
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000002",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "loss_partial",
+        "npt_h": 8.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 12
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2405.0,
+    "md_to_m": 2430.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.3,
+    "l2": 0.28,
+    "l3": 0.3,
+    "fused": 29.4,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2430.0,
+    "md_to_m": 2455.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.32,
+    "l2": 0.3,
+    "l3": null,
+    "fused": 31.2,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2455.0,
+    "md_to_m": 2480.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.4,
+    "l2": 0.38,
+    "l3": null,
+    "fused": 39.2,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2480.0,
+    "md_to_m": 2505.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.55,
+    "l2": 0.5,
+    "l3": null,
+    "fused": 53.1,
     "band": "elevated",
     "confidence": "medium",
-    "reasons": []
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2505.0,
+    "md_to_m": 2530.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.65,
+    "l2": 0.6,
+    "l3": null,
+    "fused": 63.1,
+    "band": "high",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2530.0,
+    "md_to_m": 2555.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.62,
+    "l2": 0.58,
+    "l3": null,
+    "fused": 60.5,
+    "band": "high",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2555.0,
+    "md_to_m": 2580.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.5,
+    "l2": 0.48,
+    "l3": null,
+    "fused": 49.2,
+    "band": "elevated",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2580.0,
+    "md_to_m": 2605.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.42,
+    "l2": 0.4,
+    "l3": null,
+    "fused": 41.2,
+    "band": "elevated",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2605.0,
+    "md_to_m": 2630.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.35,
+    "l2": 0.33,
+    "l3": null,
+    "fused": 34.2,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2630.0,
+    "md_to_m": 2655.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.3,
+    "l2": 0.3,
+    "l3": null,
+    "fused": 30.0,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2655.0,
+    "md_to_m": 2680.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.28,
+    "l2": 0.27,
+    "l3": null,
+    "fused": 27.6,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2680.0,
+    "md_to_m": 2705.0,
+    "risk_type": "stuck_pipe",
+    "l1": 0.25,
+    "l2": 0.25,
+    "l3": null,
+    "fused": 25.0,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "overpull_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "mud_overbalance_sg",
+        "value": 0.08
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000003",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "stuck_pipe_diff",
+        "npt_h": 18.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 4
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000004",
+        "well_name": "SYN-DLJ-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000002",
+        "depth_distance_m": 850.0,
+        "event_type": "tight_hole",
+        "npt_h": 4.0,
+        "doc_id": "00000000-0000-4000-d000-000000000001",
+        "page": 41
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2405.0,
+    "md_to_m": 2430.0,
+    "risk_type": "kick",
+    "l1": 0.05,
+    "l2": 0.06,
+    "l3": 0.05,
+    "fused": 5.3,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2430.0,
+    "md_to_m": 2455.0,
+    "risk_type": "kick",
+    "l1": 0.06,
+    "l2": 0.06,
+    "l3": null,
+    "fused": 6.0,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2455.0,
+    "md_to_m": 2480.0,
+    "risk_type": "kick",
+    "l1": 0.08,
+    "l2": 0.09,
+    "l3": null,
+    "fused": 8.4,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2480.0,
+    "md_to_m": 2505.0,
+    "risk_type": "kick",
+    "l1": 0.1,
+    "l2": 0.12,
+    "l3": null,
+    "fused": 10.7,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2505.0,
+    "md_to_m": 2530.0,
+    "risk_type": "kick",
+    "l1": 0.14,
+    "l2": 0.16,
+    "l3": null,
+    "fused": 14.8,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2530.0,
+    "md_to_m": 2555.0,
+    "risk_type": "kick",
+    "l1": 0.4,
+    "l2": 0.45,
+    "l3": null,
+    "fused": 41.9,
+    "band": "elevated",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2555.0,
+    "md_to_m": 2580.0,
+    "risk_type": "kick",
+    "l1": 0.7,
+    "l2": 0.72,
+    "l3": null,
+    "fused": 70.7,
+    "band": "high",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2580.0,
+    "md_to_m": 2605.0,
+    "risk_type": "kick",
+    "l1": 0.88,
+    "l2": 0.85,
+    "l3": null,
+    "fused": 86.9,
+    "band": "critical",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2605.0,
+    "md_to_m": 2630.0,
+    "risk_type": "kick",
+    "l1": 0.92,
+    "l2": 0.9,
+    "l3": null,
+    "fused": 91.2,
+    "band": "critical",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2630.0,
+    "md_to_m": 2655.0,
+    "risk_type": "kick",
+    "l1": 0.8,
+    "l2": 0.78,
+    "l3": null,
+    "fused": 79.2,
+    "band": "high",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2655.0,
+    "md_to_m": 2680.0,
+    "risk_type": "kick",
+    "l1": 0.6,
+    "l2": 0.58,
+    "l3": null,
+    "fused": 59.2,
+    "band": "elevated",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2680.0,
+    "md_to_m": 2705.0,
+    "risk_type": "kick",
+    "l1": 0.4,
+    "l2": 0.38,
+    "l3": null,
+    "fused": 39.2,
+    "band": "moderate",
+    "confidence": "low",
+    "confidence_reason": "1 offset within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "dxc_trend_50m",
+        "value": 0.16
+      },
+      {
+        "kind": "shap",
+        "feature": "gas_total_pct",
+        "value": 0.07
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000005",
+        "well_name": "SYN-NHK-01",
+        "wellbore_id": "00000000-0000-4000-8000-000000000005",
+        "depth_distance_m": 4200.0,
+        "event_type": "kick",
+        "npt_h": 6.0,
+        "doc_id": "00000000-0000-4000-d000-000000000004",
+        "page": 9
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2405.0,
+    "md_to_m": 2430.0,
+    "risk_type": "torque",
+    "l1": 0.25,
+    "l2": 0.3,
+    "l3": 0.35,
+    "fused": 28.5,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2430.0,
+    "md_to_m": 2455.0,
+    "risk_type": "torque",
+    "l1": 0.28,
+    "l2": 0.32,
+    "l3": null,
+    "fused": 29.5,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2455.0,
+    "md_to_m": 2480.0,
+    "risk_type": "torque",
+    "l1": 0.3,
+    "l2": 0.35,
+    "l3": null,
+    "fused": 31.9,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2480.0,
+    "md_to_m": 2505.0,
+    "risk_type": "torque",
+    "l1": 0.34,
+    "l2": 0.38,
+    "l3": null,
+    "fused": 35.5,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2505.0,
+    "md_to_m": 2530.0,
+    "risk_type": "torque",
+    "l1": 0.36,
+    "l2": 0.4,
+    "l3": null,
+    "fused": 37.5,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2530.0,
+    "md_to_m": 2555.0,
+    "risk_type": "torque",
+    "l1": 0.35,
+    "l2": 0.37,
+    "l3": null,
+    "fused": 35.7,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2555.0,
+    "md_to_m": 2580.0,
+    "risk_type": "torque",
+    "l1": 0.33,
+    "l2": 0.35,
+    "l3": null,
+    "fused": 33.8,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2580.0,
+    "md_to_m": 2605.0,
+    "risk_type": "torque",
+    "l1": 0.3,
+    "l2": 0.32,
+    "l3": null,
+    "fused": 30.8,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2605.0,
+    "md_to_m": 2630.0,
+    "risk_type": "torque",
+    "l1": 0.28,
+    "l2": 0.3,
+    "l3": null,
+    "fused": 28.8,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2630.0,
+    "md_to_m": 2655.0,
+    "risk_type": "torque",
+    "l1": 0.25,
+    "l2": 0.28,
+    "l3": null,
+    "fused": 26.1,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2655.0,
+    "md_to_m": 2680.0,
+    "risk_type": "torque",
+    "l1": 0.22,
+    "l2": 0.25,
+    "l3": null,
+    "fused": 23.1,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2680.0,
+    "md_to_m": 2705.0,
+    "risk_type": "torque",
+    "l1": 0.2,
+    "l2": 0.24,
+    "l3": null,
+    "fused": 21.5,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "torque_trend_30m",
+        "value": 0.12
+      },
+      {
+        "kind": "shap",
+        "feature": "rop_drop_pct",
+        "value": 0.05
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000006",
+        "well_name": "SYN-DLJ-02",
+        "wellbore_id": "00000000-0000-4000-8000-000000000003",
+        "depth_distance_m": 1200.0,
+        "event_type": "torque_spike",
+        "npt_h": 3.0,
+        "doc_id": "00000000-0000-4000-d000-000000000002",
+        "page": 20
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2405.0,
+    "md_to_m": 2430.0,
+    "risk_type": "cementing",
+    "l1": null,
+    "l2": 0.12,
+    "l3": null,
+    "fused": 12.0,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "No offset drilled this interval; ML only",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2430.0,
+    "md_to_m": 2455.0,
+    "risk_type": "cementing",
+    "l1": null,
+    "l2": 0.13,
+    "l3": null,
+    "fused": 13.0,
+    "band": "low",
+    "confidence": "low",
+    "confidence_reason": "No offset drilled this interval; ML only",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2455.0,
+    "md_to_m": 2480.0,
+    "risk_type": "cementing",
+    "l1": 0.15,
+    "l2": 0.14,
+    "l3": null,
+    "fused": 14.6,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2480.0,
+    "md_to_m": 2505.0,
+    "risk_type": "cementing",
+    "l1": 0.16,
+    "l2": 0.15,
+    "l3": null,
+    "fused": 15.6,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2505.0,
+    "md_to_m": 2530.0,
+    "risk_type": "cementing",
+    "l1": 0.18,
+    "l2": 0.16,
+    "l3": null,
+    "fused": 17.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Tipam",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2530.0,
+    "md_to_m": 2555.0,
+    "risk_type": "cementing",
+    "l1": 0.2,
+    "l2": 0.18,
+    "l3": null,
+    "fused": 19.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2555.0,
+    "md_to_m": 2580.0,
+    "risk_type": "cementing",
+    "l1": 0.22,
+    "l2": 0.2,
+    "l3": null,
+    "fused": 21.2,
+    "band": "moderate",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2580.0,
+    "md_to_m": 2605.0,
+    "risk_type": "cementing",
+    "l1": 0.2,
+    "l2": 0.18,
+    "l3": null,
+    "fused": 19.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2605.0,
+    "md_to_m": 2630.0,
+    "risk_type": "cementing",
+    "l1": 0.18,
+    "l2": 0.16,
+    "l3": null,
+    "fused": 17.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2630.0,
+    "md_to_m": 2655.0,
+    "risk_type": "cementing",
+    "l1": 0.16,
+    "l2": 0.14,
+    "l3": null,
+    "fused": 15.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2655.0,
+    "md_to_m": 2680.0,
+    "risk_type": "cementing",
+    "l1": 0.14,
+    "l2": 0.12,
+    "l3": null,
+    "fused": 13.3,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
+  },
+  {
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "md_from_m": 2680.0,
+    "md_to_m": 2705.0,
+    "risk_type": "cementing",
+    "l1": 0.12,
+    "l2": 0.1,
+    "l3": null,
+    "fused": 11.2,
+    "band": "low",
+    "confidence": "medium",
+    "confidence_reason": "2 offsets within 10 km; 1 unreviewed event",
+    "reasons": [
+      {
+        "kind": "shap",
+        "feature": "casing_shoe_depth_delta",
+        "value": 0.04
+      },
+      {
+        "kind": "offset_event",
+        "event_id": "00000000-0000-4000-e000-000000000007",
+        "well_name": "SYN-DLJ-04",
+        "wellbore_id": "00000000-0000-4000-8000-000000000004",
+        "depth_distance_m": 1850.0,
+        "event_type": "cement_failure",
+        "npt_h": 5.0,
+        "doc_id": "00000000-0000-4000-d000-000000000003",
+        "page": 30
+      }
+    ],
+    "formation": "Barail",
+    "model_version": "l2-mock-2026-09-29-01",
+    "computed_at": "2026-09-29T10:00:00Z"
   }
 ]

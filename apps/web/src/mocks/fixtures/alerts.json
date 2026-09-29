@@ -1,22 +1,491 @@
 [
   {
-    "id": "mock-alert-uuid",
-    "wellbore_id": "mock-wellbore-id",
+    "id": "00000000-0000-4000-b000-000000000001",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
     "kind": "lookahead",
     "risk_type": "losses",
-    "severity": "watch",
-    "state": "generated",
-    "dedup_key": "x:losses:2400",
-    "zone_md_from_m": 2400.0,
-    "zone_md_to_m": 2425.0,
-    "expected_md_m": 2410.0,
+    "severity": "warning",
+    "state": "sent",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:losses:2450",
+    "zone_md_from_m": 2450,
+    "zone_md_to_m": 2475,
+    "expected_md_m": 2460,
     "formation": "Tipam",
-    "score": 62.5,
+    "score": 72.0,
+    "confidence": "medium",
+    "title": "Mud losses likely in Tipam",
+    "message": "Offset wells SYN-DLJ-01 and SYN-DLJ-02 lost circulation in this part of Tipam (about 20 NPT hours in total).",
+    "recommendation": "Pump an LCM pill before the sand and reduce pump rate; have 20 m3 LCM on site.",
+    "evidence": {
+      "offsets": [
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000002",
+          "well_name": "SYN-DLJ-01",
+          "depth_distance_m": 850.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000001",
+              "event_type": "loss_partial",
+              "md_from_m": 2410.0,
+              "npt_h": 12.0,
+              "doc_id": "00000000-0000-4000-d000-000000000001",
+              "page": 37
+            }
+          ]
+        },
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000003",
+          "well_name": "SYN-DLJ-02",
+          "depth_distance_m": 1200.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000002",
+              "event_type": "loss_partial",
+              "md_from_m": 2432.0,
+              "npt_h": 8.0,
+              "doc_id": "00000000-0000-4000-d000-000000000002",
+              "page": 12
+            }
+          ]
+        }
+      ],
+      "lessons": [
+        {
+          "id": "00000000-0000-4000-f000-000000000001",
+          "title": "Partial losses in Tipam sands",
+          "mitigation": "Pump LCM pill (fine/medium) and reduce pump rate before the sand",
+          "success_rate": 0.8
+        }
+      ],
+      "shap": [
+        {
+          "feature": "flow_out_minus_in_trend",
+          "value": 0.14
+        },
+        {
+          "feature": "formation_tipam_sand_fraction",
+          "value": 0.09
+        }
+      ],
+      "detector": null,
+      "layers": {
+        "l1": 0.78,
+        "l2": 0.7,
+        "l3": null
+      },
+      "sources": [
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000001",
+          "doc_title": "DDR SYN-DLJ-01",
+          "page": 37
+        },
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000002",
+          "doc_title": "DDR SYN-DLJ-02",
+          "page": 12
+        }
+      ]
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-29T09:56:00Z",
+    "sent_at": "2026-09-29T09:57:00Z",
+    "escalated_at": null,
+    "acknowledged_by": null,
+    "acknowledged_at": null,
+    "action_note": null,
+    "resolved_by": null,
+    "resolved_at": null,
+    "resolved_how": null,
+    "outcome": null,
+    "dismiss_reason": null,
+    "useful": null,
+    "feedback_by": null,
+    "feedback_at": null
+  },
+  {
+    "id": "00000000-0000-4000-b000-000000000002",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "kind": "lookahead",
+    "risk_type": "stuck_pipe",
+    "severity": "watch",
+    "state": "viewed",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:stuck_pipe:2500",
+    "zone_md_from_m": 2500,
+    "zone_md_to_m": 2525,
+    "expected_md_m": 2510,
+    "formation": "Tipam",
+    "score": 55.0,
+    "confidence": "low",
+    "title": "Stuck pipe risk building near the Barail top",
+    "message": "One offset (SYN-DLJ-04) was differentially stuck close to this depth; confidence is low.",
+    "recommendation": "Review offset evidence and limit connection time across permeable zones.",
+    "evidence": {
+      "offsets": [
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000004",
+          "well_name": "SYN-DLJ-04",
+          "depth_distance_m": 1850.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000003",
+              "event_type": "stuck_pipe_diff",
+              "md_from_m": 2470.0,
+              "npt_h": 18.0,
+              "doc_id": "00000000-0000-4000-d000-000000000003",
+              "page": 4
+            }
+          ]
+        },
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000002",
+          "well_name": "SYN-DLJ-01",
+          "depth_distance_m": 850.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000004",
+              "event_type": "tight_hole",
+              "md_from_m": 2500.0,
+              "npt_h": 4.0,
+              "doc_id": "00000000-0000-4000-d000-000000000001",
+              "page": 41
+            }
+          ]
+        }
+      ],
+      "lessons": [
+        {
+          "id": "00000000-0000-4000-f000-000000000002",
+          "title": "Differential sticking across depleted sand",
+          "mitigation": "Keep pipe moving, limit connection time, use lubricant pill",
+          "success_rate": 0.65
+        }
+      ],
+      "shap": [
+        {
+          "feature": "overpull_trend_30m",
+          "value": 0.12
+        }
+      ],
+      "detector": null,
+      "layers": {
+        "l1": 0.6,
+        "l2": 0.5,
+        "l3": null
+      },
+      "sources": [
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000003",
+          "doc_title": "DDR SYN-DLJ-04",
+          "page": 4
+        },
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000001",
+          "doc_title": "DDR SYN-DLJ-01",
+          "page": 41
+        }
+      ]
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-29T09:30:00Z",
+    "sent_at": "2026-09-29T09:31:00Z",
+    "escalated_at": null,
+    "acknowledged_by": null,
+    "acknowledged_at": null,
+    "action_note": null,
+    "resolved_by": null,
+    "resolved_at": null,
+    "resolved_how": null,
+    "outcome": null,
+    "dismiss_reason": null,
+    "useful": null,
+    "feedback_by": null,
+    "feedback_at": null
+  },
+  {
+    "id": "00000000-0000-4000-b000-000000000003",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "kind": "detector",
+    "risk_type": "torque",
+    "severity": "critical",
+    "state": "acknowledged",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:torque:2400",
+    "zone_md_from_m": 2405,
+    "zone_md_to_m": 2410,
+    "expected_md_m": 2405,
+    "formation": "Tipam",
+    "score": 88.0,
     "confidence": "high",
-    "title": "High probability of mud losses",
-    "message": "Offset wells experienced losses in this section of Tipam.",
-    "recommendation": "Prepare LCM pills.",
-    "evidence": {},
-    "created_at": "2026-09-29T10:00:00Z"
+    "title": "Torque spike detected at the bit",
+    "message": "Rolling torque z-score exceeded 3.5 for 60 samples.",
+    "recommendation": "Reduce WOB and pump a sweep; watch for pack-off.",
+    "evidence": {
+      "offsets": [],
+      "lessons": [
+        {
+          "id": "00000000-0000-4000-f000-000000000003",
+          "title": "Torque spikes at Tipam shale/sand contacts",
+          "mitigation": "Reduce WOB, increase flow, pump sweep",
+          "success_rate": 0.7
+        }
+      ],
+      "shap": [],
+      "detector": {
+        "name": "torque_spike",
+        "signal": {
+          "z_score": 4.1
+        }
+      },
+      "layers": {
+        "l1": 0.3,
+        "l2": 0.35,
+        "l3": 1.0
+      },
+      "sources": []
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-29T08:30:00Z",
+    "sent_at": "2026-09-29T08:31:00Z",
+    "escalated_at": null,
+    "acknowledged_by": "00000000-0000-4000-a000-000000000002",
+    "acknowledged_at": "2026-09-29T08:35:00Z",
+    "action_note": "Reduced WOB to 30 kN",
+    "resolved_by": null,
+    "resolved_at": null,
+    "resolved_how": null,
+    "outcome": null,
+    "dismiss_reason": null,
+    "useful": null,
+    "feedback_by": null,
+    "feedback_at": null
+  },
+  {
+    "id": "00000000-0000-4000-b000-000000000004",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "kind": "lookahead",
+    "risk_type": "cementing",
+    "severity": "info",
+    "state": "generated",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:cementing:2450",
+    "zone_md_from_m": 2475,
+    "zone_md_to_m": 2500,
+    "expected_md_m": 2485,
+    "formation": "Tipam",
+    "score": 34.0,
+    "confidence": "low",
+    "title": "Cementing issue: low risk ahead",
+    "message": "Only one offset reported cement problems near this depth.",
+    "recommendation": null,
+    "evidence": {
+      "offsets": [
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000004",
+          "well_name": "SYN-DLJ-04",
+          "depth_distance_m": 1850.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000007",
+              "event_type": "cement_failure",
+              "md_from_m": 2440.0,
+              "npt_h": 5.0,
+              "doc_id": "00000000-0000-4000-d000-000000000003",
+              "page": 30
+            }
+          ]
+        }
+      ],
+      "lessons": [],
+      "shap": [
+        {
+          "feature": "casing_shoe_depth_delta",
+          "value": 0.04
+        }
+      ],
+      "detector": null,
+      "layers": {
+        "l1": null,
+        "l2": 0.16,
+        "l3": null
+      },
+      "sources": [
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000003",
+          "doc_title": "DDR SYN-DLJ-04",
+          "page": 30
+        }
+      ]
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-29T09:59:00Z",
+    "sent_at": null,
+    "escalated_at": null,
+    "acknowledged_by": null,
+    "acknowledged_at": null,
+    "action_note": null,
+    "resolved_by": null,
+    "resolved_at": null,
+    "resolved_how": null,
+    "outcome": null,
+    "dismiss_reason": null,
+    "useful": null,
+    "feedback_by": null,
+    "feedback_at": null
+  },
+  {
+    "id": "00000000-0000-4000-b000-000000000005",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "kind": "lookahead",
+    "risk_type": "losses",
+    "severity": "warning",
+    "state": "resolved",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:losses:2350",
+    "zone_md_from_m": 2350,
+    "zone_md_to_m": 2375,
+    "expected_md_m": 2360,
+    "formation": "Tipam",
+    "score": 68.0,
+    "confidence": "medium",
+    "title": "Mud losses expected at 2350 m",
+    "message": "Offsets lost circulation in this interval.",
+    "recommendation": "Pump LCM pill.",
+    "evidence": {
+      "offsets": [
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000002",
+          "well_name": "SYN-DLJ-01",
+          "depth_distance_m": 850.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000001",
+              "event_type": "loss_partial",
+              "md_from_m": 2410.0,
+              "npt_h": 12.0,
+              "doc_id": "00000000-0000-4000-d000-000000000001",
+              "page": 37
+            }
+          ]
+        }
+      ],
+      "lessons": [
+        {
+          "id": "00000000-0000-4000-f000-000000000001",
+          "title": "Partial losses in Tipam sands",
+          "mitigation": "Pump LCM pill (fine/medium) and reduce pump rate before the sand",
+          "success_rate": 0.8
+        }
+      ],
+      "shap": [
+        {
+          "feature": "flow_out_minus_in_trend",
+          "value": 0.11
+        }
+      ],
+      "detector": null,
+      "layers": {
+        "l1": 0.7,
+        "l2": 0.6,
+        "l3": null
+      },
+      "sources": [
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000001",
+          "doc_title": "DDR SYN-DLJ-01",
+          "page": 37
+        }
+      ]
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-29T00:00:00Z",
+    "sent_at": "2026-09-29T00:01:00Z",
+    "escalated_at": null,
+    "acknowledged_by": "00000000-0000-4000-a000-000000000001",
+    "acknowledged_at": "2026-09-29T00:10:00Z",
+    "action_note": null,
+    "resolved_by": "00000000-0000-4000-a000-000000000001",
+    "resolved_at": "2026-09-29T01:40:00Z",
+    "resolved_how": "manual",
+    "outcome": "avoided",
+    "dismiss_reason": null,
+    "useful": null,
+    "feedback_by": null,
+    "feedback_at": null
+  },
+  {
+    "id": "00000000-0000-4000-b000-000000000006",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
+    "kind": "lookahead",
+    "risk_type": "kick",
+    "severity": "warning",
+    "state": "feedback",
+    "dedup_key": "00000000-0000-4000-8000-000000000001:kick:2300",
+    "zone_md_from_m": 2300,
+    "zone_md_to_m": 2325,
+    "expected_md_m": 2310,
+    "formation": "Tipam",
+    "score": 74.0,
+    "confidence": "medium",
+    "title": "Overpressure ahead at 2300 m",
+    "message": "Offset kick in a similar interval.",
+    "recommendation": "Flow-check at the top.",
+    "evidence": {
+      "offsets": [
+        {
+          "wellbore_id": "00000000-0000-4000-8000-000000000005",
+          "well_name": "SYN-NHK-01",
+          "depth_distance_m": 4200.0,
+          "events": [
+            {
+              "id": "00000000-0000-4000-e000-000000000005",
+              "event_type": "kick",
+              "md_from_m": 2560.0,
+              "npt_h": 6.0,
+              "doc_id": "00000000-0000-4000-d000-000000000004",
+              "page": 9
+            }
+          ]
+        }
+      ],
+      "lessons": [
+        {
+          "id": "00000000-0000-4000-f000-000000000004",
+          "title": "Gas kick at top of Barail",
+          "mitigation": "Raise mud weight 0.03 SG before Barail, flow-check at top",
+          "success_rate": 0.9
+        }
+      ],
+      "shap": [
+        {
+          "feature": "dxc_trend_50m",
+          "value": 0.13
+        }
+      ],
+      "detector": null,
+      "layers": {
+        "l1": 0.7,
+        "l2": 0.7,
+        "l3": null
+      },
+      "sources": [
+        {
+          "doc_id": "00000000-0000-4000-d000-000000000004",
+          "doc_title": "DDR SYN-NHK-01",
+          "page": 9
+        }
+      ]
+    },
+    "model_version": "l2-mock-2026-09-29-01",
+    "created_at": "2026-09-28T14:00:00Z",
+    "sent_at": "2026-09-28T14:01:00Z",
+    "escalated_at": null,
+    "acknowledged_by": "00000000-0000-4000-a000-000000000001",
+    "acknowledged_at": "2026-09-28T14:10:00Z",
+    "action_note": null,
+    "resolved_by": "00000000-0000-4000-a000-000000000001",
+    "resolved_at": "2026-09-28T15:40:00Z",
+    "resolved_how": "manual",
+    "outcome": "event_occurred",
+    "dismiss_reason": null,
+    "useful": true,
+    "feedback_by": "00000000-0000-4000-a000-000000000001",
+    "feedback_at": "2026-09-28T15:50:00Z"
   }
 ]

@@ -19,3 +19,19 @@
   background-color: #111;
   color: #f1f1f1;
 }
+
+/* Baseline: every focusable element shows a visible keyboard focus ring (a11y, PRD FE-17). */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid theme('colors.blue.500');
+  outline-offset: 2px;
+}
+.rig :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline-color: theme('colors.sky.300');
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

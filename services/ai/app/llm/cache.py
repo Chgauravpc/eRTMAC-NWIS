@@ -12,6 +12,9 @@ import json
 from typing import Any
 
 from app.db import execute, fetch_one
+from app.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 def cache_key(system: str, user: str, schema_name: str) -> str:
@@ -21,13 +24,26 @@ def cache_key(system: str, user: str, schema_name: str) -> str:
 
 
 async def get_cached(prompt_hash: str) -> dict[str, Any] | None:
-    return await fetch_one(
-        "select provider, model, response from llm_cache where prompt_hash = %(prompt_hash)s",
-        {"prompt_hash": prompt_hash},
-    )
+    """Best-effort read: the cache is an optimisation, so a DB failure is a miss, not an error."""
+    try:
+        return await fetch_one(
+            "select provider, model, response from llm_cache where prompt_hash = %(prompt_hash)s",
+            {"prompt_hash": prompt_hash},
+        )
+    except Exception:
+        logger.warning("llm_cache_read_failed prompt_hash=%s", prompt_hash, exc_info=True)
+        return None
 
 
 async def set_cached(prompt_hash: str, provider: str, model: str, response: Any) -> None:
+    """Best-effort write: never fail an LLM call because the cache could not be written."""
+    try:
+        await _write_cached(prompt_hash, provider, model, response)
+    except Exception:
+        logger.warning("llm_cache_write_failed prompt_hash=%s", prompt_hash, exc_info=True)
+
+
+async def _write_cached(prompt_hash: str, provider: str, model: str, response: Any) -> None:
     await execute(
         """
         insert into llm_cache (prompt_hash, provider, model, response)

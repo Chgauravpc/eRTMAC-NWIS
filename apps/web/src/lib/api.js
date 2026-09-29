@@ -39,3 +39,32 @@ export async function apiFetch(path, options = {}) {
   if (res.status === 204) return null;
   return res.json();
 }
+
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '');
+
+const withBase = (path) => {
+  if (path.startsWith('http') || path.startsWith(`${API_BASE}/`)) return path; // already absolute / already prefixed
+  return `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
+/**
+ * Thin REST helper over apiFetch for the Node routes (contract §9.2).
+ * Paths are relative to VITE_API_BASE (default `/api`), e.g. api.get('/wells/123/correlation', { params }).
+ */
+export const api = {
+  get(path, { params, ...options } = {}) {
+    const qs = params
+      ? '?' +
+        new URLSearchParams(
+          Object.entries(params).filter(([, v]) => v !== undefined && v !== null && v !== '')
+        ).toString()
+      : '';
+    return apiFetch(withBase(path) + (qs === '?' ? '' : qs), { ...options, method: 'GET' });
+  },
+  post(path, body, options = {}) {
+    return apiFetch(withBase(path), { ...options, method: 'POST', body: body === undefined ? undefined : JSON.stringify(body) });
+  },
+  patch(path, body, options = {}) {
+    return apiFetch(withBase(path), { ...options, method: 'PATCH', body: JSON.stringify(body) });
+  },
+};

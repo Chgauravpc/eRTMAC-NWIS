@@ -51,7 +51,7 @@ insert into formations (
   'Upper Assam',
   5,
   array['losses'::risk_type]
-);
+) on conflict (name) do nothing; -- seed.sql already provides Tipam
 
 -- 5. Insert formation top
 insert into formation_tops (

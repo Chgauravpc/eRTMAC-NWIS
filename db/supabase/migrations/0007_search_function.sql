@@ -25,23 +25,31 @@ language sql
 stable
 security invoker
 as $$
-  with kw as (
+  with kw_top as (
     select
       c.id,
-      row_number() over (order by ts_rank_cd(c.tsv, websearch_to_tsquery('english', p_query)) desc) as rank_ix
+      ts_rank_cd(c.tsv, websearch_to_tsquery('english', p_query)) as s
     from chunks c
     where p_query is not null
       and trim(p_query) <> ''
       and c.tsv @@ websearch_to_tsquery('english', p_query)
+    order by s desc, c.id
+    limit 50
+  ),
+  kw as (
+    select id, row_number() over (order by s desc, id) as rank_ix from kw_top
+  ),
+  vec_top as (
+    select
+      c.id,
+      c.embedding <=> p_embedding as dist
+    from chunks c
+    where p_embedding is not null
+    order by c.embedding <=> p_embedding
     limit 50
   ),
   vec as (
-    select
-      c.id,
-      row_number() over (order by c.embedding <=> p_embedding asc) as rank_ix
-    from chunks c
-    where p_embedding is not null
-    limit 50
+    select id, row_number() over (order by dist, id) as rank_ix from vec_top
   ),
   fused as (
     select

@@ -1,0 +1,300 @@
+[
+  {
+    "id": "30000000-0000-4000-a000-000000000001",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": {
+      "raw": "Partial losses",
+      "value": "loss_partial",
+      "unit": null
+    },
+    "reason": null,
+    "bbox": {
+      "x": 0.08,
+      "y": 0.3,
+      "w": 0.55,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "event_type",
+    "confidence": 0.84
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000002",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": {
+      "raw": "2395 m",
+      "value": 2395,
+      "unit": "m"
+    },
+    "reason": null,
+    "bbox": {
+      "x": 0.08,
+      "y": 0.36,
+      "w": 0.3,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "md_from_m",
+    "confidence": 0.78
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000003",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": {
+      "raw": "3720 m",
+      "value": 3720,
+      "unit": "m"
+    },
+    "reason": "failed_rule:depth_gt_td",
+    "bbox": {
+      "x": 0.08,
+      "y": 0.42,
+      "w": 0.34,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "md_to_m",
+    "confidence": 0.45
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000004",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": null,
+    "reason": "unknown_formation",
+    "bbox": {
+      "x": 0.08,
+      "y": 0.48,
+      "w": 0.32,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "formation",
+    "confidence": 0.5
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000005",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": {
+      "raw": "264 bbl",
+      "value": 41.97,
+      "unit": "m3"
+    },
+    "reason": "low_ocr_confidence",
+    "bbox": {
+      "x": 0.08,
+      "y": 0.54,
+      "w": 0.32,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "volume_m3",
+    "confidence": 0.6
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000006",
+    "entity_id": "40000000-0000-4000-a000-000000000001",
+    "value": "Partial losses 15 m3/h while drilling",
+    "reason": "snippet_not_found",
+    "bbox": null,
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 1,
+    "entity": "event",
+    "field": "description",
+    "confidence": 0.4
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000007",
+    "entity_id": "40000000-0000-4000-a000-000000000002",
+    "value": {
+      "raw": "BARAIL",
+      "value": "Barail",
+      "unit": null
+    },
+    "reason": null,
+    "bbox": {
+      "x": 0.08,
+      "y": 0.2,
+      "w": 0.3,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 2,
+    "entity": "formation_top",
+    "field": "formation",
+    "confidence": 0.8
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000008",
+    "entity_id": "40000000-0000-4000-a000-000000000002",
+    "value": {
+      "raw": "2,310.5 m",
+      "value": 2310.5,
+      "unit": "m"
+    },
+    "reason": "low_ocr_confidence",
+    "bbox": {
+      "x": 0.08,
+      "y": 0.26,
+      "w": 0.3,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000002",
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page": 2,
+    "entity": "formation_top",
+    "field": "top_md_m",
+    "confidence": 0.62
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000009",
+    "entity_id": "40000000-0000-4000-a000-000000000003",
+    "value": {
+      "raw": "2400 m",
+      "value": 2400,
+      "unit": "m"
+    },
+    "reason": null,
+    "bbox": {
+      "x": 0.08,
+      "y": 0.22,
+      "w": 0.25,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000003",
+    "doc_id": "10000000-0000-4000-a000-000000000003",
+    "page": 1,
+    "entity": "mud_record",
+    "field": "md_m",
+    "confidence": 0.83
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000010",
+    "entity_id": "40000000-0000-4000-a000-000000000003",
+    "value": {
+      "raw": "2.9 SG",
+      "value": 2.9,
+      "unit": "SG"
+    },
+    "reason": "failed_rule:mw_out_of_range",
+    "bbox": {
+      "x": 0.08,
+      "y": 0.28,
+      "w": 0.3,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000003",
+    "doc_id": "10000000-0000-4000-a000-000000000003",
+    "page": 1,
+    "entity": "mud_record",
+    "field": "mw_sg",
+    "confidence": 0.3
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000011",
+    "entity_id": "40000000-0000-4000-a000-000000000003",
+    "value": 1.25,
+    "reason": null,
+    "bbox": {
+      "x": 0.08,
+      "y": 0.34,
+      "w": 0.25,
+      "h": 0.03
+    },
+    "review_status": "pending",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000003",
+    "doc_id": "10000000-0000-4000-a000-000000000003",
+    "page": 1,
+    "entity": "mud_record",
+    "field": "ecd_sg",
+    "confidence": 0.8
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000012",
+    "entity_id": "40000000-0000-4000-a000-000000000101",
+    "value": {
+      "raw": "Partial losses",
+      "value": "loss_partial",
+      "unit": null
+    },
+    "reason": null,
+    "bbox": null,
+    "review_status": "auto_approved",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000001",
+    "doc_id": "10000000-0000-4000-a000-000000000001",
+    "page": 2,
+    "entity": "event",
+    "field": "event_type",
+    "confidence": 0.93
+  },
+  {
+    "id": "30000000-0000-4000-a000-000000000013",
+    "entity_id": "40000000-0000-4000-a000-000000000101",
+    "value": {
+      "raw": "2395 m",
+      "value": 2395,
+      "unit": "m"
+    },
+    "reason": null,
+    "bbox": null,
+    "review_status": "auto_approved",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "job_id": "20000000-0000-4000-a000-000000000001",
+    "doc_id": "10000000-0000-4000-a000-000000000001",
+    "page": 2,
+    "entity": "event",
+    "field": "md_from_m",
+    "confidence": 0.9
+  }
+]

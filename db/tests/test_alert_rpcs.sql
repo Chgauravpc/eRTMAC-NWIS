@@ -561,6 +561,70 @@ $$;
 
 
 --------------------------------------------------------------------------------
+-- TEST 7b: review_field hardening (protected columns, missing target, bad cast)
+--------------------------------------------------------------------------------
+do $$
+declare
+  v_well_id uuid := 'b0000001-0000-0000-0000-000000000001';
+  v_wb_a uuid := 'b0000002-0000-0000-0000-000000000001';
+  v_doc_id uuid := 'd0000001-0000-0000-0000-000000000001';
+  v_job_id uuid := 'd0000002-0000-0000-0000-000000000001';
+  v_event_id uuid := 'e0000001-0000-0000-0000-000000000001';
+  v_f_prot uuid := 'f0000001-0000-0000-0000-000000000011';
+  v_f_null uuid := 'f0000001-0000-0000-0000-000000000012';
+  v_f_cast uuid := 'f0000001-0000-0000-0000-000000000013';
+  v_wb_after uuid;
+  v_status review_status;
+  v_msg text;
+begin
+  reset role;
+  insert into extracted_fields (id, job_id, doc_id, entity, entity_id, field, value, confidence, review_status)
+  values
+    (v_f_prot, v_job_id, v_doc_id, 'event', v_event_id, 'wellbore_id', to_jsonb(v_well_id::text), 0.5, 'pending'),
+    (v_f_null, v_job_id, v_doc_id, 'event', null, 'description', '{"value":"orphan"}', 0.5, 'pending'),
+    (v_f_cast, v_job_id, v_doc_id, 'event', v_event_id, 'md_from_m', '{"value":"not a number"}', 0.5, 'pending');
+
+  set local role authenticated;
+  set local request.jwt.claims = '{"sub":"a0000001-0000-0000-0000-000000000005"}'; -- reviewer
+
+  -- protected column must be refused and must not change the row
+  begin
+    perform review_field(v_f_prot, 'approve');
+    raise exception 'Assertion failed: protected column wellbore_id was accepted';
+  exception when others then
+    get stacked diagnostics v_msg = message_text;
+    if v_msg not like 'NWIS_BAD_REQUEST%' then raise exception 'Assertion failed: protected column, wrong error: %', v_msg; end if;
+  end;
+  select wellbore_id into v_wb_after from events where id = v_event_id;
+  if v_wb_after <> v_wb_a then raise exception 'Assertion failed: events.wellbore_id was modified via review'; end if;
+
+  -- no target row: must be refused, field must stay pending
+  begin
+    perform review_field(v_f_null, 'approve');
+    raise exception 'Assertion failed: field without entity_id was approved';
+  exception when others then
+    get stacked diagnostics v_msg = message_text;
+    if v_msg not like 'NWIS_BAD_REQUEST%' then raise exception 'Assertion failed: null entity_id, wrong error: %', v_msg; end if;
+  end;
+  select review_status into v_status from extracted_fields where id = v_f_null;
+  if v_status <> 'pending' then raise exception 'Assertion failed: orphan field status changed to %', v_status; end if;
+
+  -- bad cast: NWIS_BAD_REQUEST, not a raw Postgres error
+  begin
+    perform review_field(v_f_cast, 'approve');
+    raise exception 'Assertion failed: non-numeric value was accepted for md_from_m';
+  exception when others then
+    get stacked diagnostics v_msg = message_text;
+    if v_msg not like 'NWIS_BAD_REQUEST%' then raise exception 'Assertion failed: bad cast, wrong error: %', v_msg; end if;
+  end;
+
+  reset role;
+  delete from extracted_fields where id in (v_f_prot, v_f_null, v_f_cast);
+end;
+$$;
+
+
+--------------------------------------------------------------------------------
 -- TEST 8: audit_log check
 --------------------------------------------------------------------------------
 do $$

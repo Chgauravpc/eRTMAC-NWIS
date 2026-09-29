@@ -82,3 +82,32 @@ Environment variables used by the database loaders and services:
    select extname from pg_extension where extname in ('postgis', 'vector', 'pg_trgm');
    ```
    Expected result: 3 rows returned (`postgis`, `vector`, `pg_trgm`).
+
+## Test accounts and roles
+
+New sign-ups get the default role `office_engineer` (trigger `handle_new_user`). Create five accounts in
+**Authentication -> Users** (or let them sign up), then promote them in the SQL editor:
+
+```sql
+update profiles set role = 'admin',         full_name = 'Test Admin'    where id = (select id from auth.users where email = 'admin@nwis.test');
+update profiles set role = 'rtoc_engineer', full_name = 'Test RTOC'     where id = (select id from auth.users where email = 'rtoc@nwis.test');
+update profiles set role = 'reviewer',      full_name = 'Test Reviewer' where id = (select id from auth.users where email = 'reviewer@nwis.test');
+update profiles set role = 'office_engineer', full_name = 'Test Office' where id = (select id from auth.users where email = 'office@nwis.test');
+-- rig engineers only see alerts on wellbores in assigned_wellbore_ids
+update profiles set role = 'rig_engineer',  full_name = 'Test Rig',
+       assigned_wellbore_ids = array[]::uuid[]  -- fill with wellbore ids once wells exist
+ where id = (select id from auth.users where email = 'rig@nwis.test');
+```
+
+## Running the SQL tests
+
+Every file in `db/tests/` is a self-contained script that ends in `rollback;` and raises an exception on
+any failed assertion. Apply migrations `0001`-`0010` and `seed.sql` first, then run each file, e.g.
+
+```bash
+for t in db/tests/*.sql; do psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$t" || break; done
+```
+
+A non-zero exit code means a failed assertion. To run against a throw-away local database, use the
+`supabase/postgres` Docker image (it ships PostGIS and pgvector) and create minimal `auth`/`storage` stubs,
+or use `supabase start` from `db/`.

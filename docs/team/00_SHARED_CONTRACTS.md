@@ -916,7 +916,7 @@ System alerts: `Stream lost` (kind `system`, severity `warning`) is generated wh
 | `AI_SERVICE_URL` | Node | `https://<user>-nwis-ai.hf.space` |
 | `SERVICE_TOKEN` | Node, Space | long random string — **secret** |
 | `GROQ_API_KEY` | Space | **secret** |
-| `GROQ_MODEL` | Space | `llama-3.3-70b-versatile` (confirm availability) |
+| `GROQ_MODEL` | Space | `openai/gpt-oss-20b` (verified with `--ping`; `llama-3.3-70b-versatile` is retired on Groq) |
 | `OPENROUTER_API_KEY` | Space | **secret** |
 | `OPENROUTER_MODEL` | Space | a `:free` model chosen after bake-off |
 | `EMBED_MODEL` | Space, loaders | `BAAI/bge-small-en-v1.5` (384 dims) |

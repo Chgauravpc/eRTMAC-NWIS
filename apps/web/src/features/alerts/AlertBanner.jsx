@@ -1,71 +1,105 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Bell, WifiOff } from 'lucide-react';
+import { useProfile } from '../auth/useProfile';
+import { severityRank } from '../../lib/risk';
+import { useAlertActions, useRealtimeConnected } from '../../lib/hooks/alerts';
 import { useAlerts } from './AlertProvider';
 import { canAcknowledge } from './permissions';
-import { useProfile } from '../auth/useProfile';
-import { supabase } from '../../lib/supabase';
-import { BAND_META } from '../../lib/risk';
-import { Button } from '../../components/ui/Primitives';
-import { isSoundEnabled, setSoundEnabled } from './sound';
+import { depthPhrase, isPinned } from './alertUtils';
+import { SeverityBadge } from '../risk/BandBadge';
 
-export function AlertBanner() {
-  const { alerts, notificationPermission, requestNotificationPermission } = useAlerts();
-  const { profile } = useProfile();
-  const [soundEnabled, setLocalSoundEnabled] = useState(isSoundEnabled());
+// Contrast: black on orange-300 and white on red-800 are both above 7:1.
+const TONE = {
+  warning: 'bg-orange-300 text-black border-orange-700',
+  critical: 'bg-red-800 text-white border-red-950',
+};
 
-  const handleToggleSound = () => {
-    const next = !soundEnabled;
-    setSoundEnabled(next);
-    setLocalSoundEnabled(next);
-  };
-
-  const topAlert = alerts
-    .filter(a => ['sent', 'viewed', 'escalated'].includes(a.state) && ['warning', 'critical'].includes(a.severity))
-    .sort((a, b) => new Date(b.sent_at || 0) - new Date(a.sent_at || 0))[0];
-
-  const handleAck = async (alert) => {
-    try {
-      await supabase.rpc('ack_alert', { p_alert: alert.id });
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
+/** Live connection indicator (PRD §9: show "Reconnecting…" when Realtime drops). */
+export function ConnectionIndicator() {
+  const connected = useRealtimeConnected();
+  if (connected) return null;
   return (
-    <>
-      {(!soundEnabled || notificationPermission === 'default') && (
-        <div className="bg-gray-800 text-gray-300 px-6 py-3 flex items-center justify-between text-sm border-b border-gray-700">
-          <span>Enable alert sounds and notifications to avoid missing critical risks.</span>
-          <div className="flex gap-3">
-            {!soundEnabled && <Button variant="outline" size="sm" onClick={handleToggleSound}>Enable Sound</Button>}
-            {notificationPermission === 'default' && <Button variant="outline" size="sm" onClick={requestNotificationPermission}>Enable Notifications</Button>}
-          </div>
-        </div>
-      )}
-
-      {topAlert && (
-        <div 
-          className={`${BAND_META[topAlert.risk_band || 'critical']?.color || 'bg-red-500 text-white'} p-4 flex justify-between items-center shadow-lg font-bold text-lg`}
-          aria-live={topAlert.severity === 'critical' ? 'assertive' : 'polite'}
-        >
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">⚠️</span>
-            <span>
-              {topAlert.title}
-              <span className="mx-3 opacity-50">•</span>
-              {topAlert.wellbore_id}
-              <span className="mx-3 opacity-50">•</span>
-              Zone: {topAlert.zone_md_from_m}m - {topAlert.zone_md_to_m}m
-              {topAlert.state === 'escalated' && <span className="ml-4 bg-black/30 px-2 py-1 rounded text-xs uppercase tracking-wider">Escalated to RTOC Lead</span>}
-            </span>
-          </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={() => { /* View logic implemented later */ }}>View Details</Button>
-            {canAcknowledge(profile, topAlert) && (
-              <Button onClick={() => handleAck(topAlert)}>Acknowledge</Button>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+    <div role="status" className="flex items-center gap-2 bg-gray-900 px-4 py-2 text-lg font-semibold text-white">
+      <WifiOff size={16} aria-hidden="true" /> Reconnecting… live updates are paused; open alerts are refetched when the link returns.
+    </div>
   );
 }
+
+/**
+ * Top-of-screen banner for unacknowledged warning/critical alerts (states generated, sent, viewed,
+ * escalated). Shows title, well NAME and "~N m ahead"; "View" opens the alert card full screen.
+ */
+export function AlertBanner() {
+  const { alerts, wellNames, bitDepths, openAlert, notificationPermission, requestNotificationPermission } = useAlerts();
+  const { profile } = useProfile();
+  const actions = useAlertActions();
+
+  const pinned = alerts
+    .filter(isPinned)
+    .sort((a, b) => severityRank(b.severity) - severityRank(a.severity) || Date.parse(b.created_at) - Date.parse(a.created_at));
+  const top = pinned[0];
+  const canAsk = typeof Notification !== 'undefined' && notificationPermission === 'default';
+
+  return (
+    <div data-testid="alert-banner-region">
+      <ConnectionIndicator />
+      {canAsk && (
+        <div className="flex justify-end bg-gray-100 px-4 py-1">
+          <button
+            type="button"
+            onClick={requestNotificationPermission}
+            className="inline-flex min-h-[48px] items-center gap-2 text-lg font-medium text-gray-900 underline"
+          >
+            <Bell size={16} aria-hidden="true" /> Enable browser notifications
+          </button>
+        </div>
+      )}
+      {top && (
+        <div
+          role={top.severity === 'critical' ? 'alert' : 'status'}
+          aria-live={top.severity === 'critical' ? 'assertive' : 'polite'}
+          aria-atomic="true"
+          data-severity={top.severity}
+          className={`flex flex-wrap items-center justify-between gap-3 border-b-4 px-4 py-3 text-lg ${TONE[top.severity]}`}
+        >
+          <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+            <SeverityBadge severity={top.severity} kind={top.kind} large className="bg-white text-black" />
+            <strong>{top.title}</strong>
+            <span>· {wellNames[top.wellbore_id] ?? top.well_name ?? 'Unknown well'}</span>
+            {depthPhrase(top, bitDepths[top.wellbore_id]) && <span>· {depthPhrase(top, bitDepths[top.wellbore_id])}</span>}
+            {top.state === 'escalated' && (
+              <span className="rounded border-2 border-current px-2 font-bold">Escalated to RTOC lead</span>
+            )}
+            {pinned.length > 1 && <span>(+{pinned.length - 1} more)</span>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => openAlert(top)}
+              className="min-h-[48px] min-w-[48px] rounded-lg border-2 border-current px-4 font-semibold"
+            >
+              View
+            </button>
+            {canAcknowledge(profile, top) && (
+              <button
+                type="button"
+                disabled={actions.pending}
+                onClick={() => actions.ack(top.id)}
+                className="min-h-[48px] min-w-[48px] rounded-lg border-2 border-current bg-white px-4 font-semibold text-black disabled:opacity-60"
+              >
+                Acknowledge
+              </button>
+            )}
+          </div>
+          {actions.error && (
+            <p role="alert" className="w-full rounded bg-white px-3 py-1 font-medium text-red-900">
+              {actions.error.message}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default AlertBanner;

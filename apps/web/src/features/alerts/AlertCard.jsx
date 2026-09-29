@@ -1,110 +1,186 @@
-import React, { useEffect } from 'react';
-import { BAND_META } from '../../lib/risk';
+import React from 'react';
+import { Check, Circle, ShieldAlert } from 'lucide-react';
+import { format } from 'date-fns';
+import { RISK_LABELS } from '../../lib/constants';
+import { bandFor } from '../../lib/risk';
+import { fmtDepth } from '../../lib/units';
+import { useMarkViewedOnOpen, useMyAlertView, useWellNames } from '../../lib/hooks/alerts';
+import { BandBadge, ConfidenceChip, SeverityBadge } from '../risk/BandBadge';
 import { EvidencePanel } from './EvidencePanel';
 import { AlertActions } from './AlertActions';
 import { FeedbackBar } from './FeedbackBar';
-import { markAlertViewed } from '../../lib/data/alerts';
-import { fmtTimeAgo } from '../../lib/units';
 
-export function AlertCard({ alert, user, onStateChange }) {
-  // Mark as viewed when opened if it's currently 'sent'
-  useEffect(() => {
-    if (alert.state === 'sent') {
-      markAlertViewed(alert.id).then(onStateChange).catch(console.error);
-    }
-  }, [alert.id, alert.state, onStateChange]);
+const STATE_ORDER = ['generated', 'sent', 'viewed', 'escalated', 'acknowledged', 'resolved', 'feedback'];
+const stamp = (iso) => (iso ? format(new Date(iso), 'dd MMM HH:mm:ss') : '');
 
+function whoText(id, user) {
+  if (!id) return '';
+  return id === user?.id ? 'you' : 'another user';
+}
+
+/** Timeline steps (contract §12 lifecycle) with timestamps and who did it. */
+export function buildTimeline(alert, user, myView) {
+  const idx = STATE_ORDER.indexOf(alert.state);
+  const steps = [
+    { key: 'generated', label: 'Generated', time: alert.created_at, done: true },
+    { key: 'sent', label: 'Sent', time: alert.sent_at, done: !!alert.sent_at || idx >= 1 },
+    { key: 'viewed', label: 'Viewed', time: myView?.viewed_at, who: myView ? 'you' : '', done: !!myView || idx >= 2 },
+  ];
+  if (alert.escalated_at || alert.state === 'escalated') {
+    steps.push({ key: 'escalated', label: 'Escalated', time: alert.escalated_at, who: 'system', done: true });
+  }
+  steps.push({
+    key: 'acknowledged',
+    label: 'Acknowledged',
+    time: alert.acknowledged_at,
+    who: whoText(alert.acknowledged_by, user),
+    detail: alert.action_note || '',
+    done: !!alert.acknowledged_at || idx >= 4,
+  });
+  const how = alert.resolved_how === 'auto' ? 'system (auto)' : whoText(alert.resolved_by, user);
+  const outcome = alert.outcome ? String(alert.outcome).replace(/_/g, ' ') : '';
+  steps.push({
+    key: 'resolved',
+    label: alert.resolved_how === 'dismissed' ? 'Dismissed' : 'Resolved',
+    time: alert.resolved_at,
+    who: how,
+    detail: [outcome, alert.dismiss_reason].filter(Boolean).join(' · '),
+    done: !!alert.resolved_at || idx >= 5,
+  });
+  steps.push({
+    key: 'feedback',
+    label: 'Feedback',
+    time: alert.feedback_at,
+    who: whoText(alert.feedback_by, user),
+    detail: alert.useful == null ? '' : alert.useful ? 'useful' : 'not useful',
+    done: !!alert.feedback_at || idx >= 6,
+  });
+  return steps;
+}
+
+function Timeline({ alert, user }) {
+  const { data: myView } = useMyAlertView(alert.id);
+  const steps = buildTimeline(alert, user, myView);
+  return (
+    <ol aria-label="Alert timeline" className="mb-5 flex flex-wrap gap-2 text-sm">
+      {steps.map((s) => (
+        <li
+          key={s.key}
+          data-step={s.key}
+          data-done={s.done ? 'true' : 'false'}
+          className={`flex items-start gap-1.5 rounded border px-2 py-1 ${s.done ? 'border-gray-700 bg-white text-gray-900' : 'border-dashed border-gray-500 text-gray-700'}`}
+        >
+          {s.done ? <Check size={14} aria-hidden="true" className="mt-0.5" /> : <Circle size={14} aria-hidden="true" className="mt-0.5" />}
+          <span>
+            <strong>{s.label}</strong>
+            {s.time ? ` ${stamp(s.time)}` : ''}
+            {s.who ? ` by ${s.who}` : ''}
+            {s.detail ? ` (${s.detail})` : ''}
+          </span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/**
+ * One alert: severity + band, confidence, score, risk type, zone, expected depth, formation, time,
+ * state timeline, message, recommendation, evidence and the lifecycle actions.
+ * Opening the card records a view once per user (mark_alert_viewed) whatever the state.
+ */
+export function AlertCard({ alert, user, large = false }) {
+  useMarkViewedOnOpen(alert.id, user?.id);
+  const wellNames = useWellNames();
   const isSystem = alert.kind === 'system';
-  const meta = BAND_META[alert.risk_band] || { color: 'bg-gray-100 text-gray-800 border-gray-200' };
+  const band = alert.score != null ? bandFor(alert.score) : null;
+  const well = wellNames[alert.wellbore_id] ?? alert.well_name ?? null;
 
   return (
-    <div className={`bg-white p-6 rounded-xl border-2 shadow-sm relative ${isSystem ? 'border-gray-800' : meta.color.match(/border-(\w+-\d+)/)?.[0] || 'border-gray-200'}`}>
-      
-      {alert.state === 'escalated' && (
-        <span className="absolute -top-3 -right-3 bg-red-600 text-white text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md z-10 border-2 border-white">
-          Escalated to RTOC Lead
-        </span>
-      )}
-      
-      {isSystem && (
-        <span className="absolute -top-3 -left-3 bg-gray-900 text-white text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md z-10 border-2 border-white flex items-center gap-1">
-          ⚙️ SYSTEM
-        </span>
-      )}
-
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">{alert.title}</h2>
-          
-          <div className="flex flex-wrap gap-2 items-center text-sm mb-4">
-            {!isSystem && <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider border ${meta.color}`}>{alert.severity} • {alert.risk_band}</span>}
-            {isSystem && <span className="bg-gray-800 text-white px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">Warning</span>}
-            
-            <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-200 font-medium">Zone: {alert.zone_md_from_m} - {alert.zone_md_to_m}m</span>
-            
-            {!isSystem && alert.formation && <span className="bg-blue-50 text-blue-800 px-2 py-1 rounded border border-blue-200 font-medium">{alert.formation}</span>}
-            
-            {!isSystem && alert.confidence && <span className="bg-amber-50 text-amber-800 px-2 py-1 rounded border border-amber-200 font-medium">Conf: <span className="capitalize">{alert.confidence}</span></span>}
-          </div>
-        </div>
-        
-        {!isSystem && alert.fused != null && (
-          <div className="flex flex-col items-end">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Fused Score</span>
-            <div className={`text-4xl font-black ${meta.color.split(' ')[1]}`}>{Math.round(alert.fused)}</div>
-          </div>
+    <article
+      aria-label={`Alert: ${alert.title}`}
+      data-alert-id={alert.id}
+      data-state={alert.state}
+      className={`relative rounded-xl border-2 bg-white p-5 text-gray-900 shadow-sm ${isSystem ? 'border-gray-900' : 'border-gray-400'} ${large ? 'text-lg' : ''}`}
+    >
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        {isSystem && (
+          <span className="inline-flex items-center gap-1 rounded bg-gray-900 px-2 py-0.5 text-xs font-bold uppercase text-white">
+            <ShieldAlert size={14} aria-hidden="true" /> System
+          </span>
         )}
-      </div>
-
-      <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg mb-5">
-        <p className="text-gray-900 font-medium text-lg mb-2">{alert.message}</p>
-        {alert.recommendation && (
-          <div className="mt-3 text-blue-900 bg-blue-100/50 p-3 rounded border border-blue-200 text-sm">
-            <span className="font-bold uppercase tracking-wider text-xs block mb-1">Action Recommendation:</span>
-            {alert.recommendation}
-          </div>
-        )}
-      </div>
-
-      {/* Timeline */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 mb-6 bg-white border border-gray-100 p-3 rounded shadow-sm">
-        <span className="font-bold uppercase tracking-wider text-gray-400 mr-2">Timeline:</span>
-        <TimelineStep label="Generated" time={alert.created_at} active={true} />
-        <span className="opacity-50">→</span>
-        <TimelineStep label="Sent" time={alert.sent_at} active={!!alert.sent_at} />
-        <span className="opacity-50">→</span>
-        <TimelineStep label="Viewed" time={alert.viewed_at} active={!!alert.viewed_at} />
-        
+        <SeverityBadge severity={alert.severity} kind={alert.kind} />
+        {band && <BandBadge band={band} score={alert.score} />}
+        {!isSystem && <ConfidenceChip level={alert.confidence} reason={alert.evidence?.confidence_reason} />}
         {alert.state === 'escalated' && (
-          <>
-            <span className="opacity-50">→</span>
-            <TimelineStep label="Escalated" active={true} className="text-red-600 border-red-200 bg-red-50" />
-          </>
+          <span className="rounded border-2 border-red-800 bg-red-50 px-2 py-0.5 text-xs font-bold uppercase text-red-900">
+            Escalated to RTOC lead
+          </span>
         )}
-        
-        <span className="opacity-50">→</span>
-        <TimelineStep label="Acknowledged" time={alert.acknowledged_at} active={!!alert.acknowledged_at} className="text-green-700 border-green-200 bg-green-50" />
-        <span className="opacity-50">→</span>
-        <TimelineStep label="Resolved" time={alert.resolved_at} active={!!alert.resolved_at} className="text-blue-700 border-blue-200 bg-blue-50" />
       </div>
 
-      <EvidencePanel alert={alert} />
+      <h2 className="mb-2 text-2xl font-black">{alert.title}</h2>
 
-      <div className="mt-2">
-        <AlertActions alert={alert} user={user} onStateChange={onStateChange} />
-        <FeedbackBar alert={alert} user={user} />
+      <dl className="mb-4 grid grid-cols-2 gap-x-6 gap-y-1 text-sm md:grid-cols-3">
+        <div>
+          <dt className="inline font-semibold">Well: </dt>
+          <dd className="inline">{well ?? 'Unknown well'}</dd>
+        </div>
+        {alert.risk_type && (
+          <div>
+            <dt className="inline font-semibold">Risk: </dt>
+            <dd className="inline">{RISK_LABELS[alert.risk_type] ?? alert.risk_type}</dd>
+          </div>
+        )}
+        {alert.score != null && (
+          <div>
+            <dt className="inline font-semibold">Score: </dt>
+            <dd className="inline">{Math.round(alert.score)} / 100</dd>
+          </div>
+        )}
+        {alert.zone_md_from_m != null && (
+          <div>
+            <dt className="inline font-semibold">Zone: </dt>
+            <dd className="inline">
+              {alert.zone_md_from_m}–{alert.zone_md_to_m} m
+            </dd>
+          </div>
+        )}
+        {alert.expected_md_m != null && (
+          <div>
+            <dt className="inline font-semibold">Expected depth: </dt>
+            <dd className="inline">{fmtDepth(alert.expected_md_m)}</dd>
+          </div>
+        )}
+        {alert.formation && (
+          <div>
+            <dt className="inline font-semibold">Formation: </dt>
+            <dd className="inline">{alert.formation}</dd>
+          </div>
+        )}
+        <div>
+          <dt className="inline font-semibold">Raised: </dt>
+          <dd className="inline">{stamp(alert.created_at)}</dd>
+        </div>
+      </dl>
+
+      <div className="mb-4 rounded-lg border border-gray-400 bg-gray-50 p-4">
+        <p className="font-medium">{alert.message}</p>
+        {alert.recommendation && (
+          <p className="mt-3 rounded border border-blue-800 bg-blue-50 p-3 text-blue-950">
+            <strong className="block text-xs uppercase tracking-wide">Recommendation</strong>
+            {alert.recommendation}
+          </p>
+        )}
       </div>
-    </div>
+
+      <Timeline alert={alert} user={user} />
+
+      {!isSystem && <EvidencePanel alert={alert} />}
+
+      <AlertActions alert={alert} user={user} />
+      <FeedbackBar alert={alert} user={user} />
+    </article>
   );
 }
 
-function TimelineStep({ label, time, active, className = "text-gray-800 border-gray-300 bg-gray-100" }) {
-  if (!active) return <span className="opacity-50 font-medium">{label}</span>;
-  
-  return (
-    <span className={`px-2 py-0.5 rounded border font-bold flex gap-2 items-center ${className}`}>
-      {label}
-      {time && <span className="font-normal opacity-75 text-[10px]">{fmtTimeAgo(time)}</span>}
-    </span>
-  );
-}
+export default AlertCard;

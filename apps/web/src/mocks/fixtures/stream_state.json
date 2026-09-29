@@ -1,6 +1,6 @@
 [
   {
-    "wellbore_id": "mock-wellbore-id",
+    "wellbore_id": "00000000-0000-4000-8000-000000000001",
     "status": "live",
     "source": "synthetic",
     "speed": 1,
@@ -12,9 +12,15 @@
       "wob_kn": 45.2,
       "rpm": 120,
       "torque_knm": 14.2,
+      "spp_bar": 182.0,
       "flow_in_lpm": 2000,
       "flow_out_lpm": 1950,
-      "pit_vol_m3": 40.5
-    }
+      "pit_vol_m3": 40.5,
+      "hookload_kn": 1320.0,
+      "mw_sg": 1.18,
+      "ecd_sg": 1.22,
+      "gas_total_pct": 0.4
+    },
+    "updated_at": "2026-09-29T10:00:00Z"
   }
 ]

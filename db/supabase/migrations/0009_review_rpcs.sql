@@ -63,6 +63,11 @@ begin
       raise exception using errcode = 'P0001', message = 'NWIS_BAD_REQUEST: unsupported entity ' || v_rec.entity;
   end case;
 
+  -- Structural / identity columns can never be changed through review
+  if v_rec.field in ('id', 'wellbore_id', 'well_id', 'doc_id', 'job_id', 'provenance', 'review_status', 'created_at', 'updated_at') then
+    raise exception using errcode = 'P0001', message = 'NWIS_BAD_REQUEST: column ' || v_rec.field || ' is protected and cannot be reviewed';
+  end if;
+
   -- Verify column exists in information_schema.columns
   select data_type, udt_name into v_data_type, v_udt_name
   from information_schema.columns
@@ -111,6 +116,11 @@ begin
     end if;
 
     -- Dynamic update using format() and %I with type-safe casting
+    if v_rec.entity <> 'survey_station' and v_target_id is null then
+      raise exception using errcode = 'P0001', message = 'NWIS_BAD_REQUEST: extracted field has no target row to update';
+    end if;
+
+    begin
     if v_rec.entity = 'survey_station' then
       v_wb_id := coalesce((v_new_json->>'wellbore_id')::uuid, (select wellbore_id from documents where id = v_rec.doc_id));
       v_md_m := coalesce((v_new_json->>'md_m')::real, (v_rec.value->>'md_m')::real);
@@ -163,6 +173,10 @@ begin
         end if;
       end if;
     end if;
+    exception
+      when data_exception or integrity_constraint_violation then
+        raise exception using errcode = 'P0001', message = 'NWIS_BAD_REQUEST: value cannot be stored in ' || v_table || '.' || v_rec.field;
+    end;
 
     -- Update extracted_fields
     if p_action = 'edit' then

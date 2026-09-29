@@ -1,49 +1,53 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { bboxToPercentStyle } from './bbox';
 
-export function PageViewer({ imageUrl, selectedField }) {
-  const imgRef = useRef(null);
-  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    if (imgRef.current) {
-      setImgSize({ width: imgRef.current.width, height: imgRef.current.height });
-    }
-  }, [imageUrl]);
-
-  const onImgLoad = (e) => {
-    setImgSize({ width: e.target.width, height: e.target.height });
-  };
+/**
+ * Page image with the selected field's bbox highlighted.
+ * The wrapper is exactly the size of the image (no border/padding, image is display:block), so the
+ * percentage overlay (bbox fractions x 100) lines up with the text on the page at any zoom.
+ */
+export function PageViewer({ imageUrl, selectedField, loading = false }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [imageUrl]);
 
   if (!imageUrl) {
-    return <div className="text-gray-500 font-bold mt-20 uppercase tracking-widest text-sm animate-pulse">Waiting for page image...</div>;
+    return (
+      <div role="status" className="mt-20 text-sm font-bold uppercase tracking-widest text-gray-400">
+        {loading ? 'Loading page image…' : 'No image available for this page'}
+      </div>
+    );
+  }
+  if (failed) {
+    return (
+      <div role="alert" className="mt-20 text-sm font-bold text-red-400">
+        The page image could not be loaded.
+      </div>
+    );
   }
 
-  // bbox jsonb format: {"x":0.12,"y":0.40,"w":0.30,"h":0.03} fractions of page
-  const bbox = selectedField?.bbox;
+  const style = bboxToPercentStyle(selectedField?.bbox);
 
   return (
-    <div className="relative inline-block border-4 border-white shadow-2xl bg-white max-w-full">
-      <img 
-        ref={imgRef}
-        src={imageUrl} 
-        alt="Document Page" 
-        onLoad={onImgLoad}
-        className="max-w-full h-auto object-contain transition-opacity duration-300"
-        style={{ maxHeight: 'calc(100vh - 120px)' }}
+    <div className="relative inline-block max-w-full bg-white shadow-2xl" data-testid="page-frame">
+      <img
+        src={imageUrl}
+        alt="Document page"
+        onError={() => setFailed(true)}
+        className="block h-auto max-w-full"
+        style={{ maxHeight: 'calc(100vh - 140px)' }}
       />
-      {bbox && imgSize.width > 0 && (
-        <div 
-          className="absolute border-2 border-amber-400 bg-amber-400/20 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)] z-10 transition-all duration-300 ease-out pointer-events-none"
-          style={{
-            left: `${bbox.x * 100}%`,
-            top: `${bbox.y * 100}%`,
-            width: `${bbox.w * 100}%`,
-            height: `${bbox.h * 100}%`,
-          }}
-        >
-          <div className="absolute -top-3 -left-1 bg-amber-400 text-amber-900 text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded shadow-sm">
-            Target
-          </div>
+      {style && (
+        <div
+          data-testid="bbox-overlay"
+          aria-label="Highlighted text location for the selected field"
+          role="img"
+          className="pointer-events-none absolute z-10 rounded-sm border-2 border-amber-500 bg-amber-300/30 transition-all duration-200"
+          style={style}
+        />
+      )}
+      {selectedField && !style && (
+        <div className="absolute left-2 top-2 rounded bg-gray-900/80 px-2 py-1 text-xs font-bold text-white">
+          No location recorded for this field
         </div>
       )}
     </div>

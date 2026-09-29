@@ -113,4 +113,83 @@ begin
 end;
 $$;
 
+-- Ordering: add offsets at 1 km and 3 km, expect ascending surface distance
+insert into wells (id, name, surface, provenance, status)
+values
+  ('44444444-0000-0000-0000-000000000001', 'SYN-GEO-N1', ST_Project(ST_GeogFromText('SRID=4326;POINT(95.30 27.35)'), 3000.0, pi()), 'synthetic', 'completed'),
+  ('55555555-0000-0000-0000-000000000001', 'SYN-GEO-N2', ST_Project(ST_GeogFromText('SRID=4326;POINT(95.30 27.35)'), 1000.0, 0.0), 'synthetic', 'completed');
+insert into wellbores (id, well_id, name, kind, is_primary)
+values
+  ('44444444-0000-0000-0000-000000000002', '44444444-0000-0000-0000-000000000001', 'SYN-GEO-N1-WB1', 'vertical', true),
+  ('55555555-0000-0000-0000-000000000002', '55555555-0000-0000-0000-000000000001', 'SYN-GEO-N2-WB1', 'vertical', true);
+
+do $$
+declare
+  v_names text[];
+  v_sorted text[];
+begin
+  select array_agg(well_name order by ord) into v_names
+  from (select well_name, row_number() over () as ord
+        from offsets_within('11111111-0000-0000-0000-000000000002', 5000.0)) s;
+  if v_names is distinct from array['SYN-GEO-N2', 'SYN-GEO-DEV2', 'SYN-GEO-N1'] then
+    raise exception 'Assertion 7 failed: offsets not ordered by distance / self not excluded: %', v_names;
+  end if;
+  if exists (select 1 from offsets_within('11111111-0000-0000-0000-000000000002', 5000.0)
+             where surface_distance_m > 5000.0 or well_name = 'SYN-GEO-V1') then
+    raise exception 'Assertion 7b failed: radius or self-exclusion violated';
+  end if;
+end;
+$$;
+
+-- Performance (DB-04 acceptance): every function < 200 ms with 50 wells
+insert into wells (id, name, surface, provenance, status)
+select gen_random_uuid(), 'SYN-PERF-' || g,
+       ST_Project(ST_GeogFromText('SRID=4326;POINT(95.30 27.35)'), 500 + (g * 190)::float, (g * 0.7)::float),
+       'synthetic', 'completed'
+from generate_series(1, 50) g;
+insert into wellbores (id, well_id, name, kind, is_primary)
+select gen_random_uuid(), id, name || '-WB1', 'deviated', true from wells where name like 'SYN-PERF-%';
+insert into survey_stations (wellbore_id, md_m, inc_deg, azi_deg, tvd_m, north_m, east_m, dls_deg_per_30m)
+select b.id, s.md, 20, 45, s.md * 0.95, s.md * 0.1, s.md * 0.1, 0.3
+from wellbores b, (values (0.0), (1000.0), (2000.0), (3000.0)) s(md)
+where b.name like 'SYN-PERF-%';
+insert into formation_tops (wellbore_id, formation, top_md_m, source, provenance)
+select b.id, f.name, f.md, 'actual', 'synthetic'
+from wellbores b, (values ('Girujan', 800.0), ('Tipam', 1800.0), ('Barail', 2600.0)) f(name, md)
+where b.name like 'SYN-PERF-%';
+insert into events (wellbore_id, event_type, risk_type, md_from_m, md_to_m, formation, description, provenance)
+select b.id, 'loss_partial', 'losses', 1900.0, 1950.0, 'Tipam', 'perf', 'synthetic'
+from wellbores b where b.name like 'SYN-PERF-%';
+
+do $$
+declare
+  t0 timestamptz;
+  ms numeric;
+  n int;
+begin
+  t0 := clock_timestamp();
+  select count(*) into n from offsets_within('11111111-0000-0000-0000-000000000002', 25000.0);
+  ms := extract(epoch from clock_timestamp() - t0) * 1000;
+  if n < 50 or ms > 200 then raise exception 'Assertion 8a failed: offsets_within % rows in % ms', n, ms; end if;
+
+  t0 := clock_timestamp();
+  select count(*) into n from offsets_within('11111111-0000-0000-0000-000000000002', 25000.0, 2000.0, 'depth');
+  ms := extract(epoch from clock_timestamp() - t0) * 1000;
+  if n < 50 or ms > 200 then raise exception 'Assertion 8b failed: offsets_within depth % rows in % ms', n, ms; end if;
+
+  t0 := clock_timestamp();
+  select count(*) into n from events_for_offsets('11111111-0000-0000-0000-000000000002', 25000.0);
+  ms := extract(epoch from clock_timestamp() - t0) * 1000;
+  if n < 50 or ms > 200 then raise exception 'Assertion 8c failed: events_for_offsets % rows in % ms', n, ms; end if;
+
+  t0 := clock_timestamp();
+  perform well_position_at_md(id, 1500.0) from wellbores where name like 'SYN-PERF-%' limit 1;
+  perform formation_at_md(id, 1500.0) from wellbores where name like 'SYN-PERF-%' limit 1;
+  ms := extract(epoch from clock_timestamp() - t0) * 1000;
+  if ms > 200 then raise exception 'Assertion 8d failed: position/formation lookup % ms', ms; end if;
+
+  raise notice 'DB-04 ordering and performance assertions passed (50 wells).';
+end;
+$$;
+
 rollback;

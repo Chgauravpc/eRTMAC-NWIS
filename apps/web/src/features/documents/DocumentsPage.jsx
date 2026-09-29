@@ -1,135 +1,142 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { FileText, Info, RotateCcw, XCircle } from 'lucide-react';
 import { UploadDropzone } from './UploadDropzone';
 import { DocumentList } from './DocumentList';
-import { getUploadUrl, uploadToStorage, submitDocumentRecord } from '../../lib/data/documents';
 import { JobProgress } from './JobProgress';
-import { Button } from '../../components/ui/Primitives';
+import { registerDocument, runUpload } from './uploadFlow';
+
+let nextId = 0;
+const newId = () => `upload-${Date.now()}-${nextId++}`;
+
+function UploadRow({ entry, onRetryUpload, onRetryRegister }) {
+  const sizeMb = (entry.file.size / 1024 / 1024).toFixed(2);
+  return (
+    <li className="flex flex-col justify-between rounded-lg border border-gray-200 bg-gray-50/50 p-4 shadow-sm md:flex-row md:items-center">
+      <div className="mr-4 flex-1">
+        <div className="mb-1 flex items-center gap-3">
+          <FileText className="h-5 w-5 text-gray-500" aria-hidden="true" />
+          <span className="truncate font-bold text-gray-800">{entry.file.name}</span>
+        </div>
+        <div className="mb-3 ml-8 text-xs font-medium uppercase tracking-wider text-gray-500">Size: {sizeMb} MB</div>
+
+        <div className="ml-8">
+          {entry.status === 'uploading' && (
+            <div className="w-full">
+              <div className="mb-1 flex justify-between text-[10px] font-bold uppercase tracking-wider text-blue-600">
+                <span>Uploading</span>
+                <span>{Math.round(entry.progress)}%</span>
+              </div>
+              <div
+                role="progressbar"
+                aria-label={`Uploading ${entry.file.name}`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(entry.progress)}
+                className="h-1.5 w-full rounded-full bg-blue-100"
+              >
+                <div className="h-1.5 rounded-full bg-blue-500 transition-all" style={{ width: `${entry.progress}%` }} />
+              </div>
+            </div>
+          )}
+
+          {entry.status === 'registering' && <div className="text-sm font-bold text-blue-600">Registering document…</div>}
+
+          {entry.status === 'processing' && (
+            <JobProgress jobId={entry.jobId} docId={entry.docId} onRetry={() => onRetryRegister(entry.id)} />
+          )}
+
+          {entry.status === 'duplicate' && (
+            <div className="flex items-center justify-between rounded border border-blue-100 bg-blue-50 p-3 text-sm font-bold text-blue-700">
+              <span className="flex items-center gap-2">
+                <Info className="h-4 w-4" aria-hidden="true" />
+                Already in the library
+              </span>
+              <Link
+                to={`/search?doc=${entry.docId}`}
+                className="rounded border border-blue-300 bg-white px-3 py-1 text-xs uppercase tracking-wider hover:bg-blue-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                View existing
+              </Link>
+            </div>
+          )}
+
+          {entry.status === 'error' && (
+            <div role="alert" className="flex items-start gap-2 rounded border border-red-100 bg-red-50 p-3 text-sm font-bold text-red-600">
+              <XCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>Error: {entry.errorMsg}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {entry.status === 'error' && (
+        <button
+          type="button"
+          className="mt-4 inline-flex items-center gap-1 rounded border border-gray-300 px-4 py-2 font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 md:mt-0"
+          onClick={() => (entry.uploaded ? onRetryRegister(entry.id) : onRetryUpload(entry.id))}
+        >
+          <RotateCcw className="h-4 w-4" aria-hidden="true" />
+          {entry.uploaded ? 'Retry processing' : 'Retry Upload'}
+        </button>
+      )}
+    </li>
+  );
+}
 
 export function DocumentsPage() {
   const [uploads, setUploads] = useState([]);
+  const uploadsRef = useRef(uploads);
+  useEffect(() => {
+    uploadsRef.current = uploads;
+  }, [uploads]);
+
+  const updateUpload = useCallback((id, changes) => {
+    setUploads((prev) => prev.map((u) => (u.id === id ? { ...u, ...changes } : u)));
+  }, []);
+
+  const start = useCallback(
+    (entry) => runUpload(entry, (changes) => updateUpload(entry.id, changes)),
+    [updateUpload]
+  );
 
   const handleFilesAdded = (newFiles) => {
-    const entries = newFiles.map(f => ({
-      ...f,
-      id: Math.random().toString(36).substring(7),
-    }));
-    setUploads(prev => [...entries, ...prev]);
-
-    // Fire uploads
-    entries.forEach(startUpload);
+    const entries = newFiles.map((f) => ({ ...f, id: newId() }));
+    setUploads((prev) => [...entries, ...prev]);
+    entries.forEach(start);
   };
 
-  const startUpload = async (entry) => {
-    updateUpload(entry.id, { status: 'uploading', progress: 10, errorMsg: null });
-    try {
-      // 1. Get Signed URL
-      const { upload_id, storage_path, signed_url, token } = await getUploadUrl(entry.file);
-      updateUpload(entry.id, { progress: 30 });
-      
-      // 2. Upload Bytes (Fake 40% progress bridge since signed url upload progress isn't directly exposed in JS simply here)
-      await uploadToStorage(storage_path, token, entry.file, (pct) => {
-        updateUpload(entry.id, { progress: 30 + (pct * 0.4) });
-      });
-      updateUpload(entry.id, { progress: 70 });
-      
-      // 3. Register with backend inference pipeline
-      const res = await submitDocumentRecord({
-        storage_path,
-        filename: entry.file.name,
-        well_id: null,
-        wellbore_id: entry.wellboreId,
-        doc_type: entry.docType,
-        provenance: entry.provenance
-      });
-      
-      if (res.duplicate) {
-        updateUpload(entry.id, { 
-          status: 'duplicate', 
-          docId: res.document_id,
-          progress: 100
-        });
-      } else {
-        updateUpload(entry.id, {
-          status: 'processing',
-          jobId: res.job_id,
-          docId: res.document_id,
-          progress: 100
-        });
-      }
-    } catch (err) {
-      updateUpload(entry.id, { status: 'error', errorMsg: err.message });
-    }
+  const latest = (id) => uploadsRef.current.find((u) => u.id === id);
+  // Retry after a failure before the bytes were stored: run the whole flow again.
+  const retryUpload = (id) => {
+    const entry = latest(id);
+    if (entry) start(entry);
   };
-
-  const updateUpload = (id, changes) => {
-    setUploads(prev => prev.map(u => u.id === id ? { ...u, ...changes } : u));
+  // Retry when the file is already in storage (or the job failed): re-POST /api/documents only.
+  const retryRegister = (id) => {
+    const entry = latest(id);
+    if (entry) registerDocument(entry, (changes) => updateUpload(id, changes));
   };
 
   return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto h-full overflow-y-auto">
+    <div className="mx-auto h-full max-w-7xl overflow-y-auto p-4 md:p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Documents Pipeline</h1>
-        <p className="text-gray-500 mt-2">Upload unstructured reports to extract events and predict risks.</p>
+        <h1 className="text-3xl font-black tracking-tight text-gray-900">Documents</h1>
+        <p className="mt-2 text-gray-600">Upload reports to extract events and feed the risk models.</p>
       </div>
-      
+
       <UploadDropzone onFilesAdded={handleFilesAdded} />
-      
+
       {uploads.length > 0 && (
-        <div className="bg-white p-6 rounded-xl border border-blue-200 shadow-md mb-8 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-1 bg-blue-500 h-full"></div>
-          <h2 className="text-lg font-black mb-4 text-gray-800 uppercase tracking-wider">Active Ingestion Pipeline</h2>
-          
-          <div className="space-y-4">
-            {uploads.map(u => (
-              <div key={u.id} className="border border-gray-200 p-4 rounded-lg bg-gray-50/50 flex flex-col md:flex-row md:items-center justify-between shadow-sm">
-                <div className="flex-1 mr-4">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-xl">📄</span>
-                    <span className="font-bold text-gray-800 truncate">{u.file.name}</span>
-                  </div>
-                  <div className="text-xs font-medium uppercase tracking-wider text-gray-400 mb-3 ml-8">
-                    Size: {(u.file.size / 1024 / 1024).toFixed(2)} MB
-                  </div>
-                  
-                  <div className="ml-8">
-                    {u.status === 'uploading' && (
-                      <div className="w-full">
-                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-blue-500 mb-1">
-                          <span>Uploading...</span>
-                          <span>{Math.round(u.progress)}%</span>
-                        </div>
-                        <div className="w-full bg-blue-100 rounded-full h-1.5">
-                          <div className="bg-blue-500 h-1.5 rounded-full transition-all" style={{ width: `${u.progress}%` }}></div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {u.status === 'processing' && (
-                      <JobProgress jobId={u.jobId} docId={u.docId} />
-                    )}
-                    
-                    {u.status === 'duplicate' && (
-                      <div className="text-sm bg-blue-50 text-blue-700 font-bold p-3 rounded border border-blue-100 flex items-center justify-between">
-                        <span>ℹ️ Hash match: File already exists in the library.</span>
-                        <a href={`/search?doc=${u.docId}`} className="uppercase tracking-wider text-xs border border-blue-300 px-3 py-1 rounded bg-white hover:bg-blue-100 transition-colors">View Existing</a>
-                      </div>
-                    )}
-                    
-                    {u.status === 'error' && (
-                      <div className="text-sm text-red-600 font-bold bg-red-50 p-3 rounded border border-red-100">
-                        ❌ Error: {u.errorMsg}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {u.status === 'error' && (
-                  <Button variant="outline" className="mt-4 md:mt-0 shadow-sm border-gray-300" onClick={() => startUpload(u)}>Retry Upload</Button>
-                )}
-              </div>
+        <section aria-label="Active uploads" className="relative mb-8 overflow-hidden rounded-xl border border-blue-200 bg-white p-6 shadow-md">
+          <div className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+          <h2 className="mb-4 text-lg font-black uppercase tracking-wider text-gray-800">Active ingestion</h2>
+          <ul className="space-y-4">
+            {uploads.map((u) => (
+              <UploadRow key={u.id} entry={u} onRetryUpload={retryUpload} onRetryRegister={retryRegister} />
             ))}
-          </div>
-        </div>
+          </ul>
+        </section>
       )}
 
       <DocumentList />

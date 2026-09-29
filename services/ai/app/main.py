@@ -6,12 +6,15 @@ auth, request headers).
 
 from __future__ import annotations
 
+import asyncio
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.config import get_settings
+from app.db import close_pool
 from app.errors import NwisError
 from app.logging import configure_logging, get_logger, request_id_var, user_id_var
 from app.routers import health
@@ -20,7 +23,28 @@ settings = get_settings()
 configure_logging(settings.LOG_LEVEL)
 logger = get_logger(__name__)
 
-app = FastAPI(title="NWIS AI", version="0.1.0")
+async def _warm_up_models() -> None:
+    """Load heavy models off the event loop so /v1/health answers immediately."""
+    try:
+        from app.search import embed
+
+        await asyncio.to_thread(embed._model)
+        logger.info("embedding model warmed up")
+    except Exception:  # never let warm-up take the service down
+        logger.exception("model warm-up failed; models will load lazily on first use")
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    warmup = asyncio.create_task(_warm_up_models())
+    try:
+        yield
+    finally:
+        warmup.cancel()
+        await close_pool()
+
+
+app = FastAPI(title="NWIS AI", version="0.1.0", lifespan=lifespan)
 
 app.include_router(health.router, prefix="/v1")
 

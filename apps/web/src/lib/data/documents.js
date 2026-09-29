@@ -1,79 +1,156 @@
+// Data access for FE-10 (documents + job progress). Components never call supabase/fetch directly.
 import { supabase } from '../supabase';
+import { api } from '../api';
 
-// Assuming Vite proxies or paths are correctly mapped. 
-// If Vercel API is hosted at the same origin, we use relative paths.
-const VERCEL_API = '/api'; 
-// If python API is a separate space, we use its URL. We'll assume proxy or absolute URL setup.
-const PYTHON_API = import.meta.env.VITE_PYTHON_API_URL || '/api'; 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
 
-export async function getUploadUrl(file) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error("Not authenticated");
+const MIME_BY_EXT = {
+  pdf: 'application/pdf',
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  csv: 'text/csv',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  xml: 'application/xml',
+  txt: 'text/plain',
+  las: 'application/octet-stream', // the bucket allows octet-stream for LAS
+};
 
-  const res = await fetch(`${VERCEL_API}/documents/upload-url`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.access_token}`
-    },
-    body: JSON.stringify({
-      filename: file.name,
-      size_bytes: file.size,
-      mime_type: file.type || 'application/octet-stream'
-    })
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Failed to get upload URL: ${err}`);
-  }
-
-  return res.json(); // { upload_id, storage_path, signed_url, token }
+/** mime type sent to /api/documents/upload-url; falls back to the extension when the browser gives none. */
+export function mimeForFile(file) {
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  return file.type || MIME_BY_EXT[ext] || 'application/octet-stream';
 }
 
-export async function uploadToStorage(storagePath, token, file, onProgress) {
-  // Using supabase-js v2 uploadToSignedUrl
-  // Unfortunately supabase-js doesn't natively expose an onProgress for uploadToSignedUrl in all versions,
-  // but we can pass it if supported, or rely on fetch/XMLHttpRequest.
-  // We'll use supabase.storage
-  
-  // NOTE: If onProgress is strictly required we might need XMLHttpRequest. 
-  // Supabase standard client doesn't support onProgress in `uploadToSignedUrl` easily, but we'll simulate or use standard options if they exist.
-  // For the hackathon, we can use XMLHttpRequest to standard signed_url if needed, but the contract explicitly says:
-  // "use with supabase.storage.from('documents').uploadToSignedUrl(storage_path, token, file)"
-  
-  const { data, error } = await supabase.storage
+/** Step 1 (contract §9.2, Node only): ask for a signed upload URL. Returns { upload_id, storage_path, signed_url, token }. */
+export function getUploadUrl(file) {
+  return api.post('/documents/upload-url', {
+    filename: file.name,
+    size_bytes: file.size,
+    mime_type: mimeForFile(file),
+  });
+}
+
+function storageAuthHeaders(session) {
+  const key =
+    supabase.supabaseKey ||
+    import.meta.env.VITE_SUPABASE_ANON_KEY ||
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    'fake-anon-key';
+  return { apikey: key, Authorization: `Bearer ${session?.access_token || key}` };
+}
+
+/**
+ * Step 2: send the bytes straight to Supabase Storage (never through a Vercel function).
+ * Same wire format as supabase-js `uploadToSignedUrl` (PUT multipart to /object/upload/sign/...?token=),
+ * but over XMLHttpRequest so `upload.onprogress` gives REAL byte progress.
+ * @param {(pct: number) => void} [onProgress] called with 0..100
+ * @param {string} [signedUrl] the `signed_url` returned by step 1 (built from the token when absent)
+ */
+export async function uploadToStorage(storagePath, token, file, onProgress, signedUrl) {
+  const { data } = await supabase.auth.getSession();
+  const session = data?.session;
+  const encodedPath = storagePath.split('/').map(encodeURIComponent).join('/');
+  const url =
+    signedUrl ||
+    `${SUPABASE_URL}/storage/v1/object/upload/sign/documents/${encodedPath}?token=${encodeURIComponent(token)}`;
+  const form = new FormData();
+  form.append('cacheControl', '3600');
+  form.append('', file);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('PUT', url);
+    const headers = { ...storageAuthHeaders(session), 'x-upsert': 'false' };
+    Object.entries(headers).forEach(([k, v]) => xhr.setRequestHeader(k, v));
+    xhr.upload.onprogress = (e) => {
+      if (onProgress && e.lengthComputable && e.total > 0) {
+        onProgress(Math.min(100, Math.round((e.loaded / e.total) * 100)));
+      }
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        if (onProgress) onProgress(100);
+        resolve({ path: storagePath });
+      } else {
+        let msg = `Upload failed (HTTP ${xhr.status})`;
+        try {
+          msg = JSON.parse(xhr.responseText).message || msg;
+        } catch {
+          /* keep default message */
+        }
+        reject(new Error(msg));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Upload failed: network error'));
+    xhr.onabort = () => reject(new Error('Upload cancelled'));
+    xhr.send(form);
+  });
+}
+
+/** Step 3 (contract §9.2, Space via Node): register the uploaded object. 202 {document_id, job_id, duplicate:false} | 200 {duplicate:true}. */
+export function submitDocumentRecord(payload) {
+  return api.post('/documents', payload);
+}
+
+const DOC_COLUMNS = 'id, well_id, wellbore_id, doc_type, title, pages, ocr_engine, provenance, uploaded_by, created_at';
+
+/** Documents with their latest job (status lives on jobs) and well name (wells.name). */
+export async function listDocuments() {
+  const { data, error } = await supabase
     .from('documents')
-    .uploadToSignedUrl(storagePath, token, file);
-    
+    .select(`${DOC_COLUMNS}, wells(name), jobs(id, status, stage, progress, error, created_at, updated_at)`)
+    .order('created_at', { ascending: false });
   if (error) throw error;
-  
-  // Fake progress since we wait for it to finish
-  if (onProgress) onProgress(100);
-  
+  const docs = (data || []).map((d) => {
+    const jobs = [...(d.jobs || [])].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    return { ...d, well_name: d.wells?.name ?? null, job: jobs[0] || null };
+  });
+
+  // documents.uploaded_by references auth.users (no FK to profiles), so join by hand.
+  // RLS lets non-admins read only their own profile: names are best-effort.
+  const userIds = [...new Set(docs.map((d) => d.uploaded_by).filter(Boolean))];
+  let names = {};
+  if (userIds.length) {
+    const { data: profs } = await supabase.from('profiles').select('id, full_name').in('id', userIds);
+    names = Object.fromEntries((profs || []).map((p) => [p.id, p.full_name]));
+  }
+  return docs.map((d) => ({ ...d, uploaded_by_name: names[d.uploaded_by] || null }));
+}
+
+/** Current state of one job (initial value before Realtime events arrive). */
+export async function getJob(jobId) {
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('id, doc_id, status, stage, progress, error, updated_at')
+    .eq('id', jobId)
+    .maybeSingle();
+  if (error) throw error;
   return data;
 }
 
-export async function submitDocumentRecord(payload) {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error("Not authenticated");
+async function countRows(table, filters) {
+  let q = supabase.from(table).select('id', { count: 'exact', head: true });
+  for (const [col, op, val] of filters) q = q[op](col, val);
+  const { count, error } = await q;
+  if (error) throw error;
+  return count ?? 0;
+}
 
-  // payload: { storage_path, filename, well_id, wellbore_id, doc_type, provenance }
-  const res = await fetch(`${PYTHON_API}/documents`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${session.access_token}`
-    },
-    body: JSON.stringify(payload)
-  });
+/** Numbers for the final states: events extracted (not rejected) and fields still pending review. */
+export async function getJobSummary(docId) {
+  const [events, pending] = await Promise.all([
+    countRows('events', [['doc_id', 'eq', docId], ['review_status', 'neq', 'rejected']]),
+    countRows('extracted_fields', [['doc_id', 'eq', docId], ['review_status', 'eq', 'pending']]),
+  ]);
+  return { events, pending };
+}
 
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Failed to submit document: ${err}`);
-  }
-  
-  // 202: { document_id, job_id, duplicate: false }
-  // 200: { document_id, job_id: null, duplicate: true }
-  return res.json();
+/** Well choices for the dropzone (v_well_summary). */
+export async function getWellOptions() {
+  const { data, error } = await supabase.from('v_well_summary').select('well_id, wellbore_id, well_name').order('well_name');
+  if (error) throw error;
+  return data || [];
 }

@@ -1,27 +1,30 @@
 import React from 'react';
-import { BAND_META } from '../../lib/risk';
+import { BAND_META, BAND_ORDER } from '../../lib/risk';
+import { BandIcon } from './BandBadge';
 
+/** Contract §11.1 bands with what each means for the engineer (NWIS_PRD F5 table). */
 export function BandLegend() {
-  const bands = [
-    { range: '0–20', key: 'low' },
-    { range: '21–40', key: 'moderate' },
-    { range: '41–60', key: 'elevated' },
-    { range: '61–80', key: 'high' },
-    { range: '81–100', key: 'critical' }
-  ];
-
   return (
-    <div className="flex flex-wrap gap-4 text-sm mt-4 p-2 bg-gray-50 rounded border border-gray-100">
-      {bands.map(b => (
-        <div key={b.key} className="flex items-center gap-2 group relative">
-          <div className={`w-4 h-4 rounded border ${BAND_META[b.key].color}`} />
-          <span><strong>{b.range}</strong> {BAND_META[b.key].label}</span>
-          
-          <div className="hidden group-hover:block absolute bottom-full mb-1 left-0 bg-gray-800 text-white text-xs p-2 rounded shadow-lg whitespace-nowrap z-50">
-            {BAND_META[b.key].meaning}
-          </div>
-        </div>
-      ))}
-    </div>
+    <section aria-label="Risk band legend" className="mt-4">
+      <h3 className="mb-2 text-sm font-semibold text-gray-800">What the bands mean</h3>
+      <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5">
+        {BAND_ORDER.map((key) => {
+          const m = BAND_META[key];
+          return (
+            <li key={key} data-band={key} className={`rounded border-l-4 border p-2 text-sm ${m.color}`}>
+              <div className="flex items-center gap-2 font-semibold">
+                <span aria-hidden="true" className={`inline-block h-3 w-3 rounded-sm ${m.swatch}`} />
+                <BandIcon band={key} />
+                <span>
+                  {m.range} {m.label}
+                </span>
+              </div>
+              <div className="mt-1 text-xs">Alert: {m.alertRaised}</div>
+              <div className="mt-1">{m.meaning}</div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

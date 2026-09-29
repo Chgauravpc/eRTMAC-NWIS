@@ -13,7 +13,9 @@ RUN useradd --create-home --uid 1000 appuser
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# The Space is CPU-only: install the CPU wheel of torch first so pip does not pull the multi-GB CUDA build
+# that sentence-transformers would otherwise depend on.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu     && pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 RUN chown -R appuser:appuser /app

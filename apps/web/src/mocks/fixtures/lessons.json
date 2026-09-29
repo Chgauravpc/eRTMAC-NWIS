@@ -1,0 +1,106 @@
+[
+ {
+  "id": "00000000-0000-4000-c000-000000000001",
+  "formation": "Tipam",
+  "event_type": "loss_partial",
+  "title": "Partial losses in Tipam sands",
+  "problem": "Losses of 6-30 m3/h in unconsolidated Tipam sand when ECD exceeds the fracture window.",
+  "cause": "High permeability sand, ECD above the pore pressure window.",
+  "mitigation": "Reduce flow rate, pump a 30 bbl LCM pill (fine + medium), keep ECD below 1.30 SG.",
+  "outcome": "Losses cured in 8 h on average.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000002",
+   "00000000-0000-4000-b000-000000000003",
+   "00000000-0000-4000-b000-000000000010",
+   "00000000-0000-4000-b000-000000000013",
+   "00000000-0000-4000-b000-000000000017",
+   "00000000-0000-4000-b000-000000000028"
+  ],
+  "well_count": 5,
+  "success_rate": 0.78,
+  "updated_at": "2026-09-15T09:00:00Z"
+ },
+ {
+  "id": "00000000-0000-4000-c000-000000000002",
+  "formation": "Namsang",
+  "event_type": "loss_total",
+  "title": "Total losses in Namsang conglomerate",
+  "problem": "No returns when drilling conglomerate stringers.",
+  "cause": "Fractured conglomerate with high permeability.",
+  "mitigation": "Spot a cement plug, drill ahead with reduced MW and a blind drilling procedure.",
+  "outcome": "Circulation restored after one plug.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000001"
+  ],
+  "well_count": 1,
+  "success_rate": 0.55,
+  "updated_at": "2026-09-15T09:00:00Z"
+ },
+ {
+  "id": "00000000-0000-4000-c000-000000000003",
+  "formation": "Barail",
+  "event_type": "stuck_pipe_mech",
+  "title": "Mechanical sticking in Barail shale",
+  "problem": "Tight hole and overpull on trips through Barail coal and shale.",
+  "cause": "Reactive shale and coal cavings.",
+  "mitigation": "Limit trip speed, backream, keep MW and inhibitor up, sweep before trips.",
+  "outcome": "Freed with jarring in most cases.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000011"
+  ],
+  "well_count": 1,
+  "success_rate": 0.7,
+  "updated_at": "2026-09-15T09:00:00Z"
+ },
+ {
+  "id": "00000000-0000-4000-c000-000000000004",
+  "formation": "Kopili",
+  "event_type": "kick",
+  "title": "Gas influx in Kopili",
+  "problem": "Gas influx with a small pit gain detected on flow-out.",
+  "cause": "Under-balanced pore pressure in gas-bearing Kopili shale.",
+  "mitigation": "Raise MW by 0.05-0.08 SG before drilling the top, flow-check every stand.",
+  "outcome": "Well controlled with the driller method.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000012",
+   "00000000-0000-4000-b000-000000000020",
+   "00000000-0000-4000-b000-000000000021"
+  ],
+  "well_count": 2,
+  "success_rate": 0.85,
+  "updated_at": "2026-09-15T09:00:00Z"
+ },
+ {
+  "id": "00000000-0000-4000-c000-000000000005",
+  "formation": "Tipam",
+  "event_type": "cement_failure",
+  "title": "Poor cement bond across Tipam",
+  "problem": "Cement returns lost and CBL shows a poor bond across Tipam.",
+  "cause": "Losses during cementing, weak formation.",
+  "mitigation": "Use a lightweight lead slurry and centralisers; plan a two-stage job.",
+  "outcome": "Remedial squeeze successful.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000008",
+   "00000000-0000-4000-b000-000000000027"
+  ],
+  "well_count": 2,
+  "success_rate": 0.6,
+  "updated_at": "2026-09-15T09:00:00Z"
+ },
+ {
+  "id": "00000000-0000-4000-c000-000000000006",
+  "formation": "Girujan",
+  "event_type": "tight_hole",
+  "title": "Tight hole in Girujan clay",
+  "problem": "Tight spots and overpull in mottled Girujan clay.",
+  "cause": "Swelling clay.",
+  "mitigation": "Add KCl-polymer inhibition and wiper trips every 300 m.",
+  "outcome": "Backreaming cleared the hole.",
+  "event_ids": [
+   "00000000-0000-4000-b000-000000000007"
+  ],
+  "well_count": 1,
+  "success_rate": 0.65,
+  "updated_at": "2026-09-15T09:00:00Z"
+ }
+]

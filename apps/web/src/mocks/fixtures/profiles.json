@@ -1,0 +1,42 @@
+[
+  {
+    "id": "00000000-0000-4000-a000-000000000001",
+    "email": "rtoc@syn-nwis.test",
+    "full_name": "Priya Sharma",
+    "role": "rtoc_engineer",
+    "assigned_wellbore_ids": [],
+    "created_at": "2026-08-01T09:00:00Z"
+  },
+  {
+    "id": "00000000-0000-4000-a000-000000000002",
+    "email": "rig@syn-nwis.test",
+    "full_name": "Arjun Bora",
+    "role": "rig_engineer",
+    "assigned_wellbore_ids": ["@ACTIVE_WELLBORE_ID"],
+    "created_at": "2026-08-01T09:05:00Z"
+  },
+  {
+    "id": "00000000-0000-4000-a000-000000000003",
+    "email": "office@syn-nwis.test",
+    "full_name": "Meera Iyer",
+    "role": "office_engineer",
+    "assigned_wellbore_ids": [],
+    "created_at": "2026-08-01T09:10:00Z"
+  },
+  {
+    "id": "00000000-0000-4000-a000-000000000004",
+    "email": "reviewer@syn-nwis.test",
+    "full_name": "Rahul Gogoi",
+    "role": "reviewer",
+    "assigned_wellbore_ids": [],
+    "created_at": "2026-08-01T09:15:00Z"
+  },
+  {
+    "id": "00000000-0000-4000-a000-000000000005",
+    "email": "admin@syn-nwis.test",
+    "full_name": "Sunita Das",
+    "role": "admin",
+    "assigned_wellbore_ids": [],
+    "created_at": "2026-08-01T09:20:00Z"
+  }
+]
