@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Info, ExternalLink } from 'lucide-react';
 import { SourceViewer } from './SourceViewer';
+import { ProvenanceBadge } from '../wells/ProvenanceBadge';
 
 export function AnswerView({ answer_md, citations, evidence, provider, cached }) {
   const [activeSource, setActiveSource] = useState(null);
@@ -54,8 +55,9 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
                 className="w-full bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all flex items-center justify-between group"
               >
                 <div>
-                  <div className="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors">
+                  <div className="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                     {c.doc_title}
+                    <ProvenanceBadge provenance={c.provenance} />
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
                     Page {c.page}
@@ -131,8 +133,9 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
                   {c.n}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors">
+                  <div className="font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                     {c.doc_title}
+                    <ProvenanceBadge provenance={c.provenance} />
                   </div>
                   <div className="text-xs text-slate-500 mt-1 line-clamp-2">
                     {c.snippet}

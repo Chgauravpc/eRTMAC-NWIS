@@ -1,0 +1,735 @@
+
+> nwis-web@0.1.0 test
+> vitest run
+
+
+ RUN  v1.6.1 /Users/siddhi/eRTMAC-NWIS/eRTMAC-NWIS/apps/web
+
+ ❯ src/app/app.test.jsx  (35 tests | 35 failed) 9ms
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > rtoc_engineer lands on its home page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > rig_engineer lands on its home page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > office_engineer lands on its home page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > reviewer lands on its home page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > admin lands on its home page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > a rig engineer profile is assigned the active wellbore from mocks/ids.js
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > the picker works without any Supabase session
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > role home pages via the mock role picker > restores a mock session after reload
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > unauthenticated users are sent to /login
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > office_engineer gets a 403 on /admin/users
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > rig_engineer gets a 403 on /alerts
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > rtoc_engineer gets a 403 on /documents
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > reviewer gets a 403 on /planning
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > rtoc_engineer gets a 403 on /admin/models
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > allows a permitted role
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > a rig engineer cannot open the rig view of a wellbore that is not assigned to them
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > a rig engineer can open the assigned rig view
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > guards > unknown paths show a 404 inside the layout
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > /wells/:id redirects to the map tab
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > renders the real correlation tab
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > renders the real risk tab
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > renders the real alerts tab
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > shows the well in the top bar
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > workspace routes > the formation tab is wired (auto-detected optional page)
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > layout > shows user name, role badge, banner and a working sign-out
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > layout > after sign-out protected pages redirect to login again
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > layout > the phone drawer opens and closes
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > rtoc_engineer sees only its links
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > rig_engineer sees only its links
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > office_engineer sees only its links
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > reviewer sees only its links
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > admin sees only its links
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > every visible link is reachable (no link leads to a 403)
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > side nav is filtered by role > the rig link points at the assigned wellbore
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/app/app.test.jsx > ComingSoon placeholder > looks intentional: heading, description and the task it is scheduled under
+     → Cannot read properties of undefined (reading 'clear')
+ ❯ src/features/documents/documents.test.jsx  (18 tests | 6 failed) 339ms
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > runs getUploadUrl -> uploadToStorage -> submitDocumentRecord and then shows the first job stage
+     → useDocuments is not defined
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > wires REAL upload progress from the storage callback to the progress bar
+     → useDocuments is not defined
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > handles a duplicate file with "Already in the library" and a link
+     → useDocuments is not defined
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > shows the error and "Retry Upload" when the URL request fails, and retry restarts the whole flow
+     → useDocuments is not defined
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > retry after a failed registration re-POSTs /api/documents only (no second upload)
+     → useDocuments is not defined
+   ❯ src/features/documents/documents.test.jsx > DocumentsPage upload flow state machine > a job that fails after processing started shows the error and retries by re-POSTing only
+     → useDocuments is not defined
+ ❯ src/features/rig/rig.test.jsx  (15 tests | 15 failed) 17ms
+   ❯ src/features/rig/rig.test.jsx > computeMaxGauges (max fused in the NEXT 300 m of the bit) > finds the maximum per risk type inside [bit, bit + 300]
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > computeMaxGauges (max fused in the NEXT 300 m of the bit) > ignores rows behind the bit and rows beyond bit + 300 m
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > RiskGauges > shows score, band WORD, icon, confidence and the depth of the peak for each of the 5 types
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > DepthPanel > renders the lost-stream bar with the time of loss and the detector message
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > DepthPanel > formats with units.js (kN·m, m³, m) and shows last data
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > useWakeLock > requests a screen wake lock, re-acquires it when the tab is visible again and releases on unmount
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > useWakeLock > reports "unsupported" without navigator.wakeLock
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > shows depth, ROP, torque (kN·m), flows, pit volume and the five gauges from the mock stream
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > formation panel: next formation, distance to its top and "± uncertainty"
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > lessons panel lists at most 3 lessons with mitigation, success rate and well count
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > values update live during replay: advancing the bit changes depth and re-windows the gauges
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > a new risk_scores row arriving through Realtime shows in the gauge without reload
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > the lost-stream bar appears when /api/stream/drop is called and clears when the stream returns
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > banner "View" opens the alert card full screen in the rig theme
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/rig/rig.test.jsx > FE-08 RigView (tablet, 1024x768, .rig theme) > is built for a tablet: .rig theme, no text below 18 px, touch targets >= 48 px
+     → Cannot read properties of undefined (reading 'removeItem')
+ ❯ src/features/alerts/alerts.test.jsx  (41 tests | 41 failed) 52ms
+   ❯ src/features/alerts/alerts.test.jsx > alertUtils > aheadMeters / depthPhrase say "~N m ahead", "at the bit" or fall back to the depth
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > alertUtils > notification body names the well and the depth
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > alertUtils > fmtAge counts mm:ss then hours
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > alertUtils > shouldNotify: new or re-notified (sent_at changed) warning/critical only
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > shows title, well NAME and "~N m ahead" (never an id); aria-live follows severity
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > includes the 'generated' state (no Acknowledge yet: contract only allows sent/viewed/escalated)
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > is not shown for info/watch, acknowledged or resolved alerts
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > shows the "Escalated to RTOC lead" badge
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > "View" opens the alert card full screen
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > Acknowledge from the banner changes state for everyone: banner and sound go away
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > another user acknowledging (Realtime) stops the banner and the sound here too
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > maps a server FORBIDDEN error in plain words (same mapping as the card)
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > maps BAD_STATE to "This alert has changed; refreshed." and refetches
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertBanner > shows the Reconnecting… indicator and refetches open alerts when the link returns
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertProvider notifications and shared list > notifies once for a new critical alert (also under StrictMode) with well name + depth; click focuses the alert
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertProvider notifications and shared list > re-notifies when sent_at changes but not for unrelated updates; info/watch never notify
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertProvider notifications and shared list > does not notify without permission and never runs side effects inside a state updater
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertProvider notifications and shared list > a rig engineer only receives alerts of the assigned wellbore (in.(…) filter + RLS)
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > derives band from score, shows confidence chip, zone, expected depth, formation and message
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > low confidence is dashed, says "Low confidence" and carries the reason in a tooltip
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > renders the evidence JSON: offsets with well/distance/NPT/source link, lessons, SHAP, layers, sources
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > shows the detector signal for detector alerts
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > system alerts get a distinct badge and no evidence panel
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > opening records the view once per user, for ANY state, even across re-opens and StrictMode
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > timeline lists Generated → Sent → Viewed → (Escalated) → Acknowledged → Resolved → Feedback with times and who
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertCard > EvidencePanel tolerates an alert without evidence
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > Acknowledge with an optional note sends p_note and the state changes
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > Resolve asks for an outcome (+ note) and resolves; then feedback can be given, only after resolved
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > Dismiss is offered for info/watch only, requires a reason of >= 5 characters
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > a rig engineer can acknowledge a warning but cannot resolve or dismiss it
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > a rig engineer can resolve and dismiss an info alert once it is sent
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > an office engineer sees no lifecycle buttons at all
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > server BAD_REQUEST / FORBIDDEN / BAD_STATE errors are shown in plain words
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > lifecycle actions > feedback is not offered before resolution or to people who may not rate
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertsPage (/alerts) > queries v_open_alerts, groups by well NAME, pins unacknowledged warning/critical on top
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertsPage (/alerts) > shows running age counters for the pinned alerts
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertsPage (/alerts) > filters by state and sorts by severity or age
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertsPage (/alerts) > new alerts appear live and acknowledged ones leave the pinned list (Realtime)
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > AlertsPage (/alerts) > Open shows the alert card full screen
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > WellAlertsTab > lists open alerts (shared list) and the resolved history with outcome and feedback summary
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/alerts.test.jsx > WellAlertsTab > moves an alert from open to history live when it is resolved (Realtime)
+     → Cannot read properties of undefined (reading 'removeItem')
+     → Cannot read properties of undefined (reading 'clear')
+ ✓ src/features/review/review.test.jsx  (34 tests) 825ms
+ ❯ src/features/review/integration.test.jsx  (8 tests | 8 failed) 5ms
+   ❯ src/features/review/integration.test.jsx > FE-11 acceptance: approving the last field shows the job as done in FE-10 > keyboard-approves every field of a document and the document list flips to Done live
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > review_field through HTTP (contract §7 + migration 0009 errors) > approve / edit / reject set the field status and return the row
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > review_field through HTTP (contract §7 + migration 0009 errors) > NWIS_BAD_REQUEST for an invalid action, edit without value, protected columns and missing target rows
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > review_field through HTTP (contract §7 + migration 0009 errors) > NWIS_NOT_FOUND for unknown fields and NWIS_FORBIDDEN for office engineers
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > review_field through HTTP (contract §7 + migration 0009 errors) > counts events and pending fields for the job summary (HEAD + Content-Range)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > ReviewQueue against the mock backend > groups pending fields by doc_id with well name and counts
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > FE-10 full upload through the mock backend > uploads via signed URL (XHR), registers, shows live stages, needs_review, then done after review
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/review/integration.test.jsx > FE-10 full upload through the mock backend > uploading the same file again reports "Already in the library"
+     → Cannot read properties of undefined (reading 'removeItem')
+ ❯ src/features/risk/risk.test.jsx  (13 tests | 13 failed) 13ms
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > renders 5 risk types x 12 intervals with score, band WORD and icon in every cell
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > asks for risk_scores only in the window bit..bit+300 (never all rows)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > shades the first 50 m as "at bit" and hatches low-confidence cells
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > matches cells by interval overlap: rows not aligned to floor(bit/25)*25 still show
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > shows new risk_scores rows live without a reload (Realtime upsert keyed on type + md range)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > interval detail: score, band, confidence + reason, layers with "not available", SHAP, offset events, lessons
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > keeps SHAP reasons and offset events in separate lists
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > buildOffsetEvents fills gaps from the events lookup and well names
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > Recompute posts to /api/wells/{id}/risk and the strip updates from the response
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > states what the score means and shows the bit depth
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > FE-07 RiskTab > a well without a stream says so instead of showing an empty grid
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > RiskStrip > selection survives a data refresh (selected by risk type + column)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/risk/risk.test.jsx > BandLegend (contract §11.1 + NWIS_PRD F5) > lists all five bands with range, word and what the engineer should do
+     → Cannot read properties of undefined (reading 'removeItem')
+ ✓ src/mocks/mocks.test.js  (10 tests) 200ms
+ ❯ src/dev/dev.test.jsx  (11 tests | 11 failed) 19ms
+   ❯ src/dev/dev.test.jsx > DevPanel gating > shows only with ?demo=1 in mock mode
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel gating > never in a production build, never without mocks
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > has the requested buttons
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > Warning / Critical / Look-ahead insert backend-style alerts for the active wellbore (generated, then sent)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > Advance bit moves the bit 5 m, recomputes the window and announces both on the bus
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > Drop stream calls /api/stream/drop: the stream is lost and a "Live data lost" system alert appears
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > Complete job finishes a running job on the shared bus
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > DevPanel actions (active wellbore from mocks/ids) > Drop Realtime link shows the Reconnecting state and restores it
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > mock PostgREST + Space endpoints > applyQuery honours eq / in / gte / lte / neq / not / is / order / limit
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > mock PostgREST + Space endpoints > restRespond returns an object for .single() and PGRST116 for zero/many rows
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/dev/dev.test.jsx > mock PostgREST + Space endpoints > /api/health, /api/stream/start|stop|speed
+     → Cannot read properties of undefined (reading 'removeItem')
+ ✓ src/features/wells/wells.test.jsx  (10 tests) 373ms
+ ✓ src/features/workspace/map.test.jsx  (26 tests) 1454ms
+ ❯ src/features/alerts/mockRpc.test.js  (28 tests | 28 failed) 30ms
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as rig_assigned: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as rig_other_well: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as rtoc_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as office_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as reviewer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > acknowledge as admin: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as rig_assigned: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as rig_other_well: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as rtoc_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as office_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as reviewer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > resolve as admin: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as rig_assigned: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as rig_other_well: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as rtoc_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as office_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as reviewer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss as admin: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as rig_assigned: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as rig_other_well: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as rtoc_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as office_engineer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as reviewer: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > rate as admin: every state x severity
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > errors have the Supabase shape and map to plain words
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > dismiss needs a reason of >= 5 characters (NWIS_BAD_REQUEST) and info/watch only (NWIS_BAD_STATE)
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > the caller is taken from the mock session token when there is one
+     → Cannot read properties of undefined (reading 'removeItem')
+   ❯ src/features/alerts/mockRpc.test.js > mock RPCs enforce the same rules as permissions.js (contract §12) > mark_alert_viewed records one view per user and moves only sent -> viewed
+     → Cannot read properties of undefined (reading 'removeItem')
+ ❯ src/features/auth/login.test.jsx  (7 tests | 7 failed) 4ms
+   ❯ src/features/auth/login.test.jsx > LoginPage (real mode) > does not show the mock role picker
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > LoginPage (real mode) > shows the plain error message when sign-in fails
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > LoginPage (real mode) > loads the profile after sign-in and lands on the protected page
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > LoginPage (real mode) > Forgot password calls resetPasswordForEmail and confirms without revealing the account
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > LoginPage (real mode) > shows a reset error plainly
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > AuthProvider (real mode) > restores an existing Supabase session and its profile
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/auth/login.test.jsx > AuthProvider (real mode) > reports a missing profile row instead of looping to /login
+     → Cannot read properties of undefined (reading 'clear')
+ ❯ src/features/alerts/sound.test.jsx  (12 tests | 12 failed) 7ms
+   ❯ src/features/alerts/sound.test.jsx > soundLevelFor > only unacknowledged warning/critical alerts make noise; critical wins
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > warning: 2 beeps every 20 s
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > critical: 3 beeps every 8 s
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > info and watch never make sound
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > stops for everyone when the state changes (acknowledged arrives through Realtime)
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > does not restart the interval on unrelated list changes
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > escalating from warning to critical switches cadence immediately
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > alert sound cadence > is silent until the user enables sound, then starts for alerts already open
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > EnableSoundButton > unlocks audio on click, shows the enabled state and persists the choice
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > EnableSoundButton > remembers the choice after a reload
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > EnableSoundButton > survives blocked localStorage
+     → Cannot read properties of undefined (reading 'clear')
+   ❯ src/features/alerts/sound.test.jsx > EnableSoundButton > can be muted again
+     → Cannot read properties of undefined (reading 'clear')
+ ✓ src/lib/validate.test.js  (17 tests) 6ms
+ ✓ src/features/workspace/workspace.test.jsx  (8 tests) 315ms
+ ✓ src/features/alerts/permissions.test.js  (680 tests) 17ms
+ ✓ src/features/correlation/correlation.test.jsx  (19 tests) 2533ms
+ ✓ src/components/ui/ui.test.jsx  (8 tests) 339ms
+ ✓ src/lib/risk.test.js  (19 tests) 6ms
+ ✓ src/features/documents/uploadTransport.test.js  (5 tests) 221ms
+ ✓ src/lib/realtime.test.js  (6 tests) 5ms
+ ✓ src/features/workspace/ReplayPanel.test.jsx  (4 tests) 160ms
+ ✓ src/features/admin/UserDialog.test.jsx  (3 tests) 75ms
+ ✓ src/features/workspace/formation.test.jsx  (7 tests) 738ms
+ ❯ src/features/search/AnswerView.test.jsx  (4 tests | 3 failed) 45ms
+   ❯ src/features/search/AnswerView.test.jsx > AnswerView parsing > parses single citations like [1]
+     → Found multiple elements with the text: 1
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<button[39m
+  [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+  [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+[36m>[39m
+  [0m1[0m
+[36m</button>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+[36m>[39m
+  [0m1[0m
+[36m</div>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"space-y-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl shadow-sm border border-slate-200 p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-4 last:mb-0"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mThis is a test [0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+              [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</button>[39m
+            [36m<span>[39m
+              [0m.[0m
+            [36m</span>[39m
+          [36m</p>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<h4[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-slate-800 mb-3 px-2"[39m
+        [36m>[39m
+          [0mSources Referenced[0m
+        [36m</h4>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"grid grid-cols-1 sm:grid-cols-2 gap-3"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-left bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all group flex items-start gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex-1 min-w-0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2"[39m
+              [36m>[39m
+                [0mWCR-01[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-xs text-slate-500 mt-1 line-clamp-2"[39m
+              [36m>[39m
+                [0mtest[0m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/search/AnswerView.test.jsx > AnswerView parsing > parses adjacent citations like [1][3]
+     → Found multiple elements with the text: 1
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<button[39m
+  [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+  [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+[36m>[39m
+  [0m1[0m
+[36m</button>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+[36m>[39m
+  [0m1[0m
+[36m</div>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"space-y-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl shadow-sm border border-slate-200 p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-4 last:mb-0"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mTest [0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+              [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</button>[39m
+            [36m<span />[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+              [33mtitle[39m=[32m"WCR-02, Page 2"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</button>[39m
+            [36m<span>[39m
+              [0m.[0m
+            [36m</span>[39m
+          [36m</p>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<h4[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-slate-800 mb-3 px-2"[39m
+        [36m>[39m
+          [0mSources Referenced[0m
+        [36m</h4>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"grid grid-cols-1 sm:grid-cols-2 gap-3"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-left bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all group flex items-start gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex-1 min-w-0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2"[39m
+              [36m>[39m
+                [0mWCR-01[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-xs text-slate-500 mt-1 line-clamp-2"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-left bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all group flex items-start gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+            [36m>[39m
+              [0m3[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex-1 min-w-0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2"[39m
+              [36m>[39m
+                [0mWCR-02[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-xs text-slate-500 mt-1 line-clamp-2"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+   ❯ src/features/search/AnswerView.test.jsx > AnswerView parsing > handles unknown numbers gracefully
+     → Found multiple elements with the text: 1
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<button[39m
+  [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+  [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+[36m>[39m
+  [0m1[0m
+[36m</button>[39m
+
+Ignored nodes: comments, script, style
+[36m<div[39m
+  [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+[36m>[39m
+  [0m1[0m
+[36m</div>[39m
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"space-y-6"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33mclass[39m=[32m"bg-white rounded-2xl shadow-sm border border-slate-200 p-8"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"prose prose-slate prose-indigo max-w-none text-slate-700 leading-relaxed"[39m
+        [36m>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"mb-4 last:mb-0"[39m
+          [36m>[39m
+            [36m<span>[39m
+              [0mTest [0m
+            [36m</span>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"[39m
+              [33mtitle[39m=[32m"WCR-01, Page 5"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</button>[39m
+            [36m<span>[39m
+              [0m and [0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-slate-400"[39m
+            [36m>[39m
+              [0m[9][0m
+            [36m</span>[39m
+            [36m<span>[39m
+              [0m.[0m
+            [36m</span>[39m
+          [36m</p>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+      [36m<div>[39m
+        [36m<h4[39m
+          [33mclass[39m=[32m"text-sm font-semibold text-slate-800 mb-3 px-2"[39m
+        [36m>[39m
+          [0mSources Referenced[0m
+        [36m</h4>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"grid grid-cols-1 sm:grid-cols-2 gap-3"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"text-left bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-300 hover:shadow-sm transition-all group flex items-start gap-3"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-6 h-6 shrink-0 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors"[39m
+            [36m>[39m
+              [0m1[0m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex-1 min-w-0"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2"[39m
+              [36m>[39m
+                [0mWCR-01[0m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"text-xs text-slate-500 mt-1 line-clamp-2"[39m
+              [36m/>[39m
+            [36m</div>[39m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ✓ src/features/analytics/aggregation.test.js  (3 tests) 2ms
+ ✓ src/features/auth/auth.test.jsx  (3 tests) 31ms
+ ✓ src/features/planning/PlanningForm.test.jsx  (3 tests) 133ms
+ ✓ src/lib/units.test.js  (7 tests) 2ms
+
+ Test Files  11 failed | 19 passed (30)
+      Tests  179 failed | 885 passed (1064)
+   Start at  22:28:39
+   Duration  5.30s (transform 1.52s, setup 3.74s, collect 7.54s, tests 7.97s, environment 11.11s, prepare 1.49s)
+
