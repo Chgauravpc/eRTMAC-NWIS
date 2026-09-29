@@ -32,12 +32,12 @@ import {
   sortOffsets,
 } from './mapGeo';
 
-const ACCENT = '#1d4ed8';
+const ACCENT = '#3b82f6';
 
 function activeIcon(color) {
   return L.divIcon({
     className: 'active-well-marker',
-    html: `<div style="width:22px;height:22px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 0 0 3px ${ACCENT},0 1px 4px rgba(0,0,0,.5)"></div>`,
+    html: `<div style="width:22px;height:22px;border-radius:50%;background:${color};border:3px solid #1e293b;box-shadow:0 0 0 3px ${ACCENT},0 1px 4px rgba(0,0,0,.5)"></div>`,
     iconSize: [28, 28],
     iconAnchor: [14, 14],
     popupAnchor: [0, -14],
@@ -46,7 +46,7 @@ function activeIcon(color) {
 
 const depthIcon = L.divIcon({
   className: 'active-depth-marker',
-  html: `<div style="width:12px;height:12px;transform:rotate(45deg);background:${ACCENT};border:2px solid #fff"></div>`,
+  html: `<div style="width:12px;height:12px;transform:rotate(45deg);background:${ACCENT};border:2px solid #1e293b"></div>`,
   iconSize: [16, 16],
   iconAnchor: [8, 8],
 });
@@ -99,7 +99,7 @@ const WellDot = memo(function WellDot({ well, dimmed, selected, isOpen, setRef, 
       center={[well.lat, well.lon]}
       radius={selected ? 9 : 6}
       pathOptions={{
-        color: selected ? ACCENT : '#111827',
+        color: selected ? ACCENT : '#1e293b',
         weight: selected ? 3 : 1,
         fillColor: riskColor(well.top_risk_type),
         fillOpacity: dimmed ? 0.25 : 0.95,
@@ -114,24 +114,24 @@ const WellDot = memo(function WellDot({ well, dimmed, selected, isOpen, setRef, 
 
 export function MapLegend() {
   return (
-    <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-700" aria-label="Map legend">
+    <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] uppercase tracking-wider font-semibold text-gray-500" aria-label="Map legend">
       {Object.entries(RISK_COLORS).map(([risk, color]) => (
-        <li key={risk} className="flex items-center gap-1">
-          <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full border border-gray-800" style={{ background: color }} />
+        <li key={risk} className="flex items-center gap-2">
+          <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full border border-gray-700/50" style={{ background: color }} />
           {RISK_LABELS[risk]}
         </li>
       ))}
-      <li className="flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full border border-gray-800" style={{ background: NO_RISK_COLOR }} />
+      <li className="flex items-center gap-2">
+        <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full border border-gray-700/50" style={{ background: NO_RISK_COLOR }} />
         No risk recorded
       </li>
-      <li className="flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-3.5 w-3.5 rounded-full border-2 border-white bg-gray-500 ring-2 ring-blue-700" />
-        Active well (ring)
+      <li className="flex items-center gap-2">
+        <span aria-hidden="true" className="inline-block h-3.5 w-3.5 rounded-full border-2 border-gray-900 bg-gray-500 ring-2 ring-blue-500" />
+        Active well
       </li>
-      <li className="flex items-center gap-1">
-        <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rotate-45 bg-blue-700" />
-        Position at chosen depth
+      <li className="flex items-center gap-2">
+        <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rotate-45 bg-blue-500" />
+        Depth position
       </li>
     </ul>
   );
@@ -241,20 +241,20 @@ export default function WorkspaceMap() {
   const listLoading = offsetsQ.isLoading || (filtersActive && eventsQ.isLoading);
 
   return (
-    <div className="grid h-full min-h-[560px] gap-4 lg:grid-cols-3" data-testid="map-panel">
-      <div className="flex min-h-[480px] flex-col gap-2 lg:col-span-2">
-        <div className="relative flex-1 overflow-hidden rounded-xl border border-gray-200">
+    <div className="grid h-full min-h-[560px] gap-6 lg:grid-cols-3" data-testid="map-panel">
+      <div className="flex min-h-[480px] flex-col gap-4 lg:col-span-2">
+        <div className="relative flex-1 overflow-hidden rounded-xl border border-gray-800/60 shadow-lg shadow-black/20">
           <MapContainer center={[center.lat, center.lon]} zoom={11} preferCanvas className="h-full min-h-[440px] w-full">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             />
             <MapController center={center} radiusM={qRadius} target={target} />
 
-            <Circle center={[center.lat, center.lon]} radius={params.radius} pathOptions={{ color: ACCENT, weight: 2, dashArray: '6 4', fillOpacity: 0.04 }} />
+            <Circle center={[center.lat, center.lon]} radius={params.radius} pathOptions={{ color: ACCENT, weight: 2, dashArray: '6 4', fillOpacity: 0.1 }} />
 
             {otherTrajs.features.length > 0 && (
-              <GeoJSON key={`others-${otherTrajs.features.length}-${wellboreId}`} data={otherTrajs} style={{ color: '#6b7280', weight: 1, opacity: 0.6 }} />
+              <GeoJSON key={`others-${otherTrajs.features.length}-${wellboreId}`} data={otherTrajs} style={{ color: '#4b5563', weight: 1, opacity: 0.6 }} />
             )}
             {activeTraj && <GeoJSON key={`active-${wellboreId}`} data={activeTraj.geojson} style={{ color: ACCENT, weight: 3 }} />}
 
@@ -275,8 +275,8 @@ export default function WorkspaceMap() {
 
             {depthPoints.map((p) => (
               <React.Fragment key={p.id}>
-                <Polyline positions={[p.from, p.to]} pathOptions={{ color: '#111827', weight: 1, dashArray: '3 4', opacity: 0.7 }} />
-                <CircleMarker center={p.to} radius={4} pathOptions={{ color: '#111827', weight: 2, fillColor: '#fff', fillOpacity: 1 }}>
+                <Polyline positions={[p.from, p.to]} pathOptions={{ color: '#cbd5e1', weight: 1, dashArray: '3 4', opacity: 0.5 }} />
+                <CircleMarker center={p.to} radius={4} pathOptions={{ color: '#94a3b8', weight: 2, fillColor: '#1e293b', fillOpacity: 1 }}>
                   <Popup>{p.name} at the same TVD (MD {Math.round(p.md)} m)</Popup>
                 </CircleMarker>
               </React.Fragment>
@@ -296,7 +296,7 @@ export default function WorkspaceMap() {
         <MapLegend />
       </div>
 
-      <div className="flex flex-col gap-4 overflow-y-auto">
+      <div className="flex flex-col gap-6 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-800">
         <RadiusControl
           params={params}
           onChange={setParams}
@@ -305,7 +305,7 @@ export default function WorkspaceMap() {
           bitMd={bitMd}
           formations={basinFormations}
         />
-        <div className="rounded-xl border border-gray-200 bg-white p-4">
+        <div className="rounded-xl border border-gray-800/60 bg-[#111827] shadow-lg shadow-black/20 p-5">
           <OffsetList
             offsets={visible}
             mode={qMode}

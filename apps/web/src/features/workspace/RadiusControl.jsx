@@ -3,7 +3,7 @@ import { EVENT_TYPES, PROVENANCES } from '../../lib/constants';
 import { fmtDepth } from '../../lib/units';
 
 const label = (s) => s.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase());
-const SELECT = 'w-full rounded border border-gray-300 bg-white px-2 py-1 text-sm';
+const SELECT = 'w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none';
 
 /**
  * Map controls. `params` = {radius (m), depth (m|null), mode, formation, eventType, provenance};
@@ -14,9 +14,9 @@ export function RadiusControl({ params, onChange, maxDepth = 0, depth = 0, bitMd
   const update = (key, val) => onChange((prev) => ({ ...prev, [key]: val }));
 
   return (
-    <section aria-label="Map controls" className="space-y-4 rounded-lg border border-gray-200 bg-white p-4 text-sm">
+    <section aria-label="Map controls" className="space-y-6 rounded-xl border border-gray-800/60 bg-[#111827] shadow-lg shadow-black/20 p-5 text-sm">
       <div>
-        <label className="mb-1 block font-medium text-gray-700" htmlFor="map-radius">
+        <label className="mb-2 block font-medium text-gray-200" htmlFor="map-radius">
           Radius: {params.radius / 1000} km
         </label>
         <input
@@ -27,12 +27,12 @@ export function RadiusControl({ params, onChange, maxDepth = 0, depth = 0, bitMd
           step="1"
           value={params.radius / 1000}
           onChange={(e) => update('radius', Number(e.target.value) * 1000)}
-          className="w-full"
+          className="w-full accent-blue-500"
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium text-gray-700" htmlFor="map-depth">
+        <label className="mb-2 block font-medium text-gray-200" htmlFor="map-depth">
           Depth (MD): {fmtDepth(depth)}
         </label>
         <input
@@ -43,52 +43,52 @@ export function RadiusControl({ params, onChange, maxDepth = 0, depth = 0, bitMd
           step="10"
           value={Math.min(depth ?? 0, maxDepth || 0)}
           onChange={(e) => update('depth', Number(e.target.value))}
-          className="w-full"
+          className="w-full accent-blue-500"
         />
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-gray-500 mt-1">
           <span>0 m</span>
           <span>{bitMd != null ? 'default: bit depth' : 'no live bit depth'}</span>
           <span>TD {fmtDepth(maxDepth)}</span>
         </div>
         {bitMd != null && params.depth != null && (
-          <button type="button" className="mt-1 text-xs text-blue-700 hover:underline" onClick={() => update('depth', null)}>
+          <button type="button" className="mt-2 text-xs text-blue-400 hover:text-blue-300 hover:underline" onClick={() => update('depth', null)}>
             Reset to bit depth
           </button>
         )}
       </div>
 
       <fieldset>
-        <legend className="mb-1 font-medium text-gray-700">Distance</legend>
-        <div className="flex gap-4">
-          <label className="flex items-center gap-1">
-            <input type="radio" name="map-mode" checked={params.mode === 'surface'} onChange={() => update('mode', 'surface')} />
-            Distance at surface
+        <legend className="mb-2 font-medium text-gray-200">Distance</legend>
+        <div className="flex gap-4 text-gray-300">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="map-mode" checked={params.mode === 'surface'} onChange={() => update('mode', 'surface')} className="text-blue-500 focus:ring-blue-500 bg-gray-800 border-gray-700" />
+            Surface
           </label>
-          <label className="flex items-center gap-1">
-            <input type="radio" name="map-mode" checked={params.mode === 'depth'} onChange={() => update('mode', 'depth')} />
-            Distance at depth
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="map-mode" checked={params.mode === 'depth'} onChange={() => update('mode', 'depth')} className="text-blue-500 focus:ring-blue-500 bg-gray-800 border-gray-700" />
+            Depth
           </label>
         </div>
-        <p className="mt-1 text-xs text-gray-500">Deviated wells can be far apart at depth even when close at surface.</p>
+        <p className="mt-2 text-xs text-gray-500">Deviated wells can be far apart at depth even when close at surface.</p>
       </fieldset>
 
-      <div className="grid grid-cols-1 gap-2">
+      <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className="mb-0.5 block text-xs font-medium text-gray-600" htmlFor="map-formation">Formation</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-formation">Formation</label>
           <select id="map-formation" className={SELECT} value={params.formation} onChange={(e) => update('formation', e.target.value)}>
             <option value="">All formations</option>
             {formations.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         </div>
         <div>
-          <label className="mb-0.5 block text-xs font-medium text-gray-600" htmlFor="map-event-type">Event type</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-event-type">Event type</label>
           <select id="map-event-type" className={SELECT} value={params.eventType} onChange={(e) => update('eventType', e.target.value)}>
             <option value="">All event types</option>
             {EVENT_TYPES.map((t) => <option key={t} value={t}>{label(t)}</option>)}
           </select>
         </div>
         <div>
-          <label className="mb-0.5 block text-xs font-medium text-gray-600" htmlFor="map-provenance">Provenance</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-provenance">Provenance</label>
           <select id="map-provenance" className={SELECT} value={params.provenance} onChange={(e) => update('provenance', e.target.value)}>
             <option value="">All provenances</option>
             {PROVENANCES.map((p) => <option key={p} value={p}>{p.toUpperCase()}</option>)}
