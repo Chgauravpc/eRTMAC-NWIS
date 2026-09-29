@@ -1,0 +1,38 @@
+@media print {
+  /* Ensure background colors and images are printed */
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white !important;
+  }
+
+  /* Hide elements that shouldn't be printed */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset layout constraints for printing A4 */
+  .print-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .brief-container {
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Prevent awkward page breaks */
+  .avoid-break {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Force page break if needed */
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+}
