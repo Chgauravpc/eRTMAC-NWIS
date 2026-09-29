@@ -248,12 +248,29 @@ function MapViewController({ targetWell, resetSignal }) {
   return null;
 }
 
+// Real Map Layer Providers (100% Free, Zero Watermark, No API Key Required)
+const MAP_LAYERS = {
+  street: {
+    name: 'Real Map (OSM)',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  },
+  satellite: {
+    name: 'Satellite Terrain',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP',
+    maxZoom: 18,
+  },
+};
+
 export function LandingPage() {
   const { session, profile } = useProfile();
   const loggedIn = !!(session && profile);
   const homePath = profile ? roleHome(profile) : '/wells';
 
   // Interactive Map State
+  const [mapLayerType, setMapLayerType] = useState('street'); // 'street' (real OSM) or 'satellite' (real Esri)
   const [selectedRadius, setSelectedRadius] = useState(3000); // 3.0 km default buffer
   const [selectedWell, setSelectedWell] = useState(REGIONAL_WELLS[0]); // Default to SYN-DLJ-03
   const [mapTargetWell, setMapTargetWell] = useState(null);
@@ -613,8 +630,10 @@ export function LandingPage() {
                 className="h-full w-full"
               >
                 <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                  url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                  key={mapLayerType}
+                  attribution={MAP_LAYERS[mapLayerType].attribution}
+                  url={MAP_LAYERS[mapLayerType].url}
+                  maxZoom={MAP_LAYERS[mapLayerType].maxZoom}
                 />
 
                 <MapViewController targetWell={mapTargetWell} resetSignal={resetSignal} />
@@ -694,9 +713,41 @@ export function LandingPage() {
                 })}
               </MapContainer>
 
-              {/* Floating Coordinates Tag */}
-              <div className="absolute top-4 right-4 z-[400] bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-neutral-200 shadow-sm text-xs font-mono text-neutral-700 pointer-events-none">
-                Duliajan, Assam (27.3600°N, 95.3100°E)
+              {/* Floating Header Controls: Real Map / Satellite Switcher & Coordinates */}
+              <div className="absolute top-4 left-4 right-4 z-[400] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+                {/* Real Map Layer Switcher */}
+                <div className="pointer-events-auto flex items-center p-1 bg-white/95 backdrop-blur-md rounded-xl border border-neutral-300 shadow-md">
+                  <button
+                    type="button"
+                    onClick={() => setMapLayerType('street')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      mapLayerType === 'street'
+                        ? 'bg-neutral-950 text-white shadow-sm'
+                        : 'text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Compass className="h-3.5 w-3.5" />
+                    <span>Real Map</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapLayerType('satellite')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      mapLayerType === 'satellite'
+                        ? 'bg-neutral-950 text-white shadow-sm'
+                        : 'text-neutral-700 hover:text-neutral-950 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Layers className="h-3.5 w-3.5" />
+                    <span>Satellite</span>
+                  </button>
+                </div>
+
+                {/* Real-time Location Coordinates Badge */}
+                <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-neutral-300 shadow-md text-xs font-mono font-medium text-neutral-800 pointer-events-auto flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-neutral-950" />
+                  <span>Duliajan, Assam (27.3600°N, 95.3100°E)</span>
+                </div>
               </div>
 
               {/* Floating Legend */}
