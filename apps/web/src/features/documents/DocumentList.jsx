@@ -2,8 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
-import { useDocuments } from '../../lib/hooks/documents';
 import { JOB_STATUS_LABELS, stageLabel } from './stages';
+import { ProvenanceBadge } from '../wells/ProvenanceBadge';
+import { LoadingBlock, ErrorBlock, EmptyBlock } from '../wells/StateBlocks';
 
 const STATUS_STYLE = {
   done: { cls: 'bg-green-100 text-green-800 border-green-200', Icon: CheckCircle2 },
@@ -31,16 +32,10 @@ function StatusBadge({ job }) {
 }
 
 export function DocumentList() {
-  const { data: docs, isLoading, error } = useDocuments();
+  const { data: docs, isLoading, error, refetch } = useDocuments();
 
-  if (isLoading) return <div className="p-10 text-center font-bold uppercase tracking-widest text-gray-500">Loading documents…</div>;
-  if (error) {
-    return (
-      <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">
-        Could not load documents: {error.message}
-      </div>
-    );
-  }
+  if (isLoading) return <LoadingBlock label="Loading documents…" />;
+  if (error) return <ErrorBlock message={`Could not load documents: ${error.message}`} onRetry={refetch} />;
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
@@ -76,9 +71,7 @@ export function DocumentList() {
                 <td className="p-4 text-center font-mono text-gray-600">{d.pages ?? '-'}</td>
                 <td className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">{d.ocr_engine || '-'}</td>
                 <td className="p-4">
-                  <span className="rounded border border-purple-300 px-2 py-0.5 text-xs font-bold uppercase text-purple-700">
-                    {d.provenance}
-                  </span>
+                  <ProvenanceBadge provenance={d.provenance} />
                 </td>
                 <td className="p-4 text-xs text-gray-600">
                   <div className="font-medium">{d.created_at ? format(new Date(d.created_at), 'yyyy-MM-dd HH:mm') : '-'}</div>
@@ -101,8 +94,8 @@ export function DocumentList() {
             ))}
             {docs?.length === 0 && (
               <tr>
-                <td colSpan="8" className="p-16 text-center text-lg font-medium text-gray-500">
-                  No documents found in the library.
+                <td colSpan="8" className="p-0 border-t border-gray-200">
+                  <EmptyBlock>No documents found in the library.</EmptyBlock>
                 </td>
               </tr>
             )}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
-import Plot from 'react-plotly.js';
+import PlotlyChart from '../correlation/PlotlyChart';
 import { Loader2 } from 'lucide-react';
 import { aggregateWellMetrics } from './aggregation';
-import { RISK_TYPES, PROVENANCE_TYPES } from '../../lib/constants';
+import { RISK_TYPES, PROVENANCES } from '../../lib/constants';
 
 export function AnalyticsPage() {
   const [wells, setWells] = useState([]);
@@ -72,7 +72,7 @@ export function AnalyticsPage() {
             onChange={e => setProvenance(e.target.value)}
           >
             <option value="all">All</option>
-            {PROVENANCE_TYPES?.map(p => (
+            {PROVENANCES?.map(p => (
               <option key={p} value={p} className="capitalize">{p}</option>
             )) || (
               <>
@@ -109,7 +109,7 @@ export function AnalyticsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 min-h-[400px]">
               <h3 className="text-lg font-bold text-gray-800 mb-4 px-2">NPT by Formation (All Provenance)</h3>
-              <Plot
+              <PlotlyChart
                 data={chart1Data}
                 layout={{ barmode: 'stack', margin: { t: 10, l: 50, r: 10, b: 80 }, height: 350, autosize: true }}
                 useResizeHandler={true}
@@ -118,7 +118,7 @@ export function AnalyticsPage() {
             </div>
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 min-h-[400px]">
               <h3 className="text-lg font-bold text-gray-800 mb-4 px-2">Total NPT by Field (Filtered)</h3>
-              <Plot
+              <PlotlyChart
                 data={chart2Data}
                 layout={{ margin: { t: 10, l: 50, r: 10, b: 80 }, height: 350, autosize: true }}
                 useResizeHandler={true}

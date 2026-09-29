@@ -24,15 +24,15 @@ describe('AnswerView parsing', () => {
     ];
     render(<AnswerView answer_md="Test [1][3]." citations={citations} evidence="sufficient" />);
     
-    expect(screen.getByText('1')).toBeDefined();
-    expect(screen.getByText('3')).toBeDefined();
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('3').length).toBeGreaterThan(0);
   });
 
   it('handles unknown numbers gracefully', () => {
     const citations = [{ n: 1, doc_title: 'WCR-01', page: 5, chunk_id: 'c1' }];
     render(<AnswerView answer_md="Test [1] and [9]." citations={citations} evidence="sufficient" />);
     
-    expect(screen.getByText('1')).toBeDefined();
+    expect(screen.getAllByText('1').length).toBeGreaterThan(0);
     
     // 9 shouldn't be a chip button, just raw text "[9]"
     const rawText = screen.getByText(/\[9\]/);
