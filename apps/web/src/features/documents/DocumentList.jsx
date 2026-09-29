@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { useDocuments } from '../../lib/hooks/documents';
 import { JOB_STATUS_LABELS, stageLabel } from './stages';
 import { ProvenanceBadge } from '../wells/ProvenanceBadge';
 import { LoadingBlock, ErrorBlock, EmptyBlock } from '../wells/StateBlocks';

@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:hardcoded": "! grep -rn 'SYN-' src/ --exclude-dir=mocks --exclude='*.test.js' --exclude='*.test.jsx'"
+    "check:hardcoded": "node scripts/check-hardcoded.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

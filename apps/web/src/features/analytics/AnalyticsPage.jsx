@@ -14,13 +14,18 @@ export function AnalyticsPage() {
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      const [wellRes, nptRes] = await Promise.all([
-        supabase.from('v_well_summary').select('*'),
-        supabase.from('v_npt_by_formation').select('*')
-      ]);
-      if (wellRes.data) setWells(wellRes.data);
-      if (nptRes.data) setNptByFmt(nptRes.data);
-      setLoading(false);
+      try {
+        const [wellRes, nptRes] = await Promise.all([
+          supabase.from('v_well_summary').select('*'),
+          supabase.from('v_npt_by_formation').select('*'),
+        ]);
+        if (wellRes.data) setWells(wellRes.data);
+        if (nptRes.data) setNptByFmt(nptRes.data);
+      } catch (err) {
+        console.warn('Analytics data could not be loaded', err);
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, []);
