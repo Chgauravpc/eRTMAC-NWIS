@@ -6,13 +6,7 @@ import { DepthPanel } from './DepthPanel';
 import { FormationPanel } from './FormationPanel';
 import { RiskGauges } from './RiskGauges';
 import { LessonsPanel } from './LessonsPanel';
-
-// Temporary placeholder for alert banner (will be fulfilled in FE-09)
-const AlertBannerPlaceholder = () => (
-  <div className="bg-red-600 text-white p-4 font-bold text-center cursor-pointer uppercase tracking-wider shadow-lg z-50">
-    ⚠️ [Placeholder] Active Alert Banner - Tap to open
-  </div>
-);
+import { AlertBanner } from '../alerts/AlertBanner';
 
 export function RigView() {
   const { wellboreId } = useParams();
@@ -89,7 +83,7 @@ export function RigView() {
 
   return (
     <div className="rig bg-gray-900 min-h-screen text-gray-100 flex flex-col font-sans select-none">
-      <AlertBannerPlaceholder />
+      <AlertBanner />
       
       {/* Top Header / Exit */}
       <div className="px-6 py-4 flex justify-between items-center border-b border-gray-800">

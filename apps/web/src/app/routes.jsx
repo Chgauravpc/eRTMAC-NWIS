@@ -4,6 +4,7 @@ import Layout from './Layout';
 import { RequireRole } from '../features/auth/RequireRole';
 import { LoginPage } from '../features/auth/LoginPage';
 import { useProfile } from '../features/auth/useProfile';
+import { AlertProvider } from '../features/alerts/AlertProvider';
 import { Spinner } from '../components/ui/Primitives';
 
 const RoleRedirect = () => {
@@ -23,12 +24,12 @@ import { WellsPage } from '../features/wells/WellsPage';
 import { CorrelationTab } from '../features/correlation/CorrelationTab';
 import { RiskTab } from '../features/risk/RiskTab';
 import { RigView } from '../features/rig/RigView';
+import { AlertsPage } from '../features/alerts/AlertsPage';
+import { WellAlertsTab } from '../features/alerts/WellAlertsTab';
 
 // Placeholder Pages
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
-const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
-const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
 const DocumentsPage = () => <div className="p-4">Documents</div>;
 const ReviewQueue = () => <div className="p-4">Review Queue</div>;
 const ReviewDoc = () => <div className="p-4">Review Doc</div>;
@@ -43,9 +44,17 @@ export function AppRoutes() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<RoleRedirect />} />
-      <Route path="/rig/:wellboreId" element={<RequireRole roles={['rig_engineer', 'rtoc_engineer', 'admin']}><RigView /></RequireRole>} />
+      <Route path="/rig/:wellboreId" element={
+        <RequireRole roles={['rig_engineer', 'rtoc_engineer', 'admin']}>
+          <AlertProvider><RigView /></AlertProvider>
+        </RequireRole>
+      } />
       
-      <Route element={<RequireRole><Layout /></RequireRole>}>
+      <Route element={
+        <RequireRole>
+          <AlertProvider><Layout /></AlertProvider>
+        </RequireRole>
+      }>
         <Route path="/wells" element={<WellsPage />} />
         
         <Route path="/wells/:wellboreId" element={<WorkspaceLayout />}>
@@ -53,7 +62,7 @@ export function AppRoutes() {
           <Route path="formation" element={<WorkspaceFormation />} />
           <Route path="correlation" element={<CorrelationTab />} />
           <Route path="risk" element={<RiskTab />} />
-          <Route path="alerts" element={<WorkspaceAlerts />} />
+          <Route path="alerts" element={<WellAlertsTab />} />
         </Route>
         
         <Route path="/alerts" element={<RequireRole roles={['rtoc_engineer', 'admin']}><AlertsPage /></RequireRole>} />
