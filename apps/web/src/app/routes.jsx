@@ -21,11 +21,11 @@ const RoleRedirect = () => {
 import WorkspaceLayout from '../features/workspace/WorkspaceLayout';
 import { WellsPage } from '../features/wells/WellsPage';
 import { CorrelationTab } from '../features/correlation/CorrelationTab';
+import { RiskTab } from '../features/risk/RiskTab';
 
 // Placeholder Pages
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
-const WorkspaceRisk = () => <div className="p-4">Workspace: Risk Ahead</div>;
 const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
 const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
 const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
@@ -52,7 +52,7 @@ export function AppRoutes() {
           <Route path="map" element={<WorkspaceMap />} />
           <Route path="formation" element={<WorkspaceFormation />} />
           <Route path="correlation" element={<CorrelationTab />} />
-          <Route path="risk" element={<WorkspaceRisk />} />
+          <Route path="risk" element={<RiskTab />} />
           <Route path="alerts" element={<WorkspaceAlerts />} />
         </Route>
         
