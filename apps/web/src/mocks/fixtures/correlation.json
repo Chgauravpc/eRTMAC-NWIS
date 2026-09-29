@@ -1,0 +1,15 @@
+{
+  "flatten_formation": "Barail",
+  "wells": [
+    {
+      "wellbore_id": "mock-wellbore-id",
+      "name": "SYN-DLJ-03",
+      "is_active": true,
+      "shift_m": -42.0,
+      "tops": [{"formation": "Tipam", "top_md_m": 2310.5, "source": "predicted", "uncertainty_m": 28.4}],
+      "casing": [{"casing_od_in": 9.625, "shoe_md_m": 2280.0}],
+      "events": [{"id": "mock-event", "event_type": "loss_partial", "md_from_m": 2395.0, "severity": 3, "description": "..."}],
+      "tracks": {"md_m": [2300.0, 2300.5], "gr_api": [65.2, 70.1], "rop_m_h": [12.1, 11.8], "mw_sg": [1.18, 1.18], "ecd_sg": [1.25, 1.25]}
+    }
+  ]
+}

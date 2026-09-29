@@ -1,0 +1,7 @@
+{
+  "location": {"lat": 27.35, "lon": 95.30},
+  "offsets": [{"wellbore_id": "mock-offset", "well_name": "SYN-DLJ-03", "surface_distance_m": 2140.0}],
+  "predicted_tops": [{"formation": "Tipam", "top_md_m": 2300.0, "uncertainty_m": 35.0, "n_offsets": 4}],
+  "risk_profile": [{"md_from_m": 2300, "md_to_m": 2325, "risk_type": "losses", "fused": 58.2, "band": "elevated", "confidence": "medium"}],
+  "lessons": [{"id": "mock-lesson", "formation": "Tipam", "event_type": "loss_partial", "title": "Losses mitigation", "mitigation": "...", "well_count": 4}]
+}

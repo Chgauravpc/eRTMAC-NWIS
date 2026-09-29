@@ -1,0 +1,12 @@
+[
+  {
+    "wellbore_id": "mock-wellbore-id",
+    "md_from_m": 2400.0,
+    "md_to_m": 2425.0,
+    "risk_type": "losses",
+    "fused": 62.5,
+    "band": "elevated",
+    "confidence": "medium",
+    "reasons": []
+  }
+]

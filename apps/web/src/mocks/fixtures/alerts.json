@@ -1,0 +1,22 @@
+[
+  {
+    "id": "mock-alert-uuid",
+    "wellbore_id": "mock-wellbore-id",
+    "kind": "lookahead",
+    "risk_type": "losses",
+    "severity": "watch",
+    "state": "generated",
+    "dedup_key": "x:losses:2400",
+    "zone_md_from_m": 2400.0,
+    "zone_md_to_m": 2425.0,
+    "expected_md_m": 2410.0,
+    "formation": "Tipam",
+    "score": 62.5,
+    "confidence": "high",
+    "title": "High probability of mud losses",
+    "message": "Offset wells experienced losses in this section of Tipam.",
+    "recommendation": "Prepare LCM pills.",
+    "evidence": {},
+    "created_at": "2026-09-29T10:00:00Z"
+  }
+]

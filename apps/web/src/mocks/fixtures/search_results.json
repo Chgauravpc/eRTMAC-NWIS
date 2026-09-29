@@ -1,0 +1,14 @@
+{
+  "results": [
+    {
+      "chunk_id": "mock-chunk",
+      "doc_id": "mock-doc",
+      "doc_title": "WCR SYN-DLJ-03",
+      "page": 37,
+      "snippet": "...partial losses 15 m3/h...",
+      "well_name": "SYN-DLJ-03",
+      "formation": "Tipam",
+      "score": 0.031
+    }
+  ]
+}

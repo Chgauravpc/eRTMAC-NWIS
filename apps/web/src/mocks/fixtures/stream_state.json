@@ -1,0 +1,20 @@
+[
+  {
+    "wellbore_id": "mock-wellbore-id",
+    "status": "live",
+    "source": "synthetic",
+    "speed": 1,
+    "bit_md_m": 2405.0,
+    "hole_md_m": 2405.0,
+    "last_sample_at": "2026-09-29T10:00:00Z",
+    "latest": {
+      "rop_m_h": 12.5,
+      "wob_kn": 45.2,
+      "rpm": 120,
+      "torque_knm": 14.2,
+      "flow_in_lpm": 2000,
+      "flow_out_lpm": 1950,
+      "pit_vol_m3": 40.5
+    }
+  }
+]

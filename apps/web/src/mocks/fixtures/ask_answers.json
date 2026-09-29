@@ -1,0 +1,17 @@
+{
+  "answer_md": "LCM pills were pumped [1].",
+  "evidence": "sufficient",
+  "citations": [
+    {
+      "n": 1,
+      "chunk_id": "mock-chunk",
+      "doc_id": "mock-doc",
+      "doc_title": "WCR SYN-DLJ-03",
+      "page": 4,
+      "snippet": "Pumped LCM pill..."
+    }
+  ],
+  "provider": "groq",
+  "model": "llama-3",
+  "cached": false
+}

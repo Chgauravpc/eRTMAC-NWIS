@@ -1,0 +1,17 @@
+[
+  {
+    "wellbore_id": "mock-wellbore-id",
+    "well_id": "mock-well-id",
+    "well_name": "SYN-DLJ-03",
+    "field": "SYN-Duliajan",
+    "basin": "Upper Assam",
+    "status": "drilling",
+    "provenance": "synthetic",
+    "lon": 95.31,
+    "lat": 27.36,
+    "td_md_m": 3620.0,
+    "event_count": 5,
+    "npt_h_total": 12.5,
+    "top_risk_type": "losses"
+  }
+]
