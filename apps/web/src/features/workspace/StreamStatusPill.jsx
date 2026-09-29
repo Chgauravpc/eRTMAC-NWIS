@@ -4,10 +4,10 @@ import { cn } from '../../components/ui/Primitives';
 import { fmtTimeAgo } from '../../lib/units';
 
 const CONFIG = {
-  live: { cls: 'bg-green-100 text-green-800 border-green-200', Icon: Wifi },
-  stale: { cls: 'bg-amber-100 text-amber-800 border-amber-200', Icon: Clock },
-  lost: { cls: 'bg-red-100 text-red-800 border-red-200', Icon: WifiOff },
-  stopped: { cls: 'bg-gray-100 text-gray-800 border-gray-200', Icon: PauseCircle },
+  live: { cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', Icon: Wifi },
+  stale: { cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20', Icon: Clock },
+  lost: { cls: 'bg-red-500/10 text-red-400 border-red-500/20', Icon: WifiOff },
+  stopped: { cls: 'bg-gray-800 text-gray-400 border-gray-700', Icon: PauseCircle },
 };
 
 /** Stream status: icon + word (never colour alone); stale/lost add "last data {time ago}". */
@@ -29,7 +29,7 @@ export function StreamStatusPill({ status = 'stopped', lastSampleAt }) {
       className={cn('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium', cfg.cls)}
     >
       <Icon aria-hidden="true" className="h-3 w-3" />
-      <span>{`${status}${ago}`}</span>
+      <span className="capitalize">{`${status}${ago}`}</span>
     </span>
   );
 }

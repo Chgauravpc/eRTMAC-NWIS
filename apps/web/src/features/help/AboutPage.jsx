@@ -11,7 +11,7 @@ export function AboutPage() {
           The Nearby Wells Intelligence System (NWIS) uses a mix of synthetic and real data to demonstrate its capabilities.
         </p>
         <ul className="mb-4 list-inside list-disc text-gray-700">
-          <li><strong>Real Data (Volve/NPD):</strong> Licensed under Equinor's Volve dataset license and the Norwegian Petroleum Directorate. Used for genuine offset correlation and analysis.</li>
+          <li><strong>Real Data (Volve/NPD):</strong> Licensed under Equinor&apos;s Volve dataset license and the Norwegian Petroleum Directorate. Used for genuine offset correlation and analysis.</li>
           <li><strong>Synthetic Data:</strong> Generated specifically for testing and demonstration purposes. Wells starting with <code>SYN{'-'}</code> are purely synthetic.</li>
         </ul>
         <p className="text-gray-700">

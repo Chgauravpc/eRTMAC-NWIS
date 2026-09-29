@@ -8,9 +8,8 @@ describe('AnswerView parsing', () => {
     const citations = [{ n: 1, doc_title: 'WCR-01', page: 5, chunk_id: 'c1', snippet: 'test' }];
     render(<AnswerView answer_md="This is a test [1]." citations={citations} evidence="sufficient" />);
     
-    // The citation chip should exist
-    const chip = screen.getByText('1');
-    expect(chip).toBeDefined();
+    // The number appears twice: as the inline citation chip and in the Sources list
+    expect(screen.getAllByText('1')).toHaveLength(2);
     
     // It should render "WCR-01" in the sources list below
     const sourcesList = screen.getByText('Sources Referenced').parentElement;

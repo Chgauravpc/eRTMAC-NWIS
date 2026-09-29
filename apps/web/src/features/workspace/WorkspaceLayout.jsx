@@ -21,14 +21,14 @@ export default function WorkspaceLayout() {
   const { data: formation } = useFormationAtMd(wellboreId, streamState?.bit_md_m);
 
   return (
-    <div className="flex h-full flex-col bg-gray-50">
+    <div className="flex h-full flex-col">
       {error ? (
         <ErrorBlock message="This well could not be loaded." onRetry={() => refetch()} />
       ) : (
         <WellHeader well={well} streamState={streamState} formation={formation} />
       )}
-      <div className="border-b border-gray-200 bg-white shadow-sm">
-        <nav aria-label="Well workspace" className="-mb-px flex space-x-6 px-4">
+      <div className="border-b border-gray-800/60 bg-[#0B0F19]">
+        <nav aria-label="Well workspace" className="-mb-px flex space-x-6 px-6">
           {WORKSPACE_TABS.map((tab) => (
             <NavLink
               key={tab.path}
@@ -36,7 +36,7 @@ export default function WorkspaceLayout() {
               className={({ isActive }) =>
                 cn(
                   'whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors',
-                  isActive ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                  isActive ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-700 hover:text-gray-300',
                 )
               }
             >
@@ -45,7 +45,7 @@ export default function WorkspaceLayout() {
           ))}
         </nav>
       </div>
-      <div className="relative z-0 flex-1 overflow-auto p-4">
+      <div className="relative z-0 flex-1 overflow-auto bg-[#0f172a] p-4 sm:p-6 lg:p-8">
         <Outlet />
       </div>
     </div>
