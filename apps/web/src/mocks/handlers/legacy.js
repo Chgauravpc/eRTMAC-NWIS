@@ -1,9 +1,9 @@
 import { http, HttpResponse } from 'msw';
-import { db } from './db';
-import searchData from './fixtures/search_results.json';
-import askData from './fixtures/ask_answers.json';
-import correlationData from './fixtures/correlation.json';
-import planningData from './fixtures/planning_brief.json';
+import { db } from '../db';
+import searchData from '../fixtures/search_results.json';
+import askData from '../fixtures/ask_answers.json';
+import correlationData from '../fixtures/correlation.json';
+import planningData from '../fixtures/planning_brief.json';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
 
@@ -46,7 +46,7 @@ export const handlers = [
   }),
 
   http.post('/api/stream/drop', async ({ request }) => {
-    const { wellbore_id, seconds } = await request.json();
+    const { seconds } = await request.json();
     return HttpResponse.json({ dropping_until: new Date(Date.now() + seconds * 1000).toISOString() });
   }),
 

@@ -1,90 +1,118 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
-import { useProfile } from '../auth/useProfile';
-import { AlertCard } from './AlertCard';
+import React, { useMemo, useState } from 'react';
+import { Pin } from 'lucide-react';
+import { useNow } from '../../lib/hooks/alerts';
+import { useAlerts } from './AlertProvider';
+import { AlertRow } from './AlertRow';
+import { compareBySeverityThenAge, isPinned } from './alertUtils';
 
+const STATE_FILTERS = ['generated', 'sent', 'viewed', 'escalated', 'acknowledged'];
+const SORTS = {
+  severity: compareBySeverityThenAge,
+  age: (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at),
+};
+
+/**
+ * /alerts (RTOC): every open alert from v_open_alerts (the provider's shared list, live through
+ * Realtime), grouped by well NAME, sortable by severity or age, filterable by state. Unacknowledged
+ * warning/critical alerts are pinned on top with running age counters.
+ */
 export function AlertsPage() {
-  const { profile } = useProfile();
-  const [filterState, setFilterState] = useState('open'); // all, open, resolved
+  const { alerts, isLoading, wellNames, openAlert } = useAlerts();
+  const now = useNow(1000);
+  const [states, setStates] = useState(() => new Set(STATE_FILTERS));
+  const [sort, setSort] = useState('severity');
 
-  const { data: alerts, refetch } = useQuery({
-    queryKey: ['v_open_alerts'],
-    queryFn: async () => {
-      // In a real app we'd query v_open_alerts for open, and standard table for resolved history
-      // We'll query standard alerts table to handle history too
-      const { data, error } = await supabase.from('alerts').select('*');
-      if (error) throw error;
-      return data || [];
+  const toggle = (s) =>
+    setStates((prev) => {
+      const next = new Set(prev);
+      if (next.has(s)) next.delete(s);
+      else next.add(s);
+      return next;
+    });
+
+  const nameOf = (a) => wellNames[a.wellbore_id] ?? a.well_name ?? 'Unknown well';
+
+  const { pinned, groups } = useMemo(() => {
+    const visible = alerts.filter((a) => states.has(a.state));
+    const pin = visible.filter(isPinned).sort(compareBySeverityThenAge);
+    const rest = visible.filter((a) => !isPinned(a));
+    const byWell = new Map();
+    for (const a of rest) {
+      const name = wellNames[a.wellbore_id] ?? a.well_name ?? 'Unknown well';
+      if (!byWell.has(name)) byWell.set(name, []);
+      byWell.get(name).push(a);
     }
-  });
+    const sorted = [...byWell.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, list]) => [name, [...list].sort(SORTS[sort])]);
+    return { pinned: pin, groups: sorted };
+  }, [alerts, states, sort, wellNames]);
 
-  const filtered = (alerts || []).filter(a => {
-    if (filterState === 'open') return a.state !== 'resolved';
-    if (filterState === 'resolved') return a.state === 'resolved';
-    return true;
-  }).sort((a, b) => {
-    // Unacknowledged warning/critical pinned to top
-    const aPin = ['sent','viewed','escalated'].includes(a.state) && ['warning','critical'].includes(a.severity);
-    const bPin = ['sent','viewed','escalated'].includes(b.state) && ['warning','critical'].includes(b.severity);
-    if (aPin && !bPin) return -1;
-    if (!aPin && bPin) return 1;
-    
-    // Sort descending by created_at
-    return new Date(b.created_at) - new Date(a.created_at);
-  });
-
-  // Group by well
-  const byWell = {};
-  filtered.forEach(a => {
-    if (!byWell[a.wellbore_id]) byWell[a.wellbore_id] = [];
-    byWell[a.wellbore_id].push(a);
-  });
+  const total = pinned.length + groups.reduce((n, [, l]) => n + l.length, 0);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto h-full overflow-y-auto">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">RTOC Global Alerts</h1>
-        
-        <div className="bg-white rounded-lg border border-gray-200 p-1 flex shadow-sm">
-          <button 
-            className={`px-4 py-1.5 rounded-md text-sm font-bold ${filterState === 'open' ? 'bg-blue-100 text-blue-800' : 'text-gray-500 hover:bg-gray-50'}`}
-            onClick={() => setFilterState('open')}
-          >
-            Open / Active
-          </button>
-          <button 
-            className={`px-4 py-1.5 rounded-md text-sm font-bold ${filterState === 'resolved' ? 'bg-gray-200 text-gray-800' : 'text-gray-500 hover:bg-gray-50'}`}
-            onClick={() => setFilterState('resolved')}
-          >
-            Resolved History
-          </button>
+    <div className="mx-auto max-w-6xl p-4">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-3xl font-black">Open alerts</h1>
+        <div className="flex flex-wrap items-center gap-2">
+          <div role="group" aria-label="Filter by state" className="flex flex-wrap gap-1">
+            {STATE_FILTERS.map((s) => (
+              <button
+                key={s}
+                type="button"
+                aria-pressed={states.has(s)}
+                onClick={() => toggle(s)}
+                className={`min-h-[44px] rounded-lg border-2 px-3 text-sm font-semibold capitalize ${states.has(s) ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-500 bg-white text-gray-900'}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            Sort by
+            <select value={sort} onChange={(e) => setSort(e.target.value)} className="min-h-[44px] rounded-lg border-2 border-gray-500 px-2">
+              <option value="severity">Severity</option>
+              <option value="age">Age (oldest first)</option>
+            </select>
+          </label>
         </div>
       </div>
 
-      {Object.keys(byWell).length === 0 ? (
-        <div className="text-center p-16 bg-white border border-gray-200 rounded-xl shadow-sm text-gray-500 text-lg">
-          No alerts matching the current filter.
-        </div>
-      ) : (
-        <div className="space-y-12">
-          {Object.entries(byWell).map(([well, wellAlerts]) => (
-            <div key={well} className="bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <h2 className="text-xl font-bold uppercase tracking-wider text-gray-700 mb-6 flex items-center gap-3">
-                <span className="bg-gray-300 text-gray-800 w-8 h-8 flex items-center justify-center rounded-full text-sm">📍</span>
-                Wellbore: {well}
-                <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded ml-auto font-medium">{wellAlerts.length} Alerts</span>
-              </h2>
-              
-              <div className="space-y-6">
-                {wellAlerts.map(a => (
-                  <AlertCard key={a.id} alert={a} user={profile} onStateChange={refetch} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+      {isLoading && <p role="status">Loading alerts…</p>}
+
+      {pinned.length > 0 && (
+        <section aria-label="Needs acknowledgement" className="mb-6 rounded-xl border-2 border-red-800 bg-red-50 p-3">
+          <h2 className="mb-2 flex items-center gap-2 text-lg font-bold text-red-950">
+            <Pin size={18} aria-hidden="true" /> Needs acknowledgement ({pinned.length})
+          </h2>
+          <ul className="space-y-2">
+            {pinned.map((a) => (
+              <AlertRow key={a.id} alert={a} wellName={nameOf(a)} now={now} onOpen={openAlert} pinned />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {groups.map(([name, list]) => (
+        <section key={name} aria-label={`Alerts for ${name}`} className="mb-6">
+          <h2 className="mb-2 text-lg font-bold">
+            {name} <span className="text-sm font-medium text-gray-800">({list.length})</span>
+          </h2>
+          <ul className="space-y-2">
+            {list.map((a) => (
+              <AlertRow key={a.id} alert={a} wellName={name} now={now} onOpen={openAlert} />
+            ))}
+          </ul>
+        </section>
+      ))}
+
+      {!isLoading && total === 0 && (
+        <p className="rounded-xl border-2 border-dashed border-gray-500 p-10 text-center text-lg text-gray-800">
+          No open alerts match the current filter.
+        </p>
       )}
     </div>
   );
 }
+
+export default AlertsPage;

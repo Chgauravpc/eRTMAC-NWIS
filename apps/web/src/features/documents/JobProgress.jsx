@@ -1,73 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import { subscribe } from '../../lib/realtime';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, RotateCcw, XCircle } from 'lucide-react';
+import { useJob, useJobSummary } from '../../lib/hooks/documents';
+import { JOB_STAGES, stageIndex, stageLabel } from './stages';
 
-export function JobProgress({ jobId, initialStatus = 'processing', docId = null, eventsExtracted = 0, needsReview = 0 }) {
-  const [jobState, setJobState] = useState({ 
-    status: initialStatus, 
-    stage: 'Classify', 
-    progress: 0,
-    eventsExtracted,
-    needsReview,
-    errorMsg: ''
-  });
+/**
+ * Live job progress (Realtime on jobs id=eq.<jobId>): stage stepper + bar, then the final states
+ *  done -> "Ready: N events extracted", needs_review -> "N fields need review" + link, failed -> error + retry.
+ * `onRetry` (optional) re-POSTs /api/documents only.
+ */
+export function JobProgress({ jobId, docId = null, onRetry }) {
+  const { job } = useJob(jobId);
+  const status = job?.status || 'queued';
+  const { data: summary } = useJobSummary(docId, status);
 
-  useEffect(() => {
-    if (!jobId) return;
-    
-    const unsub = subscribe('jobs', `id=eq.${jobId}`, (payload) => {
-      const j = payload.new;
-      setJobState({
-        status: j.status,
-        stage: j.stage || 'Processing',
-        progress: j.progress || 0,
-        eventsExtracted: j.events_extracted || 0,
-        needsReview: j.needs_review || 0,
-        errorMsg: j.error_text || ''
-      });
-    });
-
-    return () => unsub();
-  }, [jobId]);
-
-  if (jobState.status === 'failed') {
+  if (status === 'failed') {
     return (
-      <div className="text-red-600 text-sm font-bold bg-red-50 p-2 rounded border border-red-100">
-        ❌ Failed: {jobState.errorMsg || 'Unknown error occurred during processing'}
-      </div>
-    );
-  }
-
-  if (jobState.status === 'completed') {
-    return (
-      <div className="text-sm bg-gray-50 p-3 rounded border border-gray-200 shadow-sm mt-2">
-        {jobState.needsReview > 0 ? (
-          <div className="text-amber-700 font-bold flex items-center justify-between">
-            <span>⚠️ {jobState.needsReview} fields need manual review</span>
-            {docId && <Link to={`/review/${docId}`} className="ml-4 bg-amber-100 px-3 py-1 rounded text-amber-800 hover:bg-amber-200 transition-colors uppercase tracking-wider text-xs">Review Now</Link>}
-          </div>
-        ) : (
-          <div className="text-green-700 font-bold flex items-center justify-between">
-            <span>✅ Ready: {jobState.eventsExtracted} events extracted</span>
-            {docId && <Link to={`/search?doc=${docId}`} className="ml-4 bg-green-100 px-3 py-1 rounded text-green-800 hover:bg-green-200 transition-colors uppercase tracking-wider text-xs">View in Search</Link>}
-          </div>
+      <div role="alert" className="flex items-center justify-between gap-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <span className="flex items-start gap-2 font-bold">
+          <XCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>Failed: {job?.error || 'Unknown error during processing'}</span>
+        </span>
+        {onRetry && (
+          <button
+            type="button"
+            onClick={onRetry}
+            className="inline-flex shrink-0 items-center gap-1 rounded border border-red-300 bg-white px-3 py-1 text-xs font-bold uppercase tracking-wider hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+          >
+            <RotateCcw className="h-3 w-3" aria-hidden="true" /> Retry processing
+          </button>
         )}
       </div>
     );
   }
 
-  // Processing state
-  return (
-    <div className="w-full mt-2 bg-white p-3 rounded border border-gray-100 shadow-sm">
-      <div className="flex justify-between text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">
+  if (status === 'done') {
+    return (
+      <div className="flex items-center justify-between rounded border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-800">
         <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-          {jobState.stage}
+          <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+          Ready: {summary ? summary.events : '…'} events extracted
         </span>
-        <span className="text-blue-600">{jobState.progress}%</span>
+        {docId && (
+          <span className="flex gap-2">
+            <Link to={`/search?doc=${docId}`} className="rounded border border-green-300 bg-white px-3 py-1 text-xs uppercase tracking-wider hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
+              View in search
+            </Link>
+            <Link to={`/review/${docId}`} className="rounded border border-green-300 bg-white px-3 py-1 text-xs uppercase tracking-wider hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
+              Review
+            </Link>
+          </span>
+        )}
       </div>
-      <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-        <div className="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style={{ width: `${Math.max(5, jobState.progress)}%` }}></div>
+    );
+  }
+
+  if (status === 'needs_review') {
+    return (
+      <div className="flex items-center justify-between rounded border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-800">
+        <span className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4" aria-hidden="true" />
+          {summary ? summary.pending : '…'} fields need review
+        </span>
+        {docId && (
+          <Link to={`/review/${docId}`} className="inline-flex items-center gap-1 rounded border border-amber-300 bg-white px-3 py-1 text-xs uppercase tracking-wider hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600">
+            <ClipboardCheck className="h-3 w-3" aria-hidden="true" /> Review now
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  const idx = stageIndex(job);
+  const progress = job?.progress ?? 0;
+  return (
+    <div className="w-full rounded border border-gray-100 bg-white p-3 shadow-sm">
+      <div className="mb-2 flex justify-between text-xs font-bold uppercase tracking-wider text-gray-600">
+        <span className="flex items-center gap-2">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" aria-hidden="true" />
+          {stageLabel(job)}
+        </span>
+        <span className="text-blue-600">{progress}%</span>
+      </div>
+      <ol className="mb-2 flex gap-1 text-[10px] font-bold uppercase tracking-wider" aria-label="Processing stages">
+        {JOB_STAGES.map((s, i) => (
+          <li
+            key={s.key}
+            aria-current={i === idx ? 'step' : undefined}
+            className={`flex-1 rounded px-1 py-0.5 text-center ${
+              i < idx ? 'bg-green-100 text-green-800' : i === idx ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-400' : 'bg-gray-100 text-gray-500'
+            }`}
+          >
+            {s.label}
+          </li>
+        ))}
+      </ol>
+      <div
+        role="progressbar"
+        aria-label="Document processing progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress}
+        className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100"
+      >
+        <div className="h-1.5 rounded-full bg-blue-500 transition-all duration-300" style={{ width: `${Math.max(3, progress)}%` }} />
       </div>
     </div>
   );

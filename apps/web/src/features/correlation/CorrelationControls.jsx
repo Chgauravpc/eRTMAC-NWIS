@@ -1,81 +1,58 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import React from 'react';
+import { ALL_CHANNELS, MAX_OFFSETS } from './correlationModel';
+import { CHANNEL_META } from './traceBuilder';
+import { fmtDistance } from '../../lib/units';
 
-const ALL_CHANNELS = ['gr_api', 'rop_m_h', 'torque_knm', 'mw_sg', 'ecd_sg'];
-
-export function CorrelationControls({ params, onChange, wellboreId }) {
-  const [availableOffsets, setAvailableOffsets] = useState([]);
-  const [availableFormations, setAvailableFormations] = useState([]);
-
-  useEffect(() => {
-    supabase.rpc('offsets_within', { p_wellbore: wellboreId, p_radius_m: 25000 })
-      .then(({ data }) => setAvailableOffsets(data || []));
-
-    supabase.from('formation_tops').select('formation').eq('wellbore_id', wellboreId)
-      .then(({ data }) => {
-        if (data) setAvailableFormations([...new Set(data.map(d => d.formation))]);
-      });
-  }, [wellboreId]);
-
-  const toggleChannel = (ch) => {
-    onChange(p => {
-      const next = p.channels.includes(ch) ? p.channels.filter(c => c !== ch) : [...p.channels, ch];
-      return { ...p, channels: next };
-    });
+/** Presentational controls: offsets (max 6), flatten formation, channels. State lives in CorrelationTab. */
+export function CorrelationControls({ offsets, selectedOffsets, onOffsetsChange, formations, flatten, onFlattenChange, channels, onChannelsChange }) {
+  const toggleOffset = (id) => {
+    const on = selectedOffsets.includes(id);
+    if (!on && selectedOffsets.length >= MAX_OFFSETS) return;
+    onOffsetsChange(on ? selectedOffsets.filter((x) => x !== id) : [...selectedOffsets, id]);
   };
-
-  const handleOffsetChange = (e) => {
-    const selected = Array.from(e.target.selectedOptions, option => option.value);
-    if (selected.length <= 6) {
-      onChange(p => ({ ...p, offsets: selected }));
-    }
+  const toggleChannel = (ch) => {
+    const on = channels.includes(ch);
+    if (on && channels.length === 1) return; // keep at least one track
+    onChannelsChange(ALL_CHANNELS.filter((c) => (c === ch ? !on : channels.includes(c))));
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 flex gap-6 items-start text-sm">
-      <div className="flex flex-col gap-1">
-        <label className="font-medium text-gray-700">Flatten Formation</label>
-        <select 
-          className="border border-gray-300 rounded p-2 w-48" 
-          value={params.flatten} 
-          onChange={e => onChange(p => ({ ...p, flatten: e.target.value }))}
-        >
-          <option value="">None (True MD)</option>
-          {availableFormations.map(f => <option key={f} value={f}>{f}</option>)}
+    <div className="grid gap-4 rounded-lg border border-gray-200 bg-white p-4 text-sm md:grid-cols-3">
+      <div>
+        <label htmlFor="corr-flatten" className="mb-1 block font-medium text-gray-700">Flatten on formation</label>
+        <select id="corr-flatten" className="w-full rounded border border-gray-300 bg-white p-2" value={flatten} onChange={(e) => onFlattenChange(e.target.value)}>
+          <option value="">None (true MD)</option>
+          {formations.map((f) => <option key={f} value={f}>{f}</option>)}
         </select>
       </div>
 
-      <div className="flex flex-col gap-1 flex-1">
-        <label className="font-medium text-gray-700">Offsets (max 6)</label>
-        <select 
-          multiple 
-          className="border border-gray-300 rounded p-1 h-24 w-full" 
-          value={params.offsets} 
-          onChange={handleOffsetChange}
-        >
-          {availableOffsets.map(o => (
-            <option key={o.wellbore_id} value={o.wellbore_id}>
-              {o.well_name} ({Math.round(o.surface_distance_m)}m away)
-            </option>
-          ))}
-        </select>
-      </div>
+      <fieldset>
+        <legend className="mb-1 font-medium text-gray-700">Offsets ({selectedOffsets.length}/{MAX_OFFSETS})</legend>
+        <div className="max-h-28 space-y-1 overflow-y-auto">
+          {offsets.length === 0 && <p className="text-gray-500">No offsets in range.</p>}
+          {offsets.map((o) => {
+            const on = selectedOffsets.includes(o.wellbore_id);
+            return (
+              <label key={o.wellbore_id} className="flex cursor-pointer items-center gap-2">
+                <input type="checkbox" checked={on} disabled={!on && selectedOffsets.length >= MAX_OFFSETS} onChange={() => toggleOffset(o.wellbore_id)} />
+                <span>{o.well_name} <span className="text-gray-500">({fmtDistance(o.surface_distance_m)})</span></span>
+              </label>
+            );
+          })}
+        </div>
+      </fieldset>
 
-      <div className="flex flex-col gap-1 w-64">
-        <label className="font-medium text-gray-700">Channels</label>
+      <fieldset>
+        <legend className="mb-1 font-medium text-gray-700">Channels</legend>
         <div className="grid grid-cols-2 gap-2">
-          {ALL_CHANNELS.map(ch => (
-            <label key={ch} className="flex items-center gap-2 cursor-pointer">
-              <input 
-                type="checkbox" 
-                checked={params.channels.includes(ch)} 
-                onChange={() => toggleChannel(ch)} 
-              />
-              {ch}
+          {ALL_CHANNELS.map((ch) => (
+            <label key={ch} className="flex cursor-pointer items-center gap-2">
+              <input type="checkbox" checked={channels.includes(ch)} onChange={() => toggleChannel(ch)} />
+              <span>{CHANNEL_META[ch]?.label || ch} <span className="text-xs text-gray-500">{ch}</span></span>
             </label>
           ))}
         </div>
-      </div>
+      </fieldset>
     </div>
   );
 }

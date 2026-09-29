@@ -86,13 +86,64 @@ async def test_insert_and_read_well(_test_db):
 
 @requires_test_db
 @pytest.mark.asyncio
-async def test_offsets_within_rpc(_test_db):
+async def test_offsets_within_rpc_with_python_floats(_test_db):
+    """BE-02 acceptance: insert wells, call offsets_within (DB-04) through call_fn.
+
+    Python floats/lists must reach the ``real`` / ``text[]`` parameters of the
+    contract functions; this failed with "function does not exist" when they
+    were bound as float8.
+    """
+    tag = uuid.uuid4().hex[:8]
+    ids = {k: (str(uuid.uuid4()), str(uuid.uuid4())) for k in ("active", "near", "far")}
+    surface = {
+        "active": "POINT(95.3000 27.3500)",
+        "near": "POINT(95.3200 27.3500)",  # ~2 km east
+        "far": "POINT(95.7000 27.3500)",  # ~40 km east
+    }
     try:
-        await db_module.call_fn(
-            "offsets_within", p_wellbore=str(uuid.uuid4()), p_radius_m=10000.0
+        for key, (well_id, wb_id) in ids.items():
+            await db_module.execute(
+                "insert into wells (id, name, surface, provenance, status) values "
+                "(%(id)s, %(name)s, ST_GeogFromText(%(wkt)s), 'synthetic', 'completed')",
+                {"id": well_id, "name": f"SYN-T{tag}-{key}", "wkt": "SRID=4326;" + surface[key]},
+            )
+            await db_module.execute(
+                "insert into wellbores (id, well_id, name) values (%(id)s, %(w)s, %(name)s)",
+                {"id": wb_id, "w": well_id, "name": f"SYN-T{tag}-{key}-WB1"},
+            )
+        await db_module.execute(
+            "insert into events (wellbore_id, event_type, md_from_m, formation, description, provenance) "
+            "values (%(wb)s, 'loss_partial', 1900.0, 'Tipam', 'partial losses', 'synthetic')",
+            {"wb": ids["near"][1]},
         )
-    except Exception as exc:  # function lands with DB-04
-        pytest.skip(f"offsets_within not available yet (DB-04): {exc}")
+
+        rows = await db_module.call_fn(
+            "offsets_within", p_wellbore=ids["active"][1], p_radius_m=10000.0
+        )
+        assert [r["well_name"] for r in rows] == [f"SYN-T{tag}-near"]  # excludes self and the 40 km well
+        assert 1500 < rows[0]["surface_distance_m"] < 2500
+
+        events = await db_module.call_fn(
+            "events_for_offsets",
+            p_wellbore=ids["active"][1],
+            p_radius_m=10000.0,
+            p_formations=["Tipam"],
+            p_limit=10,
+        )
+        assert [e["event_type"] for e in events] == ["loss_partial"]
+    finally:
+        for well_id, _ in ids.values():
+            await db_module.execute("delete from wells where id = %(id)s", {"id": well_id})
+
+
+def test_untyped_literals_for_numbers_bools_and_arrays():
+    assert db_module._untyped(10000.0) == "10000.0"
+    assert db_module._untyped(7) == "7"
+    assert db_module._untyped(True) == "true"
+    assert db_module._untyped(None) is None
+    assert db_module._untyped("Tipam") == "Tipam"
+    assert db_module._untyped(["Tipam", 'Bar"ail']) == '{"Tipam","Bar\\"ail"}'
+    assert db_module._untyped([1.5, 2]) == '{"1.5","2"}'
 
 
 @requires_test_db

@@ -1,0 +1,253 @@
+{
+  "lessons": [
+    {
+      "id": "00000000-0000-4000-f000-000000000001",
+      "formation": "Tipam",
+      "event_type": "loss_partial",
+      "title": "Partial losses in Tipam sands",
+      "problem": "Losses of 10-20 m3/h",
+      "cause": "Permeable sand, ECD above pore pressure",
+      "mitigation": "Pump LCM pill (fine/medium) and reduce pump rate before the sand",
+      "outcome": "Losses cured in 2 of 3 attempts",
+      "event_ids": [
+        "00000000-0000-4000-e000-000000000001",
+        "00000000-0000-4000-e000-000000000002"
+      ],
+      "well_count": 4,
+      "success_rate": 0.8,
+      "updated_at": "2026-09-29T10:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-f000-000000000002",
+      "formation": "Tipam",
+      "event_type": "stuck_pipe_diff",
+      "title": "Differential sticking across depleted sand",
+      "problem": "Pipe stuck while stationary",
+      "cause": "High overbalance across permeable zone",
+      "mitigation": "Keep pipe moving, limit connection time, use lubricant pill",
+      "outcome": "Freed with jar + spot pill",
+      "event_ids": [
+        "00000000-0000-4000-e000-000000000003"
+      ],
+      "well_count": 3,
+      "success_rate": 0.65,
+      "updated_at": "2026-09-29T10:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-f000-000000000003",
+      "formation": "Tipam",
+      "event_type": "torque_spike",
+      "title": "Torque spikes at Tipam shale/sand contacts",
+      "problem": "Torque rises 30% within 10 m",
+      "cause": "Bit balling",
+      "mitigation": "Reduce WOB, increase flow, pump sweep",
+      "outcome": "Torque normalised",
+      "event_ids": [
+        "00000000-0000-4000-e000-000000000006"
+      ],
+      "well_count": 2,
+      "success_rate": 0.7,
+      "updated_at": "2026-09-29T10:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-f000-000000000004",
+      "formation": "Barail",
+      "event_type": "kick",
+      "title": "Gas kick at top of Barail",
+      "problem": "Pit gain 1.5-2 m3",
+      "cause": "Underbalance in coal/gas sands",
+      "mitigation": "Raise mud weight 0.03 SG before Barail, flow-check at top",
+      "outcome": "Well controlled with 1 circulation",
+      "event_ids": [
+        "00000000-0000-4000-e000-000000000005"
+      ],
+      "well_count": 3,
+      "success_rate": 0.9,
+      "updated_at": "2026-09-29T10:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-f000-000000000005",
+      "formation": "Barail",
+      "event_type": "stuck_pipe_mech",
+      "title": "Pack-off in Barail shale",
+      "problem": "Pack-off after connection",
+      "cause": "Reactive shale, poor hole cleaning",
+      "mitigation": "Wiper trip every 150 m, maintain inhibition",
+      "outcome": "Pack-off avoided in 3 wells",
+      "event_ids": [],
+      "well_count": 2,
+      "success_rate": 0.6,
+      "updated_at": "2026-09-29T10:00:00Z"
+    },
+    {
+      "id": "00000000-0000-4000-f000-000000000006",
+      "formation": "Barail",
+      "event_type": "loss_partial",
+      "title": "Losses in Barail fractured limestone",
+      "problem": "Sudden losses at limestone stringers",
+      "cause": "Natural fractures",
+      "mitigation": "Have LCM ready, drill with reduced ECD",
+      "outcome": "Losses cured after LCM",
+      "event_ids": [],
+      "well_count": 2,
+      "success_rate": 0.55,
+      "updated_at": "2026-09-29T10:00:00Z"
+    }
+  ],
+  "formation_tops": [
+    {
+      "id": "00000000-0000-4000-c000-000000000001",
+      "wellbore_id": "00000000-0000-4000-8000-000000000001",
+      "formation": "Tipam",
+      "top_md_m": 2310.5,
+      "top_tvdss_m": 2261.0,
+      "source": "predicted",
+      "uncertainty_m": 28.4,
+      "n_offsets": 5,
+      "provenance": "synthetic"
+    },
+    {
+      "id": "00000000-0000-4000-c000-000000000002",
+      "wellbore_id": "00000000-0000-4000-8000-000000000001",
+      "formation": "Barail",
+      "top_md_m": 2525.0,
+      "top_tvdss_m": 2470.0,
+      "source": "predicted",
+      "uncertainty_m": 25.0,
+      "n_offsets": 5,
+      "provenance": "synthetic"
+    },
+    {
+      "id": "00000000-0000-4000-c000-000000000003",
+      "wellbore_id": "00000000-0000-4000-8000-000000000001",
+      "formation": "Kopili",
+      "top_md_m": 3050.0,
+      "top_tvdss_m": 2990.0,
+      "source": "predicted",
+      "uncertainty_m": 40.0,
+      "n_offsets": 4,
+      "provenance": "synthetic"
+    }
+  ],
+  "events": [
+    {
+      "id": "00000000-0000-4000-e000-000000000001",
+      "wellbore_id": "00000000-0000-4000-8000-000000000002",
+      "well_name": "SYN-DLJ-01",
+      "event_type": "loss_partial",
+      "risk_type": "losses",
+      "md_from_m": 2410.0,
+      "md_to_m": 2425.0,
+      "formation": "Tipam",
+      "relative_depth": 0.42,
+      "npt_h": 12.0,
+      "doc_id": "00000000-0000-4000-d000-000000000001",
+      "page": 37,
+      "depth_distance_m": 850.0,
+      "description": "Partial losses 15 m3/h in Tipam sand",
+      "confidence": 0.9
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000002",
+      "wellbore_id": "00000000-0000-4000-8000-000000000003",
+      "well_name": "SYN-DLJ-02",
+      "event_type": "loss_partial",
+      "risk_type": "losses",
+      "md_from_m": 2432.0,
+      "md_to_m": 2440.0,
+      "formation": "Tipam",
+      "relative_depth": 0.55,
+      "npt_h": 8.0,
+      "doc_id": "00000000-0000-4000-d000-000000000002",
+      "page": 12,
+      "depth_distance_m": 1200.0,
+      "description": "Seepage losses, LCM pill pumped",
+      "confidence": 0.85
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000003",
+      "wellbore_id": "00000000-0000-4000-8000-000000000004",
+      "well_name": "SYN-DLJ-04",
+      "event_type": "stuck_pipe_diff",
+      "risk_type": "stuck_pipe",
+      "md_from_m": 2470.0,
+      "md_to_m": 2480.0,
+      "formation": "Tipam",
+      "relative_depth": 0.75,
+      "npt_h": 18.0,
+      "doc_id": "00000000-0000-4000-d000-000000000003",
+      "page": 4,
+      "depth_distance_m": 1850.0,
+      "description": "Differentially stuck across sand, jarred free",
+      "confidence": 0.8
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000004",
+      "wellbore_id": "00000000-0000-4000-8000-000000000002",
+      "well_name": "SYN-DLJ-01",
+      "event_type": "tight_hole",
+      "risk_type": "stuck_pipe",
+      "md_from_m": 2500.0,
+      "md_to_m": 2505.0,
+      "formation": "Tipam",
+      "relative_depth": 0.9,
+      "npt_h": 4.0,
+      "doc_id": "00000000-0000-4000-d000-000000000001",
+      "page": 41,
+      "depth_distance_m": 850.0,
+      "description": "Tight hole on trip, reamed",
+      "confidence": 0.7
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000005",
+      "wellbore_id": "00000000-0000-4000-8000-000000000005",
+      "well_name": "SYN-NHK-01",
+      "event_type": "kick",
+      "risk_type": "kick",
+      "md_from_m": 2560.0,
+      "md_to_m": 2562.0,
+      "formation": "Barail",
+      "relative_depth": 0.15,
+      "npt_h": 6.0,
+      "doc_id": "00000000-0000-4000-d000-000000000004",
+      "page": 9,
+      "depth_distance_m": 4200.0,
+      "description": "Gas kick 1.8 m3 pit gain, weighted up",
+      "confidence": 0.9
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000006",
+      "wellbore_id": "00000000-0000-4000-8000-000000000003",
+      "well_name": "SYN-DLJ-02",
+      "event_type": "torque_spike",
+      "risk_type": "torque",
+      "md_from_m": 2450.0,
+      "md_to_m": 2455.0,
+      "formation": "Tipam",
+      "relative_depth": 0.65,
+      "npt_h": 3.0,
+      "doc_id": "00000000-0000-4000-d000-000000000002",
+      "page": 20,
+      "depth_distance_m": 1200.0,
+      "description": "Torque spike, reduced WOB",
+      "confidence": 0.75
+    },
+    {
+      "id": "00000000-0000-4000-e000-000000000007",
+      "wellbore_id": "00000000-0000-4000-8000-000000000004",
+      "well_name": "SYN-DLJ-04",
+      "event_type": "cement_failure",
+      "risk_type": "cementing",
+      "md_from_m": 2440.0,
+      "md_to_m": 2440.0,
+      "formation": "Tipam",
+      "relative_depth": 0.6,
+      "npt_h": 5.0,
+      "doc_id": "00000000-0000-4000-d000-000000000003",
+      "page": 30,
+      "depth_distance_m": 1850.0,
+      "description": "Poor bond behind casing",
+      "confidence": 0.6
+    }
+  ]
+}

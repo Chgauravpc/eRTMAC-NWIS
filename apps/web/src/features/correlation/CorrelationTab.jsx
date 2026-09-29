@@ -1,61 +1,79 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useDebounce } from 'use-debounce';
 import { CorrelationControls } from './CorrelationControls';
 import { CorrelationPlot } from './CorrelationPlot';
-import { Spinner, ErrorState } from '../../components/ui/Primitives';
-import { api } from '../../lib/api';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
-import { useDebounce } from 'use-debounce';
+import {
+  DEFAULT_CHANNELS,
+  OFFSET_SEARCH_RADIUS_M,
+  defaultFlattenFormation,
+  defaultOffsetIds,
+  formationsFromTops,
+} from './correlationModel';
+import { useCorrelation, useFormationAtMd, useFormationTops, useOffsets, useStreamState } from '../../lib/hooks/wells';
+import { EmptyBlock, ErrorBlock, LoadingBlock } from '../wells/StateBlocks';
 
 export function CorrelationTab() {
   const { wellboreId } = useParams();
-  
-  const [params, setParams] = useState({
-    offsets: [],
-    flatten: '',
-    channels: ['gr_api', 'rop_m_h', 'mw_sg']
-  });
-  const [debouncedParams] = useDebounce(params, 300);
+  // null = "not touched": the value is derived from the data (4 nearest offsets, next formation below the bit)
+  const [picked, setPicked] = useState({ offsets: null, flatten: null, channels: [...DEFAULT_CHANNELS] });
 
-  useEffect(() => {
-    if (params.offsets.length === 0) {
-      supabase.rpc('offsets_within', { p_wellbore: wellboreId, p_radius_m: 10000, p_mode: 'surface' })
-        .then(({ data }) => {
-          if (data && data.length > 0) {
-            setParams(p => ({ ...p, offsets: data.slice(0, 4).map(w => w.wellbore_id) }));
-          }
-        });
-    }
-  }, [wellboreId, params.offsets.length]);
+  const streamQ = useStreamState(wellboreId, { live: false });
+  const bitMd = streamQ.data?.bit_md_m ?? null;
+  const offsetsQ = useOffsets(wellboreId, OFFSET_SEARCH_RADIUS_M, null, 'surface');
+  const topsQ = useFormationTops(wellboreId);
+  const atBitQ = useFormationAtMd(wellboreId, bitMd);
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['correlation', wellboreId, debouncedParams],
-    queryFn: async () => {
-      if (debouncedParams.offsets.length === 0) return null;
-      const qs = new URLSearchParams();
-      qs.set('offsets', debouncedParams.offsets.join(','));
-      if (debouncedParams.flatten) qs.set('flatten', debouncedParams.flatten);
-      if (debouncedParams.channels.length > 0) qs.set('channels', debouncedParams.channels.join(','));
-      return api.get(`/api/wells/${wellboreId}/correlation?${qs.toString()}`);
-    },
-    enabled: !!wellboreId && debouncedParams.offsets.length > 0
-  });
+  const formations = useMemo(() => formationsFromTops(topsQ.data), [topsQ.data]);
+  const defaultFlatten = useMemo(
+    () => defaultFlattenFormation({ tops: topsQ.data, bitMd, next: atBitQ.data?.next_formation }),
+    [topsQ.data, bitMd, atBitQ.data],
+  );
+  const availableOffsets = offsetsQ.data || [];
+  const selectedOffsets = picked.offsets ?? defaultOffsetIds(availableOffsets);
+  const flatten = picked.flatten ?? defaultFlatten;
+
+  const ready = offsetsQ.isSuccess && topsQ.isSuccess && !streamQ.isLoading && (bitMd == null || !atBitQ.isLoading);
+  const queryKey = JSON.stringify({ offsets: selectedOffsets, flatten, channels: picked.channels });
+  const [debouncedKey] = useDebounce(queryKey, 300);
+  const query = useMemo(() => JSON.parse(debouncedKey), [debouncedKey]);
+  const corr = useCorrelation(wellboreId, query, ready);
 
   return (
-    <div className="flex flex-col h-full gap-4 pb-4">
-      <CorrelationControls params={params} onChange={setParams} wellboreId={wellboreId} />
-      <div className="flex-1 min-h-[600px] border border-gray-200 rounded-lg bg-white overflow-hidden">
-        {isLoading ? (
-          <div className="h-full flex items-center justify-center"><Spinner /></div>
-        ) : error ? (
-          <div className="p-10"><ErrorState message="Failed to load correlation data" /></div>
-        ) : data ? (
-          <CorrelationPlot data={data} channels={debouncedParams.channels} flatten={debouncedParams.flatten} />
-        ) : (
-          <div className="h-full flex items-center justify-center text-gray-500">Select offsets to correlate</div>
-        )}
+    <div className="flex h-full flex-col gap-4 pb-4">
+      <CorrelationControls
+        offsets={availableOffsets}
+        selectedOffsets={selectedOffsets}
+        onOffsetsChange={(offsets) => setPicked((p) => ({ ...p, offsets }))}
+        formations={formations}
+        flatten={flatten}
+        onFlattenChange={(f) => setPicked((p) => ({ ...p, flatten: f }))}
+        channels={picked.channels}
+        onChannelsChange={(channels) => setPicked((p) => ({ ...p, channels }))}
+      />
+      <div className="min-h-[600px] flex-1 overflow-hidden rounded-lg border border-gray-200 bg-white">
+        {offsetsQ.error || topsQ.error ? (
+          <ErrorBlock
+            message="Could not load the offsets or formation tops."
+            onRetry={() => {
+              offsetsQ.refetch();
+              topsQ.refetch();
+            }}
+          />
+        ) : !ready || (corr.isLoading && !corr.data) ? (
+          <LoadingBlock label="Loading correlation…" />
+        ) : availableOffsets.length === 0 ? (
+          <EmptyBlock>No offsets within {OFFSET_SEARCH_RADIUS_M / 1000} km, so there is nothing to correlate.</EmptyBlock>
+        ) : selectedOffsets.length === 0 ? (
+          <EmptyBlock>Select at least one offset well to correlate.</EmptyBlock>
+        ) : corr.error ? (
+          <ErrorBlock message="Failed to load correlation data." onRetry={() => corr.refetch()} />
+        ) : corr.data ? (
+          <CorrelationPlot data={corr.data} channels={query.channels} flatten={query.flatten} bitMd={bitMd} />
+        ) : null}
       </div>
     </div>
   );
 }
+
+export default CorrelationTab;

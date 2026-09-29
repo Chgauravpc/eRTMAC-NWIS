@@ -1,56 +1,76 @@
-import React, { useState } from 'react';
-import { resolveAlert } from '../../lib/data/alerts';
-import { Button } from '../../components/ui/Primitives';
+import React, { useEffect, useState } from 'react';
+import { useAlertActions } from '../../lib/hooks/alerts';
 
-export function ResolveDialog({ alert, onClose, onResolved }) {
-  const [outcome, setOutcome] = useState('event_occurred');
+const OUTCOMES = [
+  ['event_occurred', 'Event occurred'],
+  ['avoided', 'Avoided (mitigated)'],
+  ['false_alarm', 'False alarm'],
+];
+
+export function ResolveDialog({ alert, onClose }) {
+  const actions = useAlertActions();
+  const [outcome, setOutcome] = useState('avoided');
   const [note, setNote] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleResolve = async () => {
-    setIsSubmitting(true);
-    try {
-      await resolveAlert(alert.id, outcome, note);
-      if (onResolved) onResolved();
-      onClose();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const submit = async () => {
+    const row = await actions.resolve(alert.id, outcome, note.trim() || null);
+    if (row) onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
-        <h2 className="text-xl font-bold mb-6 text-gray-800 border-b pb-2">Resolve Alert</h2>
-        
-        <div className="mb-5">
-          <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Outcome</label>
-          <select className="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none" value={outcome} onChange={e => setOutcome(e.target.value)}>
-            <option value="event_occurred">Event Occurred</option>
-            <option value="avoided">Avoided (Mitigated)</option>
-            <option value="false_alarm">False Alarm</option>
-          </select>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Note (Optional)</label>
-          <textarea 
-            className="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none" 
-            rows={3} 
-            value={note} 
-            onChange={e => setNote(e.target.value)}
-            placeholder="Add context to help future ML training..."
-          ></textarea>
-        </div>
-
-        {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-6 border border-red-100">{error}</div>}
-
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-          <Button onClick={handleResolve} disabled={isSubmitting}>Confirm Resolution</Button>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="resolve-title" className="w-full max-w-md rounded-xl bg-white p-6 text-gray-900 shadow-2xl">
+        <h2 id="resolve-title" className="mb-4 border-b pb-2 text-xl font-bold">
+          Resolve this alert
+        </h2>
+        <label htmlFor="resolve-outcome" className="mb-1 block text-sm font-semibold">
+          Outcome
+        </label>
+        <select
+          id="resolve-outcome"
+          value={outcome}
+          onChange={(e) => setOutcome(e.target.value)}
+          className="mb-4 min-h-[48px] w-full rounded-lg border-2 border-gray-500 px-3"
+        >
+          {OUTCOMES.map(([v, label]) => (
+            <option key={v} value={v}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <label htmlFor="resolve-note" className="mb-1 block text-sm font-semibold">
+          Note (optional)
+        </label>
+        <textarea
+          id="resolve-note"
+          rows={3}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          className="mb-4 w-full rounded-lg border-2 border-gray-500 p-3"
+        />
+        {actions.error && (
+          <p role="alert" className="mb-4 rounded border border-red-800 bg-red-50 p-3 text-sm text-red-900">
+            {actions.error.message}
+          </p>
+        )}
+        <div className="flex justify-end gap-3">
+          <button type="button" onClick={onClose} disabled={actions.pending} className="min-h-[48px] rounded-lg border-2 border-gray-700 px-4 font-semibold">
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={actions.pending}
+            className="min-h-[48px] rounded-lg border-2 border-blue-900 bg-blue-800 px-4 font-semibold text-white disabled:opacity-60"
+          >
+            Confirm resolution
+          </button>
         </div>
       </div>
     </div>

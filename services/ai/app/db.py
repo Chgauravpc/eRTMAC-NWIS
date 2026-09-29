@@ -122,7 +122,40 @@ async def call_fn(name: str, **params: Any) -> list[dict[str, Any]]:
 
     args_sql = ", ".join(f"{key} => %({key})s" for key in params)
     sql = f"select * from public.{name}({args_sql})"
-    return await fetch_all(sql, params)
+    return await fetch_all(sql, {key: _untyped(value) for key, value in params.items()})
+
+
+def _array_literal(items: list[Any] | tuple[Any, ...]) -> str:
+    parts = []
+    for item in items:
+        if item is None:
+            parts.append("NULL")
+        elif isinstance(item, (list, tuple)):
+            parts.append(_array_literal(item))
+        else:
+            text = str(_untyped(item)).replace("\\", "\\\\").replace('"', '\\"')
+            parts.append(f'"{text}"')
+    return "{" + ",".join(parts) + "}"
+
+
+def _untyped(value: Any) -> Any:
+    """Send numbers, bools and lists as *untyped* literals.
+
+    psycopg would otherwise bind a Python float as float8 / a list of floats as
+    float8[], and Postgres does not implicitly cast those to the ``real`` /
+    ``real[]`` parameters the contract §7 functions declare, so the function
+    lookup fails. Untyped literals let the server infer the parameter type
+    (strings, UUIDs and pgvector literals already travel this way).
+    """
+    if value is None or isinstance(value, str):
+        return value
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, (list, tuple)):
+        return _array_literal(value)
+    return str(value)
 
 
 async def visible_depth_limit(wellbore_id: UUID | str) -> float | None:

@@ -1,39 +1,41 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
+import { useFormation } from '../../lib/hooks/risk';
+import { fmtDepth } from '../../lib/units';
 
+const SOURCE_WORD = { actual: 'picked', predicted: 'predicted', prognosis: 'prognosis' };
+
+/** Current formation, next formation and the distance to its top, with the predicted-top uncertainty. */
 export function FormationPanel({ wellboreId, bitMd }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ['formation_at_md', wellboreId, bitMd],
-    queryFn: async () => {
-      if (!wellboreId || bitMd == null) return null;
-      const { data, error } = await supabase.rpc('formation_at_md', { p_wellbore_id: wellboreId, p_md_m: bitMd });
-      if (error) throw error;
-      return data[0];
-    },
-    enabled: !!wellboreId && bitMd != null
-  });
+  const { data, isLoading, nextUncertaintyM } = useFormation(wellboreId, bitMd);
 
-  if (isLoading || !data) return (
-    <div className="bg-gray-800 p-6 rounded-lg text-white min-h-[180px] flex items-center justify-center">
-      <div className="text-gray-600 font-bold uppercase tracking-widest text-sm">Determining Formation...</div>
-    </div>
-  );
+  if (isLoading || !data) {
+    return (
+      <section aria-label="Formation" className="h-full rounded-lg border border-white/30 p-4 text-lg font-semibold">
+        {bitMd == null ? 'Waiting for bit depth…' : 'Determining formation…'}
+      </section>
+    );
+  }
 
-  const distToNext = data.next_top_md_m != null ? (data.next_top_md_m - bitMd) : null;
+  const distance = data.next_top_md_m != null && bitMd != null ? Math.max(0, Math.round(data.next_top_md_m - bitMd)) : null;
 
   return (
-    <div className="bg-gray-800 p-6 rounded-lg text-white h-full flex flex-col justify-center">
-      <h2 className="text-gray-400 text-xl font-bold uppercase tracking-wider mb-4">Formation</h2>
-      <div className="text-4xl font-black mb-4 text-blue-400">{data.formation || 'Unknown'}</div>
-      
-      {data.next_formation ? (
-        <div className="text-lg text-gray-400 border-t border-gray-700 pt-4 mt-2">
-          <span className="font-bold text-gray-200">{data.next_formation}</span> in <span className="font-bold text-amber-400">~{Math.round(distToNext)} m</span>
-        </div>
-      ) : (
-        <div className="text-lg text-gray-600 border-t border-gray-700 pt-4 mt-2">No expected formations ahead</div>
-      )}
-    </div>
+    <section aria-label="Formation" className="h-full rounded-lg border border-white/30 p-4">
+      <h2 className="mb-2 text-lg font-semibold uppercase tracking-wide text-gray-300">Formation</h2>
+      <div className="text-4xl font-black">{data.formation || 'Unknown'}</div>
+      <div className="mt-1 text-lg text-gray-300">
+        Top at {fmtDepth(data.top_md_m)}
+        {data.source ? ` (${SOURCE_WORD[data.source] || data.source})` : ''}
+      </div>
+      <div className="mt-4 border-t border-white/30 pt-3 text-xl">
+        {data.next_formation && distance != null ? (
+          <p data-testid="next-formation">
+            <strong>{data.next_formation}</strong> in ~{distance} m
+            {nextUncertaintyM != null ? ` ± ${Math.round(nextUncertaintyM)} m` : ''}
+          </p>
+        ) : (
+          <p>No formation top expected ahead.</p>
+        )}
+      </div>
+    </section>
   );
 }

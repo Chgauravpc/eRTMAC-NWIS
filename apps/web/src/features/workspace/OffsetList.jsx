@@ -1,30 +1,54 @@
 import React from 'react';
-import { Badge, Spinner } from '../../components/ui/Primitives';
+import { ProvenanceBadge } from '../wells/ProvenanceBadge';
+import { EmptyBlock, ErrorBlock, LoadingBlock } from '../wells/StateBlocks';
+import { fmtDistance } from '../../lib/units';
+import { activeDistance, sortOffsets } from './mapGeo';
 
-export function OffsetList({ offsets, mode, isLoading }) {
-  if (isLoading) return <div className="flex justify-center p-4"><Spinner /></div>;
-  if (!offsets || offsets.length === 0) return <div className="text-gray-500">No offsets found.</div>;
+/** Offsets sorted by the active distance; both distances are shown; clicking a row calls onSelect(wellbore_id). */
+export function OffsetList({ offsets, mode, isLoading, error, onRetry, radiusM, selectedId, onSelect }) {
+  if (isLoading) return <LoadingBlock label="Finding offsets…" />;
+  if (error) return <ErrorBlock message="Could not load offset wells." onRetry={onRetry} />;
+  if (!offsets || offsets.length === 0) {
+    return <EmptyBlock>No offsets within {radiusM ? `${radiusM / 1000} km` : 'this radius'}. Widen the radius or relax the filters.</EmptyBlock>;
+  }
+  const sorted = sortOffsets(offsets, mode);
+  const depthMode = mode === 'depth';
 
   return (
-    <div className="space-y-2">
-      <h3 className="font-bold text-lg mb-4">Offset Wells ({offsets.length})</h3>
-      {offsets.map(offset => (
-        <div key={offset.wellbore_id} className="p-3 border rounded hover:bg-gray-50 cursor-pointer transition-colors">
-          <div className="flex justify-between items-start mb-1">
-            <span className="font-medium text-blue-600">{offset.well_name}</span>
-            <Badge>{offset.provenance}</Badge>
-          </div>
-          <div className="text-xs text-gray-600 grid grid-cols-2 gap-1 mt-2">
-            <div>Events: <span className="font-medium">{offset.event_count || 0}</span></div>
-            <div>
-              {mode === 'depth' ? 'Depth dist: ' : 'Surface dist: '} 
-              <span className="font-medium">
-                {Math.round(mode === 'depth' ? offset.depth_distance_m : offset.surface_distance_m)}m
-              </span>
-            </div>
-          </div>
-        </div>
-      ))}
+    <div>
+      <h3 className="mb-2 text-lg font-bold">Offset wells ({sorted.length})</h3>
+      <p className="mb-2 text-xs text-gray-500">Sorted by {depthMode ? 'distance at depth' : 'distance at surface'}.</p>
+      <ol className="space-y-2" data-testid="offset-list">
+        {sorted.map((o) => {
+          const used = activeDistance(o, mode);
+          return (
+            <li key={o.wellbore_id}>
+              <button
+                type="button"
+                data-testid="offset-row"
+                aria-pressed={selectedId === o.wellbore_id}
+                onClick={() => onSelect?.(o.wellbore_id)}
+                className={`w-full rounded border p-3 text-left transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${selectedId === o.wellbore_id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+              >
+                <div className="mb-1 flex items-start justify-between gap-2">
+                  <span data-testid="offset-name" className="font-medium text-blue-700">{o.well_name}</span>
+                  <ProvenanceBadge provenance={o.provenance} />
+                </div>
+                <div className="grid grid-cols-3 gap-1 text-xs text-gray-600">
+                  <div className={!depthMode ? 'font-semibold text-gray-900' : ''}>
+                    Surface: <span data-testid="surface-dist">{fmtDistance(o.surface_distance_m)}</span>
+                  </div>
+                  <div className={depthMode ? 'font-semibold text-gray-900' : ''}>
+                    Depth: <span data-testid="depth-dist">{o.depth_distance_m == null ? '-' : fmtDistance(o.depth_distance_m)}</span>
+                  </div>
+                  <div>Events: <span className="font-medium">{o.event_count ?? 0}</span></div>
+                </div>
+                <span className="sr-only">Sorted distance {fmtDistance(used)}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

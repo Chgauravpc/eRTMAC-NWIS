@@ -98,10 +98,7 @@ Settings → Variables and secrets (contract §13):
 The Space sleeps when idle on the free CPU tier; warm it up before a demo
 (BE-22).
 
-> **Heads up:** contract §13's example `GROQ_MODEL` value
-> (`llama-3.3-70b-versatile`) no longer exists on Groq's current lineup
-> (confirmed via `GET /v1/models` with a real key while testing BE-03).
-> Check `https://api.groq.com/openai/v1/models` for what's currently
-> available before setting this secret — `openai/gpt-oss-120b` worked at
-> time of writing. Sanity-check any provider/model pair with
-> `python -m app.llm.client --ping`.
+> **Note:** contract §13's example `GROQ_MODEL` (`llama-3.3-70b-versatile`) no longer
+> exists on Groq, so the default is now `openai/gpt-oss-20b` (verified with
+> `python -m app.llm.client --ping`). Check `https://api.groq.com/openai/v1/models` for the
+> current lineup and re-run `--ping` after changing any provider/model pair.

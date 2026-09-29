@@ -1,0 +1,209 @@
+[
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page_no": 1,
+    "image_path": "10000000-0000-4000-a000-000000000002/1.png",
+    "text": "DAILY DRILLING REPORT   SYN-DLJ-03   12 MAR 2019\nSection: 12-1/4 in    Bit depth 0600 hrs: 2395 m MD\nEvent: Partial losses while drilling\nLoss depth: 2395 m\nLoss depth to: 3720 m\nFormation: Tipam Sst\nVolume lost: 264 bbl\nRemarks: Obs. partial losses @ 2395 m 15 m3/hr, pumped LCM pill",
+    "ocr_confidence": 0.82,
+    "engine": "rapidocr",
+    "lines": [
+      {
+        "text": "DAILY DRILLING REPORT   SYN-DLJ-03   12 MAR 2019",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.84,
+        "h": 0.035
+      },
+      {
+        "text": "Section: 12-1/4 in    Bit depth 0600 hrs: 2395 m MD",
+        "x": 0.08,
+        "y": 0.14,
+        "w": 0.7,
+        "h": 0.03
+      },
+      {
+        "text": "Event: Partial losses while drilling",
+        "x": 0.08,
+        "y": 0.3,
+        "w": 0.55,
+        "h": 0.03
+      },
+      {
+        "text": "Loss depth: 2395 m",
+        "x": 0.08,
+        "y": 0.36,
+        "w": 0.3,
+        "h": 0.03
+      },
+      {
+        "text": "Loss depth to: 3720 m",
+        "x": 0.08,
+        "y": 0.42,
+        "w": 0.34,
+        "h": 0.03
+      },
+      {
+        "text": "Formation: Tipam Sst",
+        "x": 0.08,
+        "y": 0.48,
+        "w": 0.32,
+        "h": 0.03
+      },
+      {
+        "text": "Volume lost: 264 bbl",
+        "x": 0.08,
+        "y": 0.54,
+        "w": 0.32,
+        "h": 0.03
+      },
+      {
+        "text": "Remarks: Obs. partial losses @ 2395 m 15 m3/hr, pumped LCM pill",
+        "x": 0.08,
+        "y": 0.62,
+        "w": 0.84,
+        "h": 0.03
+      }
+    ]
+  },
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000002",
+    "page_no": 2,
+    "image_path": "10000000-0000-4000-a000-000000000002/2.png",
+    "text": "FORMATION TOPS   SYN-DLJ-03\nFormation: BARAIL\nTop MD: 2,310.5 m",
+    "ocr_confidence": 0.82,
+    "engine": "rapidocr",
+    "lines": [
+      {
+        "text": "FORMATION TOPS   SYN-DLJ-03",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.5,
+        "h": 0.035
+      },
+      {
+        "text": "Formation: BARAIL",
+        "x": 0.08,
+        "y": 0.2,
+        "w": 0.3,
+        "h": 0.03
+      },
+      {
+        "text": "Top MD: 2,310.5 m",
+        "x": 0.08,
+        "y": 0.26,
+        "w": 0.3,
+        "h": 0.03
+      }
+    ]
+  },
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000003",
+    "page_no": 1,
+    "image_path": "10000000-0000-4000-a000-000000000003/1.png",
+    "text": "MUD LOG   SYN-DLJ-01\nDepth: 2400 m\nMud weight: 2.9 SG\nECD: 1.25 SG",
+    "ocr_confidence": 0.82,
+    "engine": "rapidocr",
+    "lines": [
+      {
+        "text": "MUD LOG   SYN-DLJ-01",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.5,
+        "h": 0.035
+      },
+      {
+        "text": "Depth: 2400 m",
+        "x": 0.08,
+        "y": 0.22,
+        "w": 0.25,
+        "h": 0.03
+      },
+      {
+        "text": "Mud weight: 2.9 SG",
+        "x": 0.08,
+        "y": 0.28,
+        "w": 0.3,
+        "h": 0.03
+      },
+      {
+        "text": "ECD: 1.25 SG",
+        "x": 0.08,
+        "y": 0.34,
+        "w": 0.25,
+        "h": 0.03
+      }
+    ]
+  },
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000001",
+    "page_no": 1,
+    "image_path": "10000000-0000-4000-a000-000000000001/1.png",
+    "text": "WELL COMPLETION REPORT   SYN-DLJ-03\nTotal depth: 3620 m MD",
+    "ocr_confidence": null,
+    "engine": "text_layer",
+    "lines": [
+      {
+        "text": "WELL COMPLETION REPORT   SYN-DLJ-03",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.7,
+        "h": 0.035
+      },
+      {
+        "text": "Total depth: 3620 m MD",
+        "x": 0.08,
+        "y": 0.2,
+        "w": 0.4,
+        "h": 0.03
+      }
+    ]
+  },
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000001",
+    "page_no": 2,
+    "image_path": "10000000-0000-4000-a000-000000000001/2.png",
+    "text": "COMPLICATIONS\nPartial losses in Tipam at 2395 m",
+    "ocr_confidence": null,
+    "engine": "text_layer",
+    "lines": [
+      {
+        "text": "COMPLICATIONS",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.3,
+        "h": 0.035
+      },
+      {
+        "text": "Partial losses in Tipam at 2395 m",
+        "x": 0.08,
+        "y": 0.2,
+        "w": 0.55,
+        "h": 0.03
+      }
+    ]
+  },
+  {
+    "doc_id": "10000000-0000-4000-a000-000000000001",
+    "page_no": 3,
+    "image_path": "10000000-0000-4000-a000-000000000001/3.png",
+    "text": "CASING SUMMARY\n9 5/8 in casing shoe at 2285 m",
+    "ocr_confidence": null,
+    "engine": "text_layer",
+    "lines": [
+      {
+        "text": "CASING SUMMARY",
+        "x": 0.08,
+        "y": 0.05,
+        "w": 0.3,
+        "h": 0.035
+      },
+      {
+        "text": "9 5/8 in casing shoe at 2285 m",
+        "x": 0.08,
+        "y": 0.2,
+        "w": 0.5,
+        "h": 0.03
+      }
+    ]
+  }
+]

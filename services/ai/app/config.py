@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     SUPABASE_DB_URL: str = ""
     SERVICE_TOKEN: str = ""
     GROQ_API_KEY: str = ""
-    GROQ_MODEL: str = "llama-3.3-70b-versatile"
+    GROQ_MODEL: str = "openai/gpt-oss-20b"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = ""
     EMBED_MODEL: str = "BAAI/bge-small-en-v1.5"

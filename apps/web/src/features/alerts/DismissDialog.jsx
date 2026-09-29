@@ -1,55 +1,68 @@
-import React, { useState } from 'react';
-import { dismissAlert } from '../../lib/data/alerts';
-import { Button } from '../../components/ui/Primitives';
+import React, { useEffect, useState } from 'react';
+import { useAlertActions } from '../../lib/hooks/alerts';
 
-export function DismissDialog({ alert, onClose, onDismissed }) {
+export const MIN_REASON_CHARS = 5;
+
+/** Dismiss is only for info/watch alerts; the reason (>= 5 characters) is required and audited. */
+export function DismissDialog({ alert, onClose }) {
+  const actions = useAlertActions();
   const [reason, setReason] = useState('');
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localError, setLocalError] = useState('');
 
-  const handleDismiss = async () => {
-    if (reason.trim().length < 5) {
-      setError('Reason must be at least 5 characters.');
+  useEffect(() => {
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const submit = async () => {
+    if (reason.trim().length < MIN_REASON_CHARS) {
+      setLocalError(`Reason must be at least ${MIN_REASON_CHARS} characters.`);
       return;
     }
-    setIsSubmitting(true);
-    try {
-      await dismissAlert(alert.id, reason);
-      if (onDismissed) onDismissed();
-      onClose();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    const row = await actions.dismiss(alert.id, reason.trim());
+    if (row) onClose();
   };
 
+  const error = localError || actions.error?.message;
+
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-      <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
-        <h2 className="text-xl font-bold mb-6 text-red-600 border-b border-red-100 pb-2">Dismiss Alert</h2>
-        
-        <p className="text-sm text-gray-600 mb-5">
-          Dismissing prevents this alert from escalating and marks it as irrelevant. A descriptive reason is required for auditing.
-        </p>
-
-        <div className="mb-6">
-          <label htmlFor="dismiss-reason" className="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Reason for dismissal <span className="text-red-500">*</span></label>
-          <textarea 
-            id="dismiss-reason"
-            className="w-full border border-gray-300 p-3 rounded-lg bg-gray-50 focus:ring-2 focus:ring-red-500 focus:outline-none" 
-            rows={3} 
-            value={reason} 
-            onChange={e => { setReason(e.target.value); setError(''); }}
-            placeholder="Why is this info/watch alert being dismissed?"
-          ></textarea>
-        </div>
-
-        {error && <div className="bg-red-50 text-red-600 text-sm p-3 rounded-lg mb-6 border border-red-100">{error}</div>}
-
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
-          <Button className="bg-red-600 text-white hover:bg-red-700" onClick={handleDismiss} disabled={isSubmitting}>Dismiss Alert</Button>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby="dismiss-title" className="w-full max-w-md rounded-xl bg-white p-6 text-gray-900 shadow-2xl">
+        <h2 id="dismiss-title" className="mb-4 border-b pb-2 text-xl font-bold text-red-900">
+          Dismiss this alert
+        </h2>
+        <p className="mb-4 text-sm">Only info and watch alerts can be dismissed. Your reason is kept in the audit log.</p>
+        <label htmlFor="dismiss-reason" className="mb-1 block text-sm font-semibold">
+          Reason for dismissal (required)
+        </label>
+        <textarea
+          id="dismiss-reason"
+          rows={3}
+          value={reason}
+          onChange={(e) => {
+            setReason(e.target.value);
+            setLocalError('');
+          }}
+          className="mb-4 w-full rounded-lg border-2 border-gray-500 p-3"
+        />
+        {error && (
+          <p role="alert" className="mb-4 rounded border border-red-800 bg-red-50 p-3 text-sm text-red-900">
+            {error}
+          </p>
+        )}
+        <div className="flex justify-end gap-3">
+          <button type="button" onClick={onClose} disabled={actions.pending} className="min-h-[48px] rounded-lg border-2 border-gray-700 px-4 font-semibold">
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={actions.pending}
+            className="min-h-[48px] rounded-lg border-2 border-red-900 bg-red-800 px-4 font-semibold text-white disabled:opacity-60"
+          >
+            Confirm dismissal
+          </button>
         </div>
       </div>
     </div>

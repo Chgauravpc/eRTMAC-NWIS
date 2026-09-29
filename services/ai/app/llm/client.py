@@ -223,16 +223,20 @@ async def complete_json(
     if cache:
         cached = await get_cached(prompt_hash)
         if cached is not None:
-            logger.info("llm_cache_hit prompt_hash=%s schema=%s", prompt_hash, schema.__name__)
-            model = schema.model_validate(cached["response"])
-            meta = LlmMeta(
-                provider=cached["provider"],
-                model=cached["model"],
-                cached=True,
-                latency_ms=0.0,
-                input_chars=len(user),
-            )
-            return model, meta
+            try:
+                model = schema.model_validate(cached["response"])
+            except ValidationError:
+                logger.warning("llm_cache_stale prompt_hash=%s schema=%s", prompt_hash, schema.__name__)
+            else:
+                logger.info("llm_cache_hit prompt_hash=%s schema=%s", prompt_hash, schema.__name__)
+                meta = LlmMeta(
+                    provider=cached["provider"],
+                    model=cached["model"],
+                    cached=True,
+                    latency_ms=0.0,
+                    input_chars=len(user),
+                )
+                return model, meta
 
     schema_json = schema.model_json_schema()
     full_system = (
@@ -250,11 +254,12 @@ async def complete_json(
             model = await _complete_json_with_provider("openrouter", full_system, user, schema, max_tokens)
             provider_used = "openrouter"
         except _ProviderFailed as openrouter_exc:
+            logger.error("llm_all_providers_failed groq=%s openrouter=%s", groq_exc, openrouter_exc)
             raise NwisError(
                 "NWIS_UPSTREAM",
                 "Both LLM providers failed to produce a valid response.",
                 502,
-                {"groq_error": str(groq_exc), "openrouter_error": str(openrouter_exc)},
+                {"providers": list(PROVIDERS)},
             ) from openrouter_exc
     latency_ms = (time.monotonic() - start) * 1000
 
@@ -297,11 +302,12 @@ async def complete_text(
             text = await _try_chat("openrouter", system, user, max_tokens, json_mode=False)
             provider_used = "openrouter"
         except _ProviderFailed as openrouter_exc:
+            logger.error("llm_all_providers_failed groq=%s openrouter=%s", groq_exc, openrouter_exc)
             raise NwisError(
                 "NWIS_UPSTREAM",
                 "Both LLM providers failed to produce a response.",
                 502,
-                {"groq_error": str(groq_exc), "openrouter_error": str(openrouter_exc)},
+                {"providers": list(PROVIDERS)},
             ) from openrouter_exc
     latency_ms = (time.monotonic() - start) * 1000
 
