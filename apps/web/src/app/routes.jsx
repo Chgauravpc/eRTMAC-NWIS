@@ -22,12 +22,12 @@ import WorkspaceLayout from '../features/workspace/WorkspaceLayout';
 import { WellsPage } from '../features/wells/WellsPage';
 import { CorrelationTab } from '../features/correlation/CorrelationTab';
 import { RiskTab } from '../features/risk/RiskTab';
+import { RigView } from '../features/rig/RigView';
 
 // Placeholder Pages
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
 const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
-const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
 const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
 const DocumentsPage = () => <div className="p-4">Documents</div>;
 const ReviewQueue = () => <div className="p-4">Review Queue</div>;
