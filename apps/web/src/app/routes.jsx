@@ -20,24 +20,12 @@ const RoleRedirect = () => {
 
 import WorkspaceLayout from '../features/workspace/WorkspaceLayout';
 import { WellsPage } from '../features/wells/WellsPage';
+import { CorrelationTab } from '../features/correlation/CorrelationTab';
+import { RiskTab } from '../features/risk/RiskTab';
 
 // Placeholder Pages
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
-const WorkspaceCorrelation = () => <div className="p-4">Workspace: Correlation</div>;
-const WorkspaceRisk = () => <div className="p-4">Workspace: Risk Ahead</div>;
-const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
-const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
-const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
-const DocumentsPage = () => <div className="p-4">Documents</div>;
-const ReviewQueue = () => <div className="p-4">Review Queue</div>;
-const ReviewDoc = () => <div className="p-4">Review Doc</div>;
-const SearchAsk = () => <div className="p-4">Search & Ask</div>;
-const Planning = () => <div className="p-4">Planning</div>;
-const Analytics = () => <div className="p-4">Analytics</div>;
-const AdminUsers = () => <div className="p-4">Admin: Users</div>;
-const AdminModels = () => <div className="p-4">Admin: Models</div>;
-const WorkspaceRisk = () => <div className="p-4">Workspace: Risk Ahead</div>;
 const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
 const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
 const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
@@ -63,8 +51,8 @@ export function AppRoutes() {
         <Route path="/wells/:wellboreId" element={<WorkspaceLayout />}>
           <Route path="map" element={<WorkspaceMap />} />
           <Route path="formation" element={<WorkspaceFormation />} />
-          <Route path="correlation" element={<WorkspaceCorrelation />} />
-          <Route path="risk" element={<WorkspaceRisk />} />
+          <Route path="correlation" element={<CorrelationTab />} />
+          <Route path="risk" element={<RiskTab />} />
           <Route path="alerts" element={<WorkspaceAlerts />} />
         </Route>
         
