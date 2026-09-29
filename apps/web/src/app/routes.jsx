@@ -26,11 +26,11 @@ import { RiskTab } from '../features/risk/RiskTab';
 import { RigView } from '../features/rig/RigView';
 import { AlertsPage } from '../features/alerts/AlertsPage';
 import { WellAlertsTab } from '../features/alerts/WellAlertsTab';
+import { DocumentsPage } from '../features/documents/DocumentsPage';
 
 // Placeholder Pages
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
-const DocumentsPage = () => <div className="p-4">Documents</div>;
 const ReviewQueue = () => <div className="p-4">Review Queue</div>;
 const ReviewDoc = () => <div className="p-4">Review Doc</div>;
 const SearchAsk = () => <div className="p-4">Search & Ask</div>;
