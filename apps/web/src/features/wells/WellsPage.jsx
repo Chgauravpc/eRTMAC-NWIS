@@ -6,7 +6,7 @@ import { RISK_LABELS } from '../../lib/constants';
 import { fmtDepth, fmtDuration } from '../../lib/units';
 import { ProvenanceBadge } from './ProvenanceBadge';
 import { EmptyBlock, ErrorBlock, LoadingBlock } from './StateBlocks';
-import { Map, RefreshCw, AlertTriangle, ChevronRight, Activity, ExternalLink, Search, SlidersHorizontal, ChevronDown, ChevronLeft } from 'lucide-react';
+import { Map, AlertTriangle, ChevronRight, Activity, ExternalLink, Search, SlidersHorizontal, ChevronDown, ChevronLeft } from 'lucide-react';
 
 export function WellsPage() {
   const { data: wells, isLoading, error, refetch } = useWells();
@@ -22,6 +22,18 @@ export function WellsPage() {
       (w) => !q || w.well_name?.toLowerCase().includes(q) || w.field?.toLowerCase().includes(q),
     );
   }, [wells, search]);
+
+  const summary = useMemo(() => {
+    const counts = Object.values(alertCounts || {});
+    const live = drilling.filter((w) => streams?.[w.wellbore_id]?.status === 'live').length;
+    return {
+      openAlerts: counts.reduce((n, c) => n + c.total, 0),
+      highPriority: counts.reduce((n, c) => n + c.critical + c.warning, 0),
+      needReview: counts.filter((c) => c.critical + c.warning > 0).length,
+      livePct: drilling.length ? Math.round((live / drilling.length) * 1000) / 10 : null,
+      nptTotal: (wells || []).reduce((n, w) => n + (w.npt_h_total || 0), 0),
+    };
+  }, [alertCounts, streams, drilling, wells]);
 
   if (isLoading) return <LoadingBlock label="Loading wells…" />;
   if (error) return <ErrorBlock message="Could not load wells." onRetry={() => refetch()} />;
@@ -50,23 +62,23 @@ export function WellsPage() {
         <div className="mt-8 border-y border-gray-200 bg-gray-50/50 flex">
           <div className="flex-1 p-6 border-r border-gray-200">
             <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Active wells</div>
-            <div className="text-4xl font-medium text-gray-900 mb-1">{wells?.length || 12}</div>
-            <div className="text-sm text-gray-500">{drilling.length || 4} drilling now</div>
+            <div className="text-4xl font-medium text-gray-900 mb-1">{wells?.length ?? 0}</div>
+            <div className="text-sm text-gray-500">{drilling.length} drilling now</div>
           </div>
           <div className="flex-1 p-6 border-r border-gray-200">
             <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Open alerts</div>
-            <div className="text-4xl font-medium text-[#d97706] mb-1">03</div>
-            <div className="text-sm text-gray-500">1 high priority</div>
+            <div className="text-4xl font-medium text-[#d97706] mb-1">{String(summary.openAlerts).padStart(2, '0')}</div>
+            <div className="text-sm text-gray-500">{summary.highPriority} high priority</div>
           </div>
           <div className="flex-1 p-6 border-r border-gray-200">
             <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Live telemetry</div>
-            <div className="text-4xl font-medium text-emerald-600 mb-1">98.4%</div>
+            <div className="text-4xl font-medium text-emerald-600 mb-1">{summary.livePct == null ? '—' : `${summary.livePct}%`}</div>
             <div className="text-sm text-gray-500">Across active fleet</div>
           </div>
           <div className="flex-1 p-6">
             <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">NPT this shift</div>
-            <div className="text-4xl font-medium text-gray-900 mb-1">6.4h</div>
-            <div className="text-sm text-gray-500">↓ 18% vs last shift</div>
+            <div className="text-4xl font-medium text-gray-900 mb-1">{Math.round(summary.nptTotal * 10) / 10}h</div>
+            <div className="text-sm text-gray-500">All recorded wells</div>
           </div>
         </div>
       </div>
@@ -103,7 +115,7 @@ export function WellsPage() {
             <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">Field Inventory</div>
             <div className="flex items-center gap-3">
               <h2 className="text-2xl font-medium text-gray-900">All wells</h2>
-              <span className="bg-gray-100 text-gray-500 text-sm font-medium px-2 py-0.5 rounded-full">{wells?.length || 12}</span>
+              <span className="bg-gray-100 text-gray-500 text-sm font-medium px-2 py-0.5 rounded-full">{wells?.length ?? 0}</span>
             </div>
           </div>
           <button className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900">

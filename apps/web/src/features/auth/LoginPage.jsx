@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { cn, FOCUS_RING } from '../../components/ui/Primitives';
+import { cn } from '../../components/ui/Primitives';
 import { ROLE_LABELS } from '../../lib/constants';
 import { useProfile } from './useProfile';
 import { HelpCircle } from 'lucide-react';
@@ -17,11 +17,12 @@ export function LoginPage() {
   const { session, profile, isMock, signIn, signInMock, listMockProfiles } = useProfile();
   const from = location.state?.from?.pathname || '/';
 
-  const [email, setEmail] = useState('engineer@nwis.gov');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState(isMock ? 'engineer@nwis.gov' : '');
+  const [password, setPassword] = useState(isMock ? 'password123' : '');
   const [selectedRole, setSelectedRole] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [mockProfiles, setMockProfiles] = useState([]);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export function LoginPage() {
           </div>
           
           <h1 className="mb-6 text-6xl font-medium tracking-tight">
-            Know what's ahead.<br />
+            Know what&apos;s ahead.<br />
             <span className="text-[#f1a260]">Before the bit gets<br />there.</span>
           </h1>
           
@@ -136,6 +137,7 @@ export function LoginPage() {
                     });
                   }}
                   disabled={busy}
+                  aria-label={`Log in as ${ROLE_LABELS[p.role] || p.role}`}
                   className="flex w-full items-center justify-between rounded border border-gray-200 bg-white p-4 text-left shadow-sm transition-colors hover:border-gray-900 hover:bg-gray-50 disabled:opacity-70"
                 >
                   <div>
@@ -174,14 +176,14 @@ export function LoginPage() {
               <div className="relative">
                 <input
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   className={INPUT}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-                <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700">
-                  Show
+                <button type="button" onClick={() => setShowPassword((v) => !v)} aria-pressed={showPassword} className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-700">
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>

@@ -1,11 +1,13 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { NavLink, Outlet, Link, useLocation, useMatch, useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, Settings, HelpCircle, Bell, Search, ChevronRight } from 'lucide-react';
-import { Badge, Button, Spinner, cn, FOCUS_RING } from '../components/ui/Primitives';
+import { NavLink, Outlet, useLocation, useMatch, useNavigate } from 'react-router-dom';
+import { LogOut, Menu, X, Bell, Search, ChevronRight } from 'lucide-react';
+import { Badge, Spinner, cn, FOCUS_RING } from '../components/ui/Primitives';
 import { ROLE_LABELS } from '../lib/constants';
 import { useProfile } from '../features/auth/useProfile';
 import { useWellSummary } from '../lib/hooks/wells';
 import { AlertBanner } from '../features/alerts/AlertBanner';
+import { useAlerts } from '../features/alerts/AlertProvider';
+import { isUnacked } from '../features/alerts/alertUtils';
 import { navItemsFor } from './nav';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -83,6 +85,10 @@ export function SidebarProfile() {
     <div 
       className="mt-auto border-t border-gray-800/60 p-4 flex items-center justify-between cursor-pointer hover:bg-[#1e293b] transition-colors"
       onClick={handleSignOut}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleSignOut()}
+      role="button"
+      tabIndex={0}
+      aria-label="Sign out"
       title="Sign out"
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -93,7 +99,7 @@ export function SidebarProfile() {
           <span className="font-medium text-sm text-gray-200 truncate" data-testid="user-name">
             {profile.full_name || profile.email?.split('@')[0]}
           </span>
-          <span className="text-[10px] uppercase tracking-widest text-gray-500 truncate">
+          <span className="text-[10px] uppercase tracking-widest text-gray-500 truncate" data-testid="role-badge">
             {ROLE_LABELS[profile.role] || profile.role}
           </span>
         </div>
@@ -105,13 +111,24 @@ export function SidebarProfile() {
 
 export function TopNav() {
   const { profile } = useProfile();
+  const navigate = useNavigate();
+  const [q, setQ] = useState('');
+  const { alerts = [] } = useAlerts();
+  const unacked = alerts.filter(isUnacked).length;
   const initials = profile ? (profile.full_name || profile.email || 'U').charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="flex items-center gap-6">
       <div className="hidden lg:flex items-center bg-gray-50 border border-gray-200 rounded px-3 py-1.5 w-64">
         <Search className="h-4 w-4 text-gray-400 mr-2" />
-        <input type="text" placeholder="Search wells, events, documents" className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-400" />
+        <input
+          type="text"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && navigate(q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : '/search')}
+          aria-label="Search wells, events, documents"
+          placeholder="Search wells, events, documents"
+          className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-400" />
         <div className="border border-gray-200 rounded px-1.5 text-[10px] text-gray-400 ml-2">⌘ K</div>
       </div>
       
@@ -120,9 +137,11 @@ export function TopNav() {
         <span className="text-gray-600">Connected <span className="text-[10px] text-gray-400">10Hz</span></span>
       </div>
       
-      <button className="relative text-gray-600 hover:text-gray-900 transition-colors">
+      <button className="relative text-gray-600 hover:text-gray-900 transition-colors" aria-label="Alerts" onClick={() => navigate('/alerts')}>
         <Bell className="h-5 w-5" />
-        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border-2 border-white">3</span>
+        {unacked > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border-2 border-white">{unacked > 9 ? '9+' : unacked}</span>
+        )}
       </button>
       
       <div className="h-8 w-8 rounded bg-[#d97706] text-white flex items-center justify-center text-xs font-bold shadow-sm">
@@ -221,7 +240,7 @@ export default function Layout() {
                 </div>
                 <span className="text-lg font-bold text-white">NWIS</span>
               </div>
-              <button type="button" onClick={() => setOpen(false)} className={cn('rounded-md p-2 text-gray-400 hover:bg-gray-800 hover:text-white', FOCUS_RING)}>
+              <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className={cn('rounded-md p-2 text-gray-400 hover:bg-gray-800 hover:text-white', FOCUS_RING)}>
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -236,6 +255,9 @@ export default function Layout() {
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
+              aria-label="Open menu"
+              aria-expanded={open}
+              aria-controls="mobile-nav"
               className={cn('md:hidden rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900', FOCUS_RING)}
               onClick={() => setOpen(true)}
             >
@@ -252,6 +274,7 @@ export default function Layout() {
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-12">
+          <AlertBanner />
           <ErrorBoundary key={location.pathname}>
             <Suspense fallback={
               <div className="flex h-full items-center justify-center">
