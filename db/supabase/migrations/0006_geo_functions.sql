@@ -17,8 +17,14 @@ security invoker
 as $$
 declare
   v_surface geography(Point, 4326);
-  v_s1 record;
-  v_s2 record;
+  v_s1_md real;
+  v_s1_tvd real;
+  v_s1_north real;
+  v_s1_east real;
+  v_s2_md real;
+  v_s2_tvd real;
+  v_s2_north real;
+  v_s2_east real;
   v_f real := 0.0;
   v_north real;
   v_east real;
@@ -39,7 +45,7 @@ begin
 
   -- Find station with largest md <= p_md
   select ss.md_m, ss.tvd_m, ss.north_m, ss.east_m
-  into v_s1
+  into v_s1_md, v_s1_tvd, v_s1_north, v_s1_east
   from survey_stations ss
   where ss.wellbore_id = p_wellbore and ss.md_m <= p_md
   order by ss.md_m desc
@@ -47,38 +53,44 @@ begin
 
   -- Find station with smallest md >= p_md
   select ss.md_m, ss.tvd_m, ss.north_m, ss.east_m
-  into v_s2
+  into v_s2_md, v_s2_tvd, v_s2_north, v_s2_east
   from survey_stations ss
   where ss.wellbore_id = p_wellbore and ss.md_m >= p_md
   order by ss.md_m asc
   limit 1;
 
   -- If no stations exist, assume vertical well at surface
-  if v_s1 is null and v_s2 is null then
+  if v_s1_md is null and v_s2_md is null then
     return query select ST_X(v_surface::geometry), ST_Y(v_surface::geometry), p_md;
     return;
   end if;
 
   -- If p_md is before first station, use first station
-  if v_s1 is null then
-    v_s1 := v_s2;
+  if v_s1_md is null then
+    v_s1_md := v_s2_md;
+    v_s1_tvd := v_s2_tvd;
+    v_s1_north := v_s2_north;
+    v_s1_east := v_s2_east;
   end if;
 
   -- If p_md is beyond last station, clamp to last station
-  if v_s2 is null then
-    v_s2 := v_s1;
+  if v_s2_md is null then
+    v_s2_md := v_s1_md;
+    v_s2_tvd := v_s1_tvd;
+    v_s2_north := v_s1_north;
+    v_s2_east := v_s1_east;
   end if;
 
   -- Linear interpolation factor
-  if v_s2.md_m > v_s1.md_m then
-    v_f := (p_md - v_s1.md_m) / (v_s2.md_m - v_s1.md_m);
+  if v_s2_md > v_s1_md then
+    v_f := (p_md - v_s1_md) / (v_s2_md - v_s1_md);
   else
     v_f := 0.0;
   end if;
 
-  v_north := v_s1.north_m + v_f * (v_s2.north_m - v_s1.north_m);
-  v_east  := v_s1.east_m  + v_f * (v_s2.east_m  - v_s1.east_m);
-  v_tvd   := v_s1.tvd_m   + v_f * (v_s2.tvd_m   - v_s1.tvd_m);
+  v_north := v_s1_north + v_f * (v_s2_north - v_s1_north);
+  v_east  := v_s1_east  + v_f * (v_s2_east  - v_s1_east);
+  v_tvd   := v_s1_tvd   + v_f * (v_s2_tvd   - v_s1_tvd);
 
   -- Project north then east on WGS84 spheroid (azimuth in radians, distance in metres)
   v_azi_north := case when v_north >= 0 then 0.0 else pi() end;
@@ -112,8 +124,11 @@ stable
 security invoker
 as $$
 declare
-  v_curr record;
-  v_next record;
+  v_curr_formation text;
+  v_curr_top_md real;
+  v_curr_source top_source;
+  v_next_formation text;
+  v_next_top_md real;
   v_rel real := null;
 begin
   -- Best formation top at or above p_md
@@ -133,13 +148,13 @@ begin
       end asc
   )
   select rt.formation, rt.top_md_m, rt.source
-  into v_curr
+  into v_curr_formation, v_curr_top_md, v_curr_source
   from ranked_tops rt
   where rt.top_md_m <= p_md
   order by rt.top_md_m desc
   limit 1;
 
-  if v_curr is null then
+  if v_curr_formation is null then
     return;
   end if;
 
@@ -147,8 +162,7 @@ begin
   with ranked_tops as (
     select distinct on (ft.formation)
       ft.formation,
-      ft.top_md_m,
-      ft.source
+      ft.top_md_m
     from formation_tops ft
     where ft.wellbore_id = p_wellbore
     order by ft.formation,
@@ -160,14 +174,14 @@ begin
       end asc
   )
   select rt.formation, rt.top_md_m
-  into v_next
+  into v_next_formation, v_next_top_md
   from ranked_tops rt
   where rt.top_md_m > p_md
   order by rt.top_md_m asc
   limit 1;
 
-  if v_next is not null and v_next.top_md_m > v_curr.top_md_m then
-    v_rel := (p_md - v_curr.top_md_m) / (v_next.top_md_m - v_curr.top_md_m);
+  if v_next_formation is not null and v_next_top_md > v_curr_top_md then
+    v_rel := (p_md - v_curr_top_md) / (v_next_top_md - v_curr_top_md);
     if v_rel < 0.0 then v_rel := 0.0; end if;
     if v_rel > 1.0 then v_rel := 1.0; end if;
   else
@@ -175,12 +189,12 @@ begin
   end if;
 
   return query select
-    v_curr.formation,
-    v_curr.top_md_m,
-    v_next.formation,
-    v_next.top_md_m,
+    v_curr_formation,
+    v_curr_top_md,
+    v_next_formation,
+    v_next_top_md,
     v_rel,
-    v_curr.source;
+    v_curr_source;
 end;
 $$;
 
@@ -212,7 +226,9 @@ security invoker
 as $$
 declare
   v_active_surface geography(Point, 4326);
-  v_active_pos record;
+  v_active_lon float8;
+  v_active_lat float8;
+  v_active_tvd real;
 begin
   -- Get active surface
   select w.surface into v_active_surface
@@ -226,7 +242,9 @@ begin
 
   -- If p_md is supplied, get active 3D position
   if p_md is not null then
-    select * into v_active_pos from well_position_at_md(p_wellbore, p_md);
+    select p.lon, p.lat, p.tvd_m
+    into v_active_lon, v_active_lat, v_active_tvd
+    from well_position_at_md(p_wellbore, p_md) p;
   end if;
 
   return query
@@ -250,17 +268,17 @@ begin
     select
       c.*,
       case
-        when v_active_pos is not null then
+        when p_md is not null and v_active_lon is not null then
           (
             select
               sqrt(
-                power(ST_Distance(ST_SetSRID(ST_MakePoint(v_active_pos.lon, v_active_pos.lat), 4326)::geography, ST_SetSRID(ST_MakePoint(q.lon, q.lat), 4326)::geography), 2) +
-                power((v_active_pos.tvd_m - q.tvd_m)::float8, 2)
+                power(ST_Distance(ST_SetSRID(ST_MakePoint(v_active_lon, v_active_lat), 4326)::geography, ST_SetSRID(ST_MakePoint(q.lon, q.lat), 4326)::geography), 2) +
+                power((v_active_tvd - q.tvd_m)::float8, 2)
               )::real
             from (
               select coalesce(
-                (select ss.md_m from survey_stations ss where ss.wellbore_id = c.wb_id order by abs(ss.tvd_m - v_active_pos.tvd_m) limit 1),
-                v_active_pos.tvd_m
+                (select ss.md_m from survey_stations ss where ss.wellbore_id = c.wb_id order by abs(ss.tvd_m - v_active_tvd) limit 1),
+                v_active_tvd
               ) as target_md
             ) t
             cross join lateral well_position_at_md(c.wb_id, t.target_md) q
