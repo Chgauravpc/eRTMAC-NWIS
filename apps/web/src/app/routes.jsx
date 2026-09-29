@@ -18,11 +18,25 @@ const RoleRedirect = () => {
   }
 };
 
+import WorkspaceLayout from '../features/workspace/WorkspaceLayout';
+import { WellsPage } from '../features/wells/WellsPage';
+
 // Placeholder Pages
-const WellsPage = () => <div className="p-4">Active Wells</div>;
 const WorkspaceMap = () => <div className="p-4">Workspace: Map</div>;
 const WorkspaceFormation = () => <div className="p-4">Workspace: Formation</div>;
 const WorkspaceCorrelation = () => <div className="p-4">Workspace: Correlation</div>;
+const WorkspaceRisk = () => <div className="p-4">Workspace: Risk Ahead</div>;
+const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
+const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
+const AlertsPage = () => <div className="p-4">All Open Alerts</div>;
+const DocumentsPage = () => <div className="p-4">Documents</div>;
+const ReviewQueue = () => <div className="p-4">Review Queue</div>;
+const ReviewDoc = () => <div className="p-4">Review Doc</div>;
+const SearchAsk = () => <div className="p-4">Search & Ask</div>;
+const Planning = () => <div className="p-4">Planning</div>;
+const Analytics = () => <div className="p-4">Analytics</div>;
+const AdminUsers = () => <div className="p-4">Admin: Users</div>;
+const AdminModels = () => <div className="p-4">Admin: Models</div>;
 const WorkspaceRisk = () => <div className="p-4">Workspace: Risk Ahead</div>;
 const WorkspaceAlerts = () => <div className="p-4">Workspace: Alerts</div>;
 const RigView = () => <div className="p-4 rig h-screen">Rig View</div>;
@@ -45,11 +59,14 @@ export function AppRoutes() {
       
       <Route element={<RequireRole><Layout /></RequireRole>}>
         <Route path="/wells" element={<WellsPage />} />
-        <Route path="/wells/:wellboreId/map" element={<WorkspaceMap />} />
-        <Route path="/wells/:wellboreId/formation" element={<WorkspaceFormation />} />
-        <Route path="/wells/:wellboreId/correlation" element={<WorkspaceCorrelation />} />
-        <Route path="/wells/:wellboreId/risk" element={<WorkspaceRisk />} />
-        <Route path="/wells/:wellboreId/alerts" element={<WorkspaceAlerts />} />
+        
+        <Route path="/wells/:wellboreId" element={<WorkspaceLayout />}>
+          <Route path="map" element={<WorkspaceMap />} />
+          <Route path="formation" element={<WorkspaceFormation />} />
+          <Route path="correlation" element={<WorkspaceCorrelation />} />
+          <Route path="risk" element={<WorkspaceRisk />} />
+          <Route path="alerts" element={<WorkspaceAlerts />} />
+        </Route>
         
         <Route path="/alerts" element={<RequireRole roles={['rtoc_engineer', 'admin']}><AlertsPage /></RequireRole>} />
         <Route path="/documents" element={<RequireRole roles={['reviewer', 'office_engineer', 'admin']}><DocumentsPage /></RequireRole>} />
