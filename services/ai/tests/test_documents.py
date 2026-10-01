@@ -342,20 +342,24 @@ async def test_pipeline_runs_stages_in_order_and_finishes_done(fake_db, monkeypa
 
 
 @pytest.mark.asyncio
-async def test_unmatched_well_queues_a_review_field_and_needs_review(fake_db, monkeypatch, stages):
+async def test_unmatched_well_is_not_flagged_at_classification(fake_db, monkeypatch, stages):
+    """A scan has no text at classify time; extraction may still read the well, so the flag waits."""
+    seen = {}
+
+    async def spy_extract(doc, pages):
+        seen["well_name_guess"] = doc.get("well_name_guess")
+        seen["well_id"] = doc["well_id"]
+
+    monkeypatch.setattr(pipeline, "extract", spy_extract)
     fake_db.job_doc = dict(DOC)
     fake_db.wells = [{"id": "well-2", "name": "SYN-NHK-01"}]
-    fake_db.pending = 1  # the row inserted above is pending
     monkeypatch.setattr(storage, "download", lambda bucket, path: DDR_TEXT)
 
     await pipeline.run_pipeline(JOB_ID)
 
-    (field,) = fake_db.params_of("insert into extracted_fields")
-    assert field["doc_id"] == DOC["id"] and field["job_id"] == JOB_ID
-    sql = next(s for s, _ in fake_db.calls if "insert into extracted_fields" in s)
-    assert "'well_header', 'well_id'" in sql and "'unmatched_well'" in sql  # contract §7 field name
+    assert fake_db.params_of("insert into extracted_fields") == []
     assert fake_db.params_of("update documents set well_id") == []
-    assert fake_db.job_updates()[-1]["status"] == "needs_review"
+    assert seen == {"well_name_guess": "SYN-DLJ-03", "well_id": None}  # handed on to extract/validate
 
 
 @pytest.mark.asyncio

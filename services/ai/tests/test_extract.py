@@ -62,6 +62,7 @@ class FakeDb:
         self.wellbore_id: str | None = WELLBORE_ID
         self.well_td: float | None = 3600.0
         self.duplicate_event = False
+        self.wells = [{"id": WELL_ID, "name": "SYN-DLJ-03"}]
         self.formation_info = {"formation": "Tipam", "relative_depth": 0.4}
         self.synonyms = [{"alias": "tipam ss", "formation": "Tipam"}, {"alias": "barail group", "formation": "Barail"}]
         self.formations = [{"name": "Tipam", "strat_order": 5}, {"name": "Barail", "strat_order": 6},
@@ -72,6 +73,8 @@ class FakeDb:
             return self.synonyms
         if "from formations" in sql:
             return self.formations
+        if "from wells" in sql:
+            return self.wells
         raise AssertionError(sql)
 
     async def fetch_one(self, sql, params=None):
@@ -101,7 +104,7 @@ class FakeDb:
     def fields(self):
         rows = []
         for sql, params in self.executed:
-            if "insert into extracted_fields" in sql:
+            if "insert into extracted_fields" in sql and isinstance(params, list):  # execute_many batches
                 rows.extend(params)
         return rows
 
@@ -401,6 +404,58 @@ async def test_a_rerun_clears_unresolved_rows_but_keeps_the_well_assignment_row(
     assert sql.strip().startswith("delete from extracted_fields")
     assert "not (entity = 'well_header' and field = 'well_id')" in sql
     assert params == {"doc_id": DOC_ID}
+
+
+# ---------------------------------------------------------------- validate: assigning the well
+
+
+@pytest.mark.asyncio
+async def test_well_is_assigned_from_the_name_the_llm_read(fake):
+    doc = make_doc(well_id=None)
+    extraction = extraction_for({"well_name": "syn-dlj-03", "events": [event()]})
+
+    await ex.validate(doc, [], extraction)
+
+    (update,) = [p for sql, p in fake.executed if sql.strip().startswith("update documents set well_id")]
+    assert update == {"well_id": WELL_ID, "id": DOC_ID} and doc["well_id"] == WELL_ID
+    assert fake.inserts("events")[0]["wellbore_id"] == WELLBORE_ID  # rows can now be created
+    assert not [r for r in fake.fields() if r["entity"] == "well_header"]  # nothing to flag
+
+
+@pytest.mark.asyncio
+async def test_classification_guess_is_the_fallback_name(fake):
+    doc = make_doc(well_id=None, well_name_guess="SYN-DLJ-03")
+    await ex.validate(doc, [], extraction_for({"events": [event()]}))
+    assert doc["well_id"] == WELL_ID and len(fake.inserts("events")) == 1
+
+
+@pytest.mark.asyncio
+async def test_still_unmatched_after_extraction_is_flagged_for_a_reviewer(fake):
+    fake.wellbore_id = None
+    doc = make_doc(well_id=None)
+    await ex.validate(doc, [], extraction_for({"well_name": "SYN-ZZZ-99", "events": [event()]}))
+
+    flags = [(sql, p) for sql, p in fake.executed if "'well_header', 'well_id'" in sql]
+    assert len(flags) == 1
+    sql, params = flags[0]
+    assert "'unmatched_well'" in sql and params["doc_id"] == DOC_ID and params["job_id"] == doc["job_id"]
+    assert params["value"].obj == {"raw": "SYN-ZZZ-99", "value": None, "unit": None}
+    assert fake.inserts("events") == []  # no wellbore: the event stays a review field
+
+
+@pytest.mark.asyncio
+async def test_unmatched_and_nameless_is_flagged_without_a_name(fake):
+    fake.wellbore_id = None
+    await ex.validate(make_doc(well_id=None), [], extraction_for({}))
+    (flag,) = [p for sql, p in fake.executed if "'well_header', 'well_id'" in sql]
+    assert flag["value"] is None
+
+
+@pytest.mark.asyncio
+async def test_a_document_that_already_has_a_well_is_not_rematched(fake):
+    await ex.validate(make_doc(), [], extraction_for({"well_name": "SYN-ZZZ-99"}))
+    assert not [1 for sql, _ in fake.executed if "'well_header', 'well_id'" in sql]
+    assert not [1 for sql, _ in fake.executed if sql.strip().startswith("update documents")]
 
 
 # ---------------------------------------------------------------- validate: other entities

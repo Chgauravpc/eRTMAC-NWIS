@@ -237,6 +237,7 @@ class _Context:
 
 async def validate(doc: dict[str, Any], pages: list[dict[str, Any]], extraction: Extraction) -> None:
     result = extraction.result
+    await _ensure_well(doc, result)
     wellbore_id, td_md_m = await _resolve_well(doc, result)
     ctx = _Context(doc, extraction, wellbore_id, td_md_m, await normalize.get_resolver())
 
@@ -262,6 +263,25 @@ async def validate(doc: dict[str, Any], pages: list[dict[str, Any]], extraction:
     if wellbore_id is None and any(ctx.counts.values()):
         logger.warning("no wellbore for doc_id=%s: results kept only as review fields", doc["id"])
     logger.info("validate_done doc_id=%s counts=%s", doc["id"], dict(ctx.counts))
+
+
+async def _ensure_well(doc: dict[str, Any], result: ExtractionResult) -> None:
+    """Assign the document's well from the name the LLM read; flag it for a reviewer if none matches.
+
+    The classify stage matches from the first pages' text only, which a scan does not have yet.
+    """
+    if doc.get("well_id"):
+        return
+    names = [n.strip() for n in (result.well_name, doc.get("well_name_guess")) if n and n.strip()]
+    for name in names:
+        well_id = await normalize.match_well(name)
+        if well_id is not None:
+            await db.execute(
+                "update documents set well_id = %(well_id)s where id = %(id)s", {"well_id": well_id, "id": doc["id"]}
+            )
+            doc["well_id"] = well_id
+            return
+    await normalize.flag_unmatched_well(doc.get("job_id"), doc["id"], names[0] if names else None)
 
 
 async def _resolve_well(doc: dict[str, Any], result: ExtractionResult) -> tuple[str | None, float | None]:

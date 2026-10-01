@@ -19,12 +19,12 @@ from typing import Any
 from uuid import UUID, uuid4
 
 from psycopg.types.json import Jsonb
-from rapidfuzz import fuzz, process
 
 from app import db, storage
 from app.errors import NwisError
 from app.ingest import classify as classify_mod
 from app.ingest.extract import extract, validate
+from app.ingest.normalize import match_well
 from app.ingest.ocr import ocr_or_parse
 from app.logging import get_logger
 from app.models.enums import DocType, JobStatus, Provenance
@@ -33,7 +33,6 @@ logger = get_logger(__name__)
 
 # progress reached when a stage has finished (PRD BE-05)
 STAGE_PROGRESS = {"classify": 5, "ocr": 40, "extract": 80, "validate": 90, "index": 100}
-WELL_MATCH_MIN_RATIO = 90
 MAX_ERROR_CHARS = 300
 
 # one document at a time (CPU box)
@@ -217,47 +216,7 @@ async def _classify_stage(job_id: str, doc: dict[str, Any]) -> dict[str, Any]:
             )
             doc["well_id"] = well_id
         else:
-            await _flag_unmatched_well(job_id, doc["id"], well_name)
+            # a scan has no text yet: extraction may still read the well name, so only flag it
+            # after extraction (app.ingest.extract.validate) if the well is still unknown
+            doc["well_name_guess"] = well_name
     return doc
-
-
-async def match_well(well_name: str) -> str | None:
-    """wells.id whose name matches `well_name` (case-insensitive, rapidfuzz ratio >= 90).
-
-    An exact match always wins. A fuzzy match must be unambiguous: names that
-    differ by one character score 90 (SYN-DLJ-03 vs SYN-DLJ-04), so if two
-    wells tie for best we leave the well unassigned for a reviewer instead of
-    guessing.
-    """
-    wells = await db.fetch_all("select id, name from wells")
-    choices = {str(w["id"]): w["name"].lower() for w in wells}
-    query = well_name.strip().lower()
-    for well_id, name in choices.items():
-        if name == query:
-            return well_id
-    ranked = process.extract(query, choices, scorer=fuzz.ratio, score_cutoff=WELL_MATCH_MIN_RATIO, limit=2)
-    if not ranked or (len(ranked) == 2 and ranked[0][1] == ranked[1][1]):
-        return None
-    return ranked[0][2]
-
-
-async def _flag_unmatched_well(job_id: str, doc_id: str, well_name: str | None) -> None:
-    """Ask a reviewer to assign the well (confidence 0 keeps it in the review queue).
-
-    Skipped when the document already has a pending one (a retried job re-runs
-    this stage).
-    """
-    # contract §7: the reviewer picks the well; review_field writes documents.well_id
-    value = Jsonb({"raw": well_name, "value": None, "unit": None}) if well_name else None
-    await db.execute(
-        """
-        insert into extracted_fields (job_id, doc_id, entity, field, value, confidence, reason)
-        select %(job_id)s, %(doc_id)s, 'well_header', 'well_id', %(value)s, 0, 'unmatched_well'
-        where not exists (
-            select 1 from extracted_fields
-            where doc_id = %(doc_id)s and entity = 'well_header' and field = 'well_id'
-              and review_status = 'pending'
-        )
-        """,
-        {"job_id": job_id, "doc_id": doc_id, "value": value},
-    )

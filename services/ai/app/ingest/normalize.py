@@ -15,6 +15,7 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
+from psycopg.types.json import Jsonb
 from rapidfuzz import fuzz, process
 
 from app import db
@@ -77,6 +78,52 @@ async def get_resolver() -> FormationResolver:
 def clear_resolver_cache() -> None:
     global _resolver
     _resolver = None
+
+
+# ---------------------------------------------------------------- wells
+
+WELL_MATCH_MIN_RATIO = 90
+
+
+async def match_well(well_name: str) -> str | None:
+    """wells.id whose name matches `well_name` (case-insensitive, rapidfuzz ratio >= 90).
+
+    An exact match always wins. A fuzzy match must be unambiguous: names that
+    differ by one character score 90 (SYN-DLJ-03 vs SYN-DLJ-04), so if two
+    wells tie for best we leave the well unassigned for a reviewer instead of
+    guessing.
+    """
+    wells = await db.fetch_all("select id, name from wells")
+    choices = {str(w["id"]): w["name"].lower() for w in wells}
+    query = well_name.strip().lower()
+    for well_id, name in choices.items():
+        if name == query:
+            return well_id
+    ranked = process.extract(query, choices, scorer=fuzz.ratio, score_cutoff=WELL_MATCH_MIN_RATIO, limit=2)
+    if not ranked or (len(ranked) == 2 and ranked[0][1] == ranked[1][1]):
+        return None
+    return ranked[0][2]
+
+
+async def flag_unmatched_well(job_id: str | None, doc_id: str, well_name: str | None) -> None:
+    """Ask a reviewer to assign the well (confidence 0 keeps it in the review queue).
+
+    contract §7: the reviewer picks the well and review_field writes documents.well_id.
+    Skipped when the document already has a pending one (a retried job runs this again).
+    """
+    value = Jsonb({"raw": well_name, "value": None, "unit": None}) if well_name else None
+    await db.execute(
+        """
+        insert into extracted_fields (job_id, doc_id, entity, field, value, confidence, reason)
+        select %(job_id)s, %(doc_id)s, 'well_header', 'well_id', %(value)s, 0, 'unmatched_well'
+        where not exists (
+            select 1 from extracted_fields
+            where doc_id = %(doc_id)s and entity = 'well_header' and field = 'well_id'
+              and review_status = 'pending'
+        )
+        """,
+        {"job_id": job_id, "doc_id": doc_id, "value": value},
+    )
 
 
 # ---------------------------------------------------------------- units
