@@ -8,7 +8,7 @@ frontend follows them over Realtime). One document at a time: the Space is a
 CPU box, so a global semaphore serialises runs.
 
 `ocr_or_parse` is BE-07 (app.ingest.ocr); `extract` and `validate` are BE-08
-(app.ingest.extract). `index` below is a placeholder that BE-09 replaces.
+(app.ingest.extract); `index` is BE-09 (app.search.index).
 """
 
 from __future__ import annotations
@@ -28,6 +28,7 @@ from app.ingest.normalize import match_well
 from app.ingest.ocr import ocr_or_parse
 from app.logging import get_logger
 from app.models.enums import DocType, JobStatus, Provenance
+from app.search.index import index_document as index
 
 logger = get_logger(__name__)
 
@@ -37,16 +38,6 @@ MAX_ERROR_CHARS = 300
 
 # one document at a time (CPU box)
 _pipeline_lock = asyncio.Semaphore(1)
-
-
-# --------------------------------------------------------------------------
-# Placeholder for a later task (BE-09; keep this signature when replacing it)
-# --------------------------------------------------------------------------
-
-
-async def index(doc_id: str) -> None:
-    """BE-09: chunk, embed and insert into `chunks`."""
-    logger.warning("index is a BE-09 placeholder; nothing indexed doc_id=%s", doc_id)
 
 
 # --------------------------------------------------------------------------

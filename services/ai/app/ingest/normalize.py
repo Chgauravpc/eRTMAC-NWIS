@@ -48,6 +48,11 @@ class FormationResolver:
             self._lookup.setdefault(squash(name), name)
         self.strat_order = dict(canonical)  # canonical name -> strat_order (1 = shallowest)
 
+    @property
+    def alias_map(self) -> dict[str, str]:
+        """lower-case alias (canonical names included) -> canonical formation name."""
+        return dict(self._lookup)
+
     def resolve(self, name: str | None) -> str | None:
         if not name or not name.strip():
             return None
