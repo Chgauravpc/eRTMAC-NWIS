@@ -9,6 +9,7 @@ psycopg-pool
 supabase
 openai<3  # 3.x moved to httpx2 internally; respx (our test mocking) only supports classic httpx
 tenacity
+rapidfuzz
 sentence-transformers
 numpy
 pytest
