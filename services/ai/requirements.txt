@@ -19,3 +19,11 @@ numpy
 pytest
 pytest-asyncio
 respx
+pymupdf
+docling
+rapidocr
+onnxruntime
+opencv-python-headless
+pytesseract
+pillow
+reportlab

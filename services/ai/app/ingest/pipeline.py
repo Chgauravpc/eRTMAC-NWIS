@@ -7,8 +7,8 @@ validate -> index, writing `jobs.stage` / `jobs.progress` as it goes (the
 frontend follows them over Realtime). One document at a time: the Space is a
 CPU box, so a global semaphore serialises runs.
 
-`ocr_or_parse`, `extract`, `validate` and `index` below are placeholders that
-BE-07 (OCR), BE-08 (extraction, validation) and BE-09 (indexing) replace.
+`ocr_or_parse` is BE-07 (app.ingest.ocr). `extract`, `validate` and `index` below
+are placeholders that BE-08 (extraction, validation) and BE-09 (indexing) replace.
 """
 
 from __future__ import annotations
@@ -24,6 +24,7 @@ from rapidfuzz import fuzz, process
 from app import db, storage
 from app.errors import NwisError
 from app.ingest import classify as classify_mod
+from app.ingest.ocr import PageResult, ocr_or_parse
 from app.logging import get_logger
 from app.models.enums import DocType, JobStatus, Provenance
 
@@ -37,19 +38,10 @@ MAX_ERROR_CHARS = 300
 # one document at a time (CPU box)
 _pipeline_lock = asyncio.Semaphore(1)
 
-# PRD BE-07: {page_no, text, markdown, tables, ocr_confidence, engine, boxes}
-PageResult = dict[str, Any]
-
 
 # --------------------------------------------------------------------------
-# Placeholders for later tasks (keep these signatures when replacing them)
+# Placeholders for later tasks (BE-08, BE-09; keep these signatures when replacing them)
 # --------------------------------------------------------------------------
-
-
-async def ocr_or_parse(doc: dict[str, Any]) -> list[PageResult]:
-    """BE-07: OCR / parse the stored file into pages."""
-    logger.warning("ocr_or_parse is a BE-07 placeholder; no pages produced doc_id=%s", doc["id"])
-    return []
 
 
 async def extract(doc: dict[str, Any], pages: list[PageResult]) -> None:
