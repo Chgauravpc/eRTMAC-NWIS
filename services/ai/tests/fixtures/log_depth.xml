@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logs xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1">
+  <log uidWell="W-1" uidWellbore="WB-1" uid="LOG-1">
+    <nameWell>SYN-TEST-01</nameWell>
+    <nameWellbore>SYN-TEST-01 main</nameWellbore>
+    <name>Drilling parameters</name>
+    <indexType>measured depth</indexType>
+    <nullValue>-999.25</nullValue>
+    <indexCurve>DEPT</indexCurve>
+    <logCurveInfo uid="DEPT"><mnemonic>DEPT</mnemonic><unit>m</unit></logCurveInfo>
+    <logCurveInfo uid="ROP"><mnemonic>ROP</mnemonic><unit>m/h</unit></logCurveInfo>
+    <logCurveInfo uid="WOB"><mnemonic>WOB</mnemonic><unit>klbf</unit></logCurveInfo>
+    <logData>
+      <mnemonicList>DEPT,ROP,WOB</mnemonicList>
+      <unitList>m,m/h,klbf</unitList>
+      <data>1000.0,12.5,10.0</data>
+      <data>1000.5,-999.25,10.4</data>
+      <data>1001.0,13.1,</data>
+      <data>1001.5,broken row</data>
+    </logData>
+  </log>
+</logs>

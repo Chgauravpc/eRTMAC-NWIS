@@ -10,6 +10,10 @@ supabase
 openai<3  # 3.x moved to httpx2 internally; respx (our test mocking) only supports classic httpx
 tenacity
 rapidfuzz
+lxml
+lasio
+pandas
+openpyxl
 sentence-transformers
 numpy
 pytest

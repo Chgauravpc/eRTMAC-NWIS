@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<trajectorys xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1">
+  <trajectory uidWell="W-1" uidWellbore="WB-1" uid="TR-1">
+    <nameWell>SYN-TEST-01</nameWell>
+    <nameWellbore>SYN-TEST-01 main</nameWellbore>
+    <name>Survey 1</name>
+    <trajectoryStation uid="s3">
+      <md uom="ft">2000</md>
+      <tvd uom="ft">1950</tvd>
+      <incl uom="dega">20</incl>
+      <azi uom="dega">95</azi>
+    </trajectoryStation>
+    <trajectoryStation uid="s1">
+      <typeTrajStation>tie in point</typeTrajStation>
+      <md uom="ft">0</md>
+      <tvd uom="ft">0</tvd>
+      <incl uom="dega">0</incl>
+      <azi uom="dega">0</azi>
+    </trajectoryStation>
+    <trajectoryStation uid="s2">
+      <md uom="ft">1000</md>
+      <tvd uom="ft">995</tvd>
+      <incl uom="dega">10</incl>
+      <azi uom="dega">90</azi>
+    </trajectoryStation>
+    <trajectoryStation uid="s4">
+      <md uom="ft">2500</md>
+    </trajectoryStation>
+  </trajectory>
+</trajectorys>
