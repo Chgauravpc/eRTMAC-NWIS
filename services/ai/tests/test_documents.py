@@ -22,6 +22,8 @@ class FakeDb:
         self.calls: list[tuple[str, dict | None]] = []
         self.existing_id: str | None = None  # row returned for the sha256 lookup
         self.latest_job_status: str | None = None  # status of the existing document's newest job
+        self.doc_exists = True  # row returned for "select id from documents where id"
+        self.active_job: str | None = None  # a queued/running job on the document, if any
         self.job_doc: dict | None = None  # row returned for the job+document lookup
         self.pending = 0
         self.wells: list[dict] = []
@@ -31,6 +33,10 @@ class FakeDb:
         self.calls.append((sql, params))
         if "from documents where sha256" in sql:
             return {"id": self.existing_id} if self.existing_id else None
+        if "from documents where id" in sql:
+            return {"id": params["id"]} if self.doc_exists else None
+        if "from jobs where status in" in sql:
+            return {"id": self.active_job} if self.active_job else None
         if "from jobs where doc_id" in sql:
             return {"status": self.latest_job_status} if self.latest_job_status else None
         if "from jobs j join documents" in sql:
@@ -275,6 +281,62 @@ def test_failed_move_rolls_back_the_document(client, fake_db, fake_storage, pipe
     assert response.json()["error"]["code"] == "NWIS_UPSTREAM"
     assert len(fake_db.params_of("delete from documents")) == 1
     assert fake_db.params_of("insert into jobs") == [] and pipeline_runs == []
+
+
+# ---------------------------------------------------------------- reprocess
+
+DOC_UUID = str(uuid4())
+
+
+def test_reprocess_starts_a_new_job_for_a_stored_document(client, fake_db, pipeline_runs):
+    response = client.post(f"/v1/documents/{DOC_UUID}/reprocess", headers=headers("reviewer"))
+
+    assert response.status_code == 202
+    body = response.json()
+    assert body["document_id"] == DOC_UUID and body["job_id"]
+    (job,) = fake_db.params_of("insert into jobs")
+    assert job["id"] == body["job_id"] and job["doc_id"] == DOC_UUID and job["created_by"] == USER_ID
+    assert fake_db.params_of("insert into audit_log")[0]["action"] == "doc.reprocess"
+    assert pipeline_runs == [body["job_id"]]
+    assert fake_db.params_of("insert into documents") == []  # the stored copy is reused
+
+
+@pytest.mark.parametrize("role", ["reviewer", "office_engineer", "admin"])
+def test_reprocess_is_allowed_for_the_upload_roles(client, fake_db, pipeline_runs, role):
+    assert client.post(f"/v1/documents/{DOC_UUID}/reprocess", headers=headers(role)).status_code == 202
+
+
+@pytest.mark.parametrize("role", ["rig_engineer", "rtoc_engineer"])
+def test_reprocess_rejects_other_roles(client, fake_db, pipeline_runs, role):
+    response = client.post(f"/v1/documents/{DOC_UUID}/reprocess", headers=headers(role))
+    assert response.status_code == 403 and response.json()["error"]["code"] == "NWIS_FORBIDDEN"
+    assert pipeline_runs == []
+
+
+def test_reprocess_unknown_document_is_404(client, fake_db, pipeline_runs):
+    fake_db.doc_exists = False
+    response = client.post(f"/v1/documents/{DOC_UUID}/reprocess", headers=headers())
+    assert response.status_code == 404 and response.json()["error"]["code"] == "NWIS_NOT_FOUND"
+    assert pipeline_runs == []
+
+
+def test_reprocess_while_a_job_is_active_is_409(client, fake_db, pipeline_runs):
+    fake_db.active_job = str(uuid4())
+    response = client.post(f"/v1/documents/{DOC_UUID}/reprocess", headers=headers())
+
+    assert response.status_code == 409
+    error = response.json()["error"]
+    assert error["code"] == "NWIS_BAD_STATE" and error["details"]["job_id"] == fake_db.active_job
+    assert fake_db.params_of("insert into jobs") == [] and pipeline_runs == []
+
+
+def test_reprocess_with_a_non_uuid_id_is_400(client, fake_db, pipeline_runs):
+    response = client.post("/v1/documents/not-a-uuid/reprocess", headers=headers())
+    assert response.status_code == 400 and response.json()["error"]["code"] == "NWIS_BAD_REQUEST"
+
+
+def test_reprocess_requires_the_service_token(client):
+    assert client.post(f"/v1/documents/{DOC_UUID}/reprocess").status_code == 401
 
 
 # ---------------------------------------------------------------- pipeline

@@ -237,6 +237,7 @@ sanity check (mark slow).
   - No rule matched → LLM classification (small prompt, JSON `{doc_type, well_name, confidence}`).
   - If the request gave `doc_type`, use it.
 - Well matching: if `well_id` not given, match `well_name` from the header/LLM against `wells.name` (case-insensitive, `rapidfuzz` ratio ≥ 90); no match → leave null and add an `extracted_fields` row (`entity='well_header'`, field `well_id`, `value` `{"raw": "<name as read or null>", "value": null, "unit": null}`, confidence 0, reason `unmatched_well`); the reviewer picks the well and `review_field` writes `documents.well_id` (contract §7). A match needs an exact name, or a unique fuzzy best (a tie between wells is left to the reviewer). If the document's latest job failed, re-posting the same file starts a new job (202) instead of reporting a duplicate.
+- `POST /v1/documents/{document_id}/reprocess` (contract §9.2): 202 + a new job that runs the whole pipeline again on the stored file with the document's current well. 404 unknown document, 409 if a job is queued/running, 400 if the id is not a uuid. Used after a reviewer assigns a well to a document that had none.
 - `batch.py`: CLI `python -m app.ingest.batch --doc-type witsml --limit 50` to run the pipeline for documents already inserted by Database loaders (Volve DDRs) that have no `jobs` row; also `--dir <folder>` to ingest local files (synthetic PDFs, NPD history text).
 
 **Acceptance**
@@ -820,6 +821,7 @@ rows with action alert.system.<transition>. Tests with a fake clock for every ru
   - `documents/upload-url`: validate size ≤ 25 MB and MIME in the DB-06 list; `supabaseAdmin.storage.from('documents').createSignedUploadUrl('incoming/<uuid>/<sanitised filename>')`; return `{upload_id, storage_path, signed_url, token}`.
   - `admin/users/invite`: `supabaseAdmin.auth.admin.inviteUserByEmail(email, {data: {full_name}})`, then update `profiles` role and assignments; audit row.
   - `admin/users/[id]` PATCH: update role/assignments; audit row.
+- `documents/[documentId]/reprocess.js` (**new, not Node-only**): roles reviewer, office_engineer, admin; check the id is a uuid (else 400 `NWIS_BAD_REQUEST`), then `forwardToSpace` to `POST /v1/documents/{id}/reprocess` with no body and return the Space response unchanged (202 / 404 / 409). Test: wrong role is 403, a non-uuid id is 400, and a forwarded 409 passes through.
 - `health.js`: public; returns own ok + the Space health (with 5 s timeout).
 - Filenames sanitised (`[^a-zA-Z0-9._-]` → `_`, max 120 chars).
 - **Deploy manually** with `vercel --prod` from `apps/web` (no auto-deploy); env vars set in the Vercel dashboard.
@@ -835,7 +837,8 @@ Task BE-20. Read contract §3 (apps/web/api layout), §4 (errors), §9 (all), §
 Create the Vercel Node 20 JavaScript (ES module) serverless functions in apps/web/api/: _lib/auth.js
 (requireUser), _lib/forward.js (forwardToSpace), _lib/errors.js, and one file per route in §3,
 with the role lists from §9.2. Node-only routes: documents/upload-url (createSignedUploadUrl on
-'incoming/<uuid>/<sanitised>'), admin/users/invite, admin/users/[id]. Use @supabase/supabase-js v2
+'incoming/<uuid>/<sanitised>'), admin/users/invite, admin/users/[id]. Also the forwarded route
+documents/[documentId]/reprocess (reviewer, office_engineer, admin; uuid check; forward to the Space). Use @supabase/supabase-js v2
 with SUPABASE_SERVICE_ROLE_KEY server-side only. Add vercel.json with a functions maxDuration
 entry (leave a comment to set it to the plan's limit). Tests with vitest mocking supabase and fetch.
 ```
