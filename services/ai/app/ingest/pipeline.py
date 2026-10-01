@@ -7,8 +7,8 @@ validate -> index, writing `jobs.stage` / `jobs.progress` as it goes (the
 frontend follows them over Realtime). One document at a time: the Space is a
 CPU box, so a global semaphore serialises runs.
 
-`ocr_or_parse` is BE-07 (app.ingest.ocr). `extract`, `validate` and `index` below
-are placeholders that BE-08 (extraction, validation) and BE-09 (indexing) replace.
+`ocr_or_parse` is BE-07 (app.ingest.ocr); `extract` and `validate` are BE-08
+(app.ingest.extract). `index` below is a placeholder that BE-09 replaces.
 """
 
 from __future__ import annotations
@@ -24,7 +24,8 @@ from rapidfuzz import fuzz, process
 from app import db, storage
 from app.errors import NwisError
 from app.ingest import classify as classify_mod
-from app.ingest.ocr import PageResult, ocr_or_parse
+from app.ingest.extract import extract, validate
+from app.ingest.ocr import ocr_or_parse
 from app.logging import get_logger
 from app.models.enums import DocType, JobStatus, Provenance
 
@@ -40,18 +41,8 @@ _pipeline_lock = asyncio.Semaphore(1)
 
 
 # --------------------------------------------------------------------------
-# Placeholders for later tasks (BE-08, BE-09; keep these signatures when replacing them)
+# Placeholder for a later task (BE-09; keep this signature when replacing it)
 # --------------------------------------------------------------------------
-
-
-async def extract(doc: dict[str, Any], pages: list[PageResult]) -> None:
-    """BE-08: LLM extraction; writes events, tops, ... and extracted_fields rows."""
-    logger.warning("extract is a BE-08 placeholder; nothing extracted doc_id=%s", doc["id"])
-
-
-async def validate(doc: dict[str, Any], pages: list[PageResult]) -> None:
-    """BE-08: validation rules and confidence adjustment."""
-    logger.warning("validate is a BE-08 placeholder doc_id=%s", doc["id"])
 
 
 async def index(doc_id: str) -> None:
@@ -141,6 +132,7 @@ async def run_pipeline(job_id: UUID | str) -> None:
 
 async def _run(job_id: str) -> None:
     doc = await _load_doc(job_id)
+    doc["job_id"] = job_id  # extracted_fields rows point back at the job
     await _set_job(job_id, status=JobStatus.RUNNING.value, stage="classify", progress=0, error=None)
 
     doc = await _classify_stage(job_id, doc)
@@ -149,10 +141,10 @@ async def _run(job_id: str) -> None:
     pages = await ocr_or_parse(doc)
 
     await _set_job(job_id, stage="extract", progress=STAGE_PROGRESS["ocr"])
-    await extract(doc, pages)
+    extraction = await extract(doc, pages)
 
     await _set_job(job_id, stage="validate", progress=STAGE_PROGRESS["extract"])
-    await validate(doc, pages)
+    await validate(doc, pages, extraction)
 
     await _set_job(job_id, stage="index", progress=STAGE_PROGRESS["validate"])
     await index(doc["id"])
