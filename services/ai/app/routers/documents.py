@@ -175,3 +175,37 @@ def _as_uuid_str(value: str | None) -> str | None:
         return str(UUID(value)) if value else None
     except ValueError:
         return None
+
+
+@router.post("/documents/{document_id}/reprocess")
+async def reprocess_document(
+    document_id: str, request: Request, response: Response, background: BackgroundTasks
+) -> dict:
+    """Read an already stored document again (contract §9.2).
+
+    Used after a reviewer assigns a well to a document that had none: the new job
+    runs the whole pipeline on the stored file with the document's current well.
+    """
+    user = current_user(request).require_role(*UPLOAD_ROLES)
+    try:
+        doc_id = str(UUID(document_id))
+    except ValueError as exc:
+        raise _bad_request("document_id must be a uuid") from exc
+
+    if await db.fetch_one("select id from documents where id = %(id)s", {"id": doc_id}) is None:
+        raise NwisError("NWIS_NOT_FOUND", "Document not found", 404, {"document_id": doc_id})
+    active = await db.fetch_one(
+        "select id from jobs where status in ('queued', 'running') and doc_id = %(id)s limit 1", {"id": doc_id}
+    )
+    if active is not None:
+        raise NwisError(
+            "NWIS_BAD_STATE", "This document is already being processed", 409,
+            {"document_id": doc_id, "job_id": str(active["id"])},
+        )
+
+    user_id = _as_uuid_str(user.id)
+    job_id = await pipeline.create_job(doc_id, user_id)
+    await pipeline.write_audit(user_id, "doc.reprocess", "document", doc_id, {"job_id": job_id})
+    background.add_task(pipeline.run_pipeline, job_id)
+    response.status_code = 202
+    return {"document_id": doc_id, "job_id": job_id}

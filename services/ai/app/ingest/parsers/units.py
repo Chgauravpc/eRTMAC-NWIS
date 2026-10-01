@@ -63,7 +63,7 @@ _family("kn.m", {
 _family("m/h", {"m/h": 1.0, "ft/h": 0.3048, "m/min": 60.0, "ft/min": 18.288, "m/s": 3600.0})
 _family("deg", {"deg": 1.0, "dega": 1.0, "degree": 1.0, "degrees": 1.0, "rad": 57.29577951308232})
 _family("h", {
-    "h": 1.0, "hr": 1.0, "hour": 1.0, "hours": 1.0, "min": 1 / 60, "s": 1 / 3600,
+    "h": 1.0, "hr": 1.0, "hrs": 1.0, "hour": 1.0, "hours": 1.0, "min": 1 / 60, "s": 1 / 3600,
     "d": 24.0, "day": 24.0, "days": 24.0,
 })
 # kept in industry units by the contract (§4): only aliases are folded together
@@ -160,3 +160,26 @@ def parse_quantity(text: str) -> tuple[float, str] | None:
         if unit:
             return _number(match.group(1)), unit
     return None
+
+
+def iter_quantities(text: str) -> list[tuple[float, str]]:
+    """Every number followed by a known unit, in text order, units as written.
+
+    A range (`"2395-2410 m"`) contributes both ends. Unlike `parse_quantity`,
+    this does not stop at the first hit.
+    """
+    found: list[tuple[int, float, str]] = []
+    spans: list[tuple[int, int]] = []
+    for match in _RANGE_RE.finditer(text):
+        unit = _clean_unit(match.group(3))
+        if unit:
+            found.append((match.start(), _number(match.group(1)), unit))
+            found.append((match.start(2), _number(match.group(2)), unit))
+            spans.append(match.span())
+    for match in _QUANTITY_RE.finditer(text):
+        if any(start <= match.start() < end for start, end in spans):
+            continue
+        unit = _clean_unit(match.group(2))
+        if unit:
+            found.append((match.start(), _number(match.group(1)), unit))
+    return [(value, unit) for _, value, unit in sorted(found)]
