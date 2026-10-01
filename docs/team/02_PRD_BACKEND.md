@@ -236,7 +236,7 @@ sanity check (mark slow).
   - Keywords (case-insensitive) in first 2 pages: "daily drilling report", "IADC", "morning report" → `ddr`; "well completion report", "completion report" → `wcr`; "mud log", "master log" → `mud_log`; "cement job", "cementing report" → `cement_report`; "drilling program", "casing program", "mud program" → `program`; "incident", "NPT report", "fishing" → `incident`.
   - No rule matched → LLM classification (small prompt, JSON `{doc_type, well_name, confidence}`).
   - If the request gave `doc_type`, use it.
-- Well matching: if `well_id` not given, match `well_name` from the header/LLM against `wells.name` (case-insensitive, `rapidfuzz` ratio ≥ 90); no match → leave null and add an `extracted_fields` row (`entity='well_header'`, field `well_name`, reason `unmatched_well`).
+- Well matching: if `well_id` not given, match `well_name` from the header/LLM against `wells.name` (case-insensitive, `rapidfuzz` ratio ≥ 90); no match → leave null and add an `extracted_fields` row (`entity='well_header'`, field `well_id`, `value` `{"raw": "<name as read or null>", "value": null, "unit": null}`, confidence 0, reason `unmatched_well`); the reviewer picks the well and `review_field` writes `documents.well_id` (contract §7). A match needs an exact name, or a unique fuzzy best (a tie between wells is left to the reviewer). If the document's latest job failed, re-posting the same file starts a new job (202) instead of reporting a duplicate.
 - `batch.py`: CLI `python -m app.ingest.batch --doc-type witsml --limit 50` to run the pipeline for documents already inserted by Database loaders (Volve DDRs) that have no `jobs` row; also `--dir <folder>` to ingest local files (synthetic PDFs, NPD history text).
 
 **Acceptance**

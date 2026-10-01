@@ -17,7 +17,7 @@ from app.config import get_settings
 from app.db import close_pool
 from app.errors import NwisError
 from app.logging import configure_logging, get_logger, request_id_var, user_id_var
-from app.routers import health
+from app.routers import documents, health
 
 settings = get_settings()
 configure_logging(settings.LOG_LEVEL)
@@ -47,6 +47,7 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="NWIS AI", version="0.1.0", lifespan=lifespan)
 
 app.include_router(health.router, prefix="/v1")
+app.include_router(documents.router, prefix="/v1")
 
 
 def _error_body(code: str, message: str, details: dict | None = None) -> dict:

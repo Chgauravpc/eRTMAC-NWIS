@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<drillReports xmlns="http://www.witsml.org/schemas/1series" version="1.4.1.1">
+  <drillReport uidWell="W-1" uidWellbore="WB-1" uid="DR-12">
+    <nameWell>SYN-TEST-01</nameWell>
+    <nameWellbore>SYN-TEST-01 main</nameWellbore>
+    <name>Report 12</name>
+    <dTimStart>2019-03-12T00:00:00Z</dTimStart>
+    <dTimEnd>2019-03-12T23:59:59Z</dTimEnd>
+    <statusInfo>
+      <dTim>2019-03-12T06:00:00Z</dTim>
+      <md uom="m">2400</md>
+      <tvd uom="m">2380</tvd>
+      <sum24Hr>Drilled 12-1/4in hole to 2400 m. Partial losses at 2395 m, spotted LCM pill.</sum24Hr>
+      <forecast24Hr>Continue drilling ahead.</forecast24Hr>
+    </statusInfo>
+    <fluid uid="F1">
+      <dTim>2019-03-12T06:00:00Z</dTim>
+      <type>WBM</type>
+      <md uom="m">2400</md>
+      <density uom="g/cm3">1.18</density>
+      <pv uom="cP">18</pv>
+      <yp uom="Pa">10.5</yp>
+      <filtrateLtlp uom="mL">5.2</filtrateLtlp>
+      <ecd uom="g/cm3">1.25</ecd>
+    </fluid>
+    <surveyStation uid="S1">
+      <dTim>2019-03-12T04:00:00Z</dTim>
+      <md uom="m">2300</md>
+      <tvd uom="m">2290</tvd>
+      <incl uom="dega">18.5</incl>
+      <azi uom="dega">112</azi>
+    </surveyStation>
+    <activity uid="A1">
+      <dTimStart>2019-03-12T06:00:00Z</dTimStart>
+      <dTimEnd>2019-03-12T09:30:00Z</dTimEnd>
+      <md uom="m">2395.0</md>
+      <phase>12-1/4in</phase>
+      <proprietaryCode>drilling -- drill</proprietaryCode>
+      <state>ok</state>
+      <stateDetailActivity>drilling</stateDetailActivity>
+      <comments>Drilled to 2395 m</comments>
+    </activity>
+    <activity uid="A2">
+      <dTimStart>2019-03-12T09:30:00Z</dTimStart>
+      <dTimEnd>2019-03-12T13:00:00Z</dTimEnd>
+      <md uom="ft">7870</md>
+      <phase>12-1/4in</phase>
+      <proprietaryCode>circulating</proprietaryCode>
+      <state>fail</state>
+      <stateDetailActivity>lost circulation</stateDetailActivity>
+      <comments>Partial losses 15 bbl/hr, pumped LCM pill</comments>
+    </activity>
+    <equipFailureInfo uid="E1">
+      <dTim>2019-03-12T11:00:00Z</dTim>
+      <md uom="m">1800</md>
+      <equipClass>mud pump</equipClass>
+      <description>Pump liner washout</description>
+    </equipFailureInfo>
+    <controlIncidentInfo uid="C1">
+      <dTim>2019-03-12T12:00:00Z</dTim>
+      <md uom="m">2398</md>
+      <type>kick</type>
+      <description>Flow check positive, well shut in</description>
+    </controlIncidentInfo>
+    <lithShowInfo uid="L1">
+      <mdTop uom="m">2310</mdTop>
+      <mdBottom uom="m">2330</mdBottom>
+      <lithology>sandstone</lithology>
+    </lithShowInfo>
+    <stratInfo uid="T1">
+      <dTim>2019-03-12T00:00:00Z</dTim>
+      <mdTop uom="m">2310.5</mdTop>
+      <description>Tipam</description>
+    </stratInfo>
+  </drillReport>
+</drillReports>
