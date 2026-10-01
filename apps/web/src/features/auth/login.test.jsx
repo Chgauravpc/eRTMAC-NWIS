@@ -57,7 +57,7 @@ afterEach(() => {
 describe('LoginPage (real mode)', () => {
   it('does not show the mock role picker', async () => {
     renderLogin();
-    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /Sign in/i })).toBeInTheDocument();
     expect(screen.queryByText(/Mock mode/i)).toBeNull();
   });
 
@@ -65,9 +65,9 @@ describe('LoginPage (real mode)', () => {
     const user = userEvent.setup();
     h.supabase.auth.signInWithPassword.mockResolvedValueOnce({ data: {}, error: { message: 'Invalid login credentials' } });
     renderLogin();
-    await user.type(await screen.findByLabelText('Email Address'), 'a@b.in');
+    await user.type(await screen.findByLabelText('Email'), 'a@b.in');
     await user.type(screen.getByLabelText('Password'), 'nope');
-    await user.click(screen.getByRole('button', { name: 'Enter workspace' }));
+    await user.click(screen.getByRole('button', { name: 'Sign In' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Invalid login credentials');
     expect(h.supabase.auth.signInWithPassword).toHaveBeenCalledWith({ email: 'a@b.in', password: 'nope' });
   });
@@ -79,34 +79,32 @@ describe('LoginPage (real mode)', () => {
       return { data: { user: { id: 'u-1' } }, error: null };
     });
     renderLogin();
-    await user.type(await screen.findByLabelText('Email Address'), 'r@x.in');
+    await user.type(await screen.findByLabelText('Email'), 'r@x.in');
     await user.type(screen.getByLabelText('Password'), 'pw');
-    await user.click(screen.getByRole('button', { name: 'Enter workspace' }));
+    await user.click(screen.getByRole('button', { name: 'Sign In' }));
     expect(await screen.findByText('HOME')).toBeInTheDocument();
     expect(h.supabase.from).toHaveBeenCalledWith('profiles');
   });
 
-  // SKIPPED: PRD FE-03 'Forgot password' control was removed by the login redesign; restore it to re-enable.
-  it.skip('Forgot password calls resetPasswordForEmail and confirms without revealing the account', async () => {
+  it('Forgot password calls resetPasswordForEmail and confirms without revealing the account', async () => {
     const user = userEvent.setup();
     renderLogin();
     await user.click(await screen.findByRole('button', { name: 'Forgot password?' }));
-    await user.type(screen.getByLabelText('Email Address'), 'someone@x.in');
+    await user.type(screen.getByLabelText('Email'), 'someone@x.in');
     await user.click(screen.getByRole('button', { name: 'Send reset link' }));
     await waitFor(() => expect(h.supabase.auth.resetPasswordForEmail).toHaveBeenCalled());
     expect(h.supabase.auth.resetPasswordForEmail.mock.calls[0][0]).toBe('someone@x.in');
     expect(await screen.findByRole('status')).toHaveTextContent(/If an account exists for someone@x.in/);
     await user.click(screen.getByRole('button', { name: 'Back to sign in' }));
-    expect(screen.getByRole('button', { name: 'Enter workspace' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
   });
 
-  // SKIPPED: PRD FE-03 'Forgot password' control was removed by the login redesign; restore it to re-enable.
-  it.skip('shows a reset error plainly', async () => {
+  it('shows a reset error plainly', async () => {
     const user = userEvent.setup();
     h.supabase.auth.resetPasswordForEmail.mockResolvedValueOnce({ error: { message: 'Rate limit exceeded' } });
     renderLogin();
     await user.click(await screen.findByRole('button', { name: 'Forgot password?' }));
-    await user.type(screen.getByLabelText('Email Address'), 'a@b.in');
+    await user.type(screen.getByLabelText('Email'), 'a@b.in');
     await user.click(screen.getByRole('button', { name: 'Send reset link' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Rate limit exceeded');
   });

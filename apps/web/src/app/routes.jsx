@@ -7,6 +7,7 @@ import { lazyExport, optionalPage } from './lazyPages';
 import { RequireRole } from '../features/auth/RequireRole';
 import { ForbiddenPage } from '../features/auth/ForbiddenPage';
 import { LoginPage } from '../features/auth/LoginPage';
+import { LandingPage } from '../features/landing/LandingPage';
 import { useProfile } from '../features/auth/useProfile';
 import { roleHome } from '../features/auth/roleHome';
 import { AlertProvider } from '../features/alerts/AlertProvider';
@@ -64,12 +65,12 @@ const Fallback = () => (
 );
 const Page = ({ children }) => <Suspense fallback={<Fallback />}>{children}</Suspense>;
 
-/** "/" -> the role's home page (PRD section 4). */
+/** "/" -> if authenticated, redirect to role home; otherwise show LandingPage. */
 function RoleRedirect() {
   const { profile, session, isLoading } = useProfile();
   if (isLoading) return <Fallback />;
-  if (!session || !profile) return <Navigate to="/login" replace />;
-  return <Navigate to={roleHome(profile)} replace />;
+  if (session && profile) return <Navigate to={roleHome(profile)} replace />;
+  return <LandingPage />;
 }
 
 /** A rig engineer may only open the rig view of a wellbore they are assigned to. */
@@ -105,8 +106,9 @@ const guard = (roles, el) => (
 export function AppRoutes() {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
       <Route path="/" element={<RoleRedirect />} />
+      <Route path="/landing" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
 
       <Route
         path="/rig/:wellboreId"
