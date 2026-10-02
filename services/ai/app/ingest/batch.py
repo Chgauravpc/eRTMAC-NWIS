@@ -126,6 +126,20 @@ async def _main(args: argparse.Namespace) -> None:
         await db.close_pool()
     if summary:
         print("results: " + ", ".join(f"{status}={n}" for status, n in sorted(summary.items())))
+        await _rebuild_lessons()
+
+
+async def _rebuild_lessons() -> None:
+    """New events may form new lessons (BE-11); a failure here must not fail the batch."""
+    from app.search import lessons
+
+    try:
+        stats = await lessons.rebuild()
+        print(f"lessons: {stats['created']} created, {stats['updated']} updated, {stats['failed']} failed")
+    except Exception:  # noqa: BLE001
+        logger.exception("lessons_rebuild_failed")
+    finally:
+        await db.close_pool()
 
 
 def main(argv: list[str] | None = None) -> None:

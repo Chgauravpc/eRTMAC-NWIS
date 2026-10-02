@@ -735,7 +735,7 @@ stateDiagram-v2
 | Question | Rule |
 | --- | --- |
 | Who can acknowledge? | The rig engineer assigned to that well, or any RTOC engineer. Office engineers and reviewers can only view. |
-| Who can resolve? | RTOC engineers, for all severities; rig engineers, for Info and Watch. The system auto-resolves when the bit is past the zone and the score has dropped below the band. |
+| Who can resolve? | RTOC engineers, for all severities; rig engineers, for Info and Watch. The system auto-resolves when the bit is past the zone (a warning or critical must have been acknowledged first). |
 | Can an alert be dismissed? | Info and Watch: yes, with a mandatory reason; this counts as Resolved (false alarm). Warning and Critical: no; they must be acknowledged, then resolved with an outcome. |
 | What if nobody acknowledges? | The sound repeats. Critical escalates to the RTOC lead after 5 min, Warning after 15 min. The escalation is logged. |
 | Can the same alert reappear? | Dedup key = well + risk type + depth zone, so there is no duplicate while one is open. It re-triggers only if the severity band rises, an L3 detector fires, or, after resolution, the score climbs at least 15 points above the band threshold (hysteresis stops flicker). |

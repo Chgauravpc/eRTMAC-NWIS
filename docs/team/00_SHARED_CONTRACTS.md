@@ -893,7 +893,7 @@ stateDiagram-v2
 | acknowledge | rig_engineer assigned to the wellbore; rtoc_engineer; admin | sent, viewed, escalated | any |
 | resolve (manual) | rtoc_engineer, admin: any severity; rig_engineer (assigned): info, watch | acknowledged (warning/critical); sent/viewed/acknowledged (info/watch) | see who |
 | dismiss | rig_engineer (assigned), rtoc_engineer, admin | sent, viewed | info, watch only |
-| auto-resolve | backend | acknowledged (any); sent/viewed (info/watch) — when bit_md > zone_md_to + 25 **and** fused score < band threshold; never while stream status is `lost` | any |
+| auto-resolve | backend | acknowledged (any); sent/viewed (info/watch) — when bit_md > zone_md_to + 25; never while stream status is `lost` | any |
 | rate (feedback) | the resolver, or any rig/rtoc engineer on that well | resolved | any |
 | re-trigger | backend | a new row (the old one is resolved) | when band rises, a detector fires, or score ≥ threshold + 15 |
 
