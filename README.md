@@ -4,6 +4,7 @@ SIH26121 · Oil India Limited · AI-powered offset-well knowledge and decision s
 
 ## Documents
 - [`NWIS_PRD.md`](NWIS_PRD.md) — product requirements (problem, data, OCR decision, features, architecture, workflows).
+- [`docs/PROGRESS.md`](docs/PROGRESS.md) — **where the project stands**: task status, merged PRs, handover items, known gaps, how to run things.
 - [`docs/team/00_SHARED_CONTRACTS.md`](docs/team/00_SHARED_CONTRACTS.md) — **source of truth** for schema, APIs, enums, rules and task dependencies. Read first.
 - [`docs/team/01_PRD_DATABASE.md`](docs/team/01_PRD_DATABASE.md) — Database + data tasks.
 - [`docs/team/02_PRD_BACKEND.md`](docs/team/02_PRD_BACKEND.md) — Backend tasks (FastAPI on Hugging Face, Node routes on Vercel).
