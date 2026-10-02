@@ -3,7 +3,7 @@
 **As of 2 Oct 2026**, `main` at PR #11. Task IDs and sprints are the ones in
 [`team/00_SHARED_CONTRACTS.md`](team/00_SHARED_CONTRACTS.md) §14, which stays the source of truth.
 
-Legend: ✅ done and merged · 🟡 present but not verified by this report · ⬜ not started · ⛔ blocked
+Legend: ✅ done and merged · ◐ present and checked from the code (see §3a), not run on a live system · 🟡 present, not checked · ⬜ not started · ⛔ blocked
 
 ## 1. Where we are in one paragraph
 
@@ -60,21 +60,45 @@ name extraction reads, and the unmatched-well review row is raised only if that 
 
 | ID | Task | Status |
 | --- | --- | --- |
-| DB-01 … DB-07 | project, schema, reference data, geo and search functions, RLS and RPCs, storage, realtime | 🟡 migrations `0001`–`0011` and SQL tests are on `main`; not checked against a live Supabase project in this report |
+| DB-01 … DB-07 | project, schema, reference data, geo and search functions, RLS and RPCs, storage, realtime | ◐ migrations `0001`–`0011` match the contract exactly (§3a); the SQL has never been run in this report, and there is no live Supabase project from the backend's side |
 | DB-08 | Trajectory builder (Minimum Curvature) | ⬜ **critical path** |
 | DB-09 | Synthetic Assam dataset | ⬜ **critical path** (blocked by DB-08) |
 | DB-10 | Volve loader | ⬜ (BE-06 is ready for it) |
 | DB-11 | NPD loader | ⬜ |
-| DB-12 | Views (`0012_views.sql`) | ⬜ |
+| DB-12 | Views (`0012_views.sql`) | ⬜ all five contract views are missing; the frontend reads `v_well_summary`, `v_open_alerts`, ... |
 | DB-13, DB-14 | Reset scripts, evaluation set | ⬜ |
 | **DB-05 follow-up** | `review_field`: assign a well and move the records | ⬜ `0009_review_rpcs.sql` line 67 still blocks `well_id` |
 
 ### Frontend (`apps/web`)
 
-FE-01 … FE-17 screens exist on `main` (a landing page was added by teammates). 🟡 The frontend test suite is
-not green: on `origin/main` 30 tests in 5 files fail (alerts, wells, map, workspace, app); a branch that
-included the wiring commit had 26. The causes were not investigated. FE-11 still needs the well select and the
-reprocess call (§5).
+FE-01 … FE-17 screens exist on `main` (a landing page was added by teammates). ◐ Checked from the code, and it is
+**not green**: failing tests, lint errors, the hardcoded-name check, and invented display numbers. Details in §3a.
+FE-11 still needs the well select and the reprocess call (§5).
+
+### 3a. Verified from the code (2 Oct)
+
+**Database, static check** of the contract's SQL against migrations `0001`–`0011` (a throwaway script, not committed):
+29 of 29 tables with 301 columns of identical name and base type; 17 of 17 enums with identical values; all 14 §7 functions
+with the same parameter names; every contract index; RLS enabled on every table and a policy on each except `llm_cache`
+(as specified); the three buckets; realtime on the four tables; `handle_new_user` and `set_updated_at`; reference data
+19 formations / 36 synonyms / 34 IADC codes with trouble codes 3, 5, 19, 24, 27. Behaviours present in the SQL: rig engineers
+limited to assigned wellbores, `depth_series` hidden below the bit, one open alert per `dedup_key`, replica identity full on alerts.
+**Gaps:** the five views (no `0012`), and `review_field` does not handle `well_id` (§5).
+**Not checked:** that the SQL executes on Postgres, and the RPC and RLS behaviour (eight SQL test scripts exist in `db/tests/`; none was run).
+
+**Frontend** (`npm run test`, `lint`, `check:hardcoded`, and reading the code):
+- **Tests:** 1038 of 1064 pass; 26 fail in 5 files (app 3, alerts 5, wells 7, map 4, workspace 7). Most are stale tests: they look for
+  labels, test ids and colour classes the redesign changed. The features behind them are still in the code (the surface / depth
+  toggle on the map, the stream pill word + icon + colour, the unacknowledged alerts section). `app.test.jsx` expects the heading
+  "Welcome back" but the login page now says "Sign in to NWIS".
+- **Lint fails** (FE-01 acceptance says it must pass): 7 errors, 3 in `LoginPage.jsx` and 4 unused imports in `LandingPage.jsx`.
+- **`check:hardcoded` fails** (FE-17): 16 hits, all in `LandingPage.jsx` (hardcoded `SYN-` well names and evidence text).
+- **Invented numbers in the Wells table:** `WellsPage.jsx` shows `event_count || 18` and `npt_h_total || 6.4`, so a well with no events
+  or no NPT displays 18 events or 6.4 h. This breaks the "no hardcoded values" rule. The summary tile "NPT this shift" also sums the
+  all-time `npt_h_total`.
+- **PRD drift:** the Wells table has no Field or TD column (FE-04 lists name, field, status, TD, events, NPT total, provenance).
+- **Fine:** all 18 PRD routes exist, and all 17 contract enums exist as frozen arrays with identical values.
+- **Not checked:** behaviour in a browser, the real-data (non-mock) path against a live Supabase, accessibility, performance.
 
 ## 4. Contract amendments merged
 
@@ -115,7 +139,7 @@ reprocess call (§5).
 4. **Docling is heavy.** Running it locally crashed a developer PC once. Its table extraction has not been verified (the one
    successful test page had no real table). The real Docling test only runs with `NWIS_RUN_DOCLING=1`.
 5. **Tesseract is not installed on the dev machine,** so its two real tests skip; the fallback logic is covered by mocks.
-6. **Frontend tests are red** on `main` (see §3).
+6. **Frontend is not green** on `main`: 26 failing tests, 7 lint errors, a failing hardcoded-name check, and invented numbers in the Wells table (§3a).
 
 ## 8. Recommended next steps
 
@@ -123,7 +147,9 @@ reprocess call (§5).
 2. **BE-20 (Node routes)** and **BE-15 (live detectors)** can start now.
 3. Fix the DB-05 follow-up so the review flow works end to end.
 4. First deployment: Supabase (push `0001`–`0011`), then a health-only Space, then run one real upload through the pipeline.
-5. Investigate the red frontend tests.
+5. **Frontend clean-up (Person C):** remove the `|| 18` and `|| 6.4` fallbacks; fix the 7 lint errors; update or restore the 26 stale tests;
+   move the landing page's sample wells out of `src/features` (or exempt it explicitly); add Field and TD columns to the Wells table.
+6. **Database (Person A):** add `0012_views.sql`; the frontend and BE-13 depend on the views.
 
 ## 9. How to run things
 
