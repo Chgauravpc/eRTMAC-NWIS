@@ -114,7 +114,7 @@ const WellDot = memo(function WellDot({ well, dimmed, selected, isOpen, setRef, 
 
 export function MapLegend() {
   return (
-    <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] uppercase tracking-wider font-semibold text-gray-500" aria-label="Map legend">
+    <ul className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] uppercase tracking-wider font-semibold text-gray-400" aria-label="Map legend">
       {Object.entries(RISK_COLORS).map(([risk, color]) => (
         <li key={risk} className="flex items-center gap-2">
           <span aria-hidden="true" className="inline-block h-3 w-3 rounded-full border border-gray-700/50" style={{ background: color }} />

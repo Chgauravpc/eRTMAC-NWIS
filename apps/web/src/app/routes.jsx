@@ -7,13 +7,14 @@ import { lazyExport, optionalPage } from './lazyPages';
 import { RequireRole } from '../features/auth/RequireRole';
 import { ForbiddenPage } from '../features/auth/ForbiddenPage';
 import { LoginPage } from '../features/auth/LoginPage';
-import { LandingPage } from '../features/landing/LandingPage';
 import { useProfile } from '../features/auth/useProfile';
 import { roleHome } from '../features/auth/roleHome';
 import { AlertProvider } from '../features/alerts/AlertProvider';
 import { EmptyState, Spinner, FOCUS_RING, cn } from '../components/ui/Primitives';
 
 // Heavy pages (Leaflet, Plotly, PDF/page viewers) are code-split.
+const LandingPage = lazyExport(() => import('../features/landing/LandingPage'), 'LandingPage'); // pulls in Leaflet
+const SourcePage = lazyExport(() => import('../features/search/SourcePage'), 'SourcePage');
 const WellsPage = lazyExport(() => import('../features/wells/WellsPage'), 'WellsPage');
 const WorkspaceLayout = lazyExport(() => import('../features/workspace/WorkspaceLayout'), 'default');
 const WorkspaceMap = lazyExport(() => import('../features/workspace/WorkspaceMap'), 'default');
@@ -70,7 +71,7 @@ function RoleRedirect() {
   const { profile, session, isLoading } = useProfile();
   if (isLoading) return <Fallback />;
   if (session && profile) return <Navigate to={roleHome(profile)} replace />;
-  return <LandingPage />;
+  return <Page><LandingPage /></Page>;
 }
 
 /** A rig engineer may only open the rig view of a wellbore they are assigned to. */
@@ -107,7 +108,7 @@ export function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<RoleRedirect />} />
-      <Route path="/landing" element={<LandingPage />} />
+      <Route path="/landing" element={<Page><LandingPage /></Page>} />
       <Route path="/login" element={<LoginPage />} />
 
       <Route
@@ -151,6 +152,7 @@ export function AppRoutes() {
         <Route path="/review/:docId" element={guard(ROUTE_ROLES.review, <ReviewDoc />)} />
 
         <Route path="/search" element={<Page><SearchAsk /></Page>} />
+        <Route path="/sources/:docId" element={<Page><SourcePage /></Page>} />
         <Route path="/planning" element={guard(ROUTE_ROLES.planning, <Planning />)} />
         <Route path="/analytics" element={<Page><Analytics /></Page>} />
 

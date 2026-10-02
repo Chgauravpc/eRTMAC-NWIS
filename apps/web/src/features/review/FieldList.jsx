@@ -2,7 +2,7 @@ import React from 'react';
 import { AlertTriangle, Check, Pencil, X } from 'lucide-react';
 import { FieldEditor } from './FieldEditor';
 import { reasonTexts } from './reasons';
-import { formatFieldValue } from './value';
+import { formatFieldValue, needsWellChoice } from './value';
 
 const ENTITY_LABELS = {
   event: 'Event',
@@ -54,6 +54,7 @@ export const FieldCard = React.forwardRef(function FieldCard(
   const status = STATUS_BADGE[field.review_status];
   const entity = ENTITY_LABELS[field.entity] || field.entity;
   const label = `${entity} ${field.field}`;
+  const mustChooseWell = needsWellChoice(field);
 
   return (
     <li
@@ -101,7 +102,8 @@ export const FieldCard = React.forwardRef(function FieldCard(
                 type="button"
                 aria-keyshortcuts="a"
                 aria-label={`Approve ${label}`}
-                disabled={busy}
+                disabled={busy || mustChooseWell}
+                title={mustChooseWell ? 'Choose the well with Edit first' : undefined}
                 className={`${btn} border-green-200 bg-green-100 text-green-800 hover:bg-green-200 focus-visible:ring-green-600`}
                 onClick={(e) => {
                   e.stopPropagation();
@@ -137,6 +139,9 @@ export const FieldCard = React.forwardRef(function FieldCard(
                 <X className="h-3.5 w-3.5" aria-hidden="true" /> Reject <kbd className="font-mono">R</kbd>
               </button>
             </div>
+          )}
+          {mustChooseWell && !isEditing && (
+            <p className="mt-2 text-xs font-bold text-amber-900">Choose the well with Edit. Approve is available once a well is chosen.</p>
           )}
         </div>
       )}

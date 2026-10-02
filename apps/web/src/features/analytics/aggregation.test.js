@@ -47,3 +47,24 @@ describe('aggregateWellMetrics', () => {
     expect(res.byField[0].field).toBe('F1');
   });
 });
+
+import { aggregateByFormation } from './aggregation';
+
+describe('aggregateByFormation', () => {
+  it('sums over risk types, keeps the split, and sorts by NPT', () => {
+    const rows = [
+      { formation: 'Tipam', risk_type: 'losses', event_count: 3, npt_h_total: 20 },
+      { formation: 'Tipam', risk_type: 'cementing', event_count: 1, npt_h_total: 5 },
+      { formation: 'Barail', risk_type: 'stuck_pipe', event_count: 2, npt_h_total: 40 },
+    ];
+    const res = aggregateByFormation(rows);
+    expect(res.map((r) => r.formation)).toEqual(['Barail', 'Tipam']);
+    expect(res[1]).toEqual({ formation: 'Tipam', event_count: 4, npt_h_total: 25, byRisk: { losses: 20, cementing: 5 } });
+  });
+
+  it('ignores rows without a formation and tolerates null input and string numbers', () => {
+    expect(aggregateByFormation(null)).toEqual([]);
+    expect(aggregateByFormation([{ risk_type: 'losses', npt_h_total: 5 }])).toEqual([]);
+    expect(aggregateByFormation([{ formation: 'X', risk_type: 'kick', event_count: '2', npt_h_total: '1.5' }])[0].npt_h_total).toBe(1.5);
+  });
+});

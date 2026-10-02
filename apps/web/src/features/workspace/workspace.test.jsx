@@ -23,7 +23,7 @@ describe('StreamStatusPill', () => {
     renderRoute(<StreamStatusPill status="live" lastSampleAt={new Date().toISOString()} />);
     const el = screen.getByTestId('stream-status');
     expect(el.textContent).toBe('live');
-    expect(el.className).toMatch(/bg-green-100/);
+    expect(el.className).toMatch(/bg-emerald-500\/10/);
     expect(el.querySelector('svg')).toBeTruthy(); // not colour alone
   });
 
@@ -32,7 +32,7 @@ describe('StreamStatusPill', () => {
     const el = screen.getByTestId('stream-status');
     expect(el.textContent).toMatch(/^stale/);
     expect(el.textContent).toMatch(/last data 1 minute ago/i);
-    expect(el.className).toMatch(/bg-amber-100/);
+    expect(el.className).toMatch(/bg-amber-500\/10/);
     expect(el.querySelector('svg')).toBeTruthy();
   });
 
@@ -41,7 +41,7 @@ describe('StreamStatusPill', () => {
     const el = screen.getByTestId('stream-status');
     expect(el.textContent).toMatch(/^lost/);
     expect(el.textContent).toMatch(/last data about 1 hour ago/i);
-    expect(el.className).toMatch(/bg-red-100/);
+    expect(el.className).toMatch(/bg-red-500\/10/);
     expect(el.querySelector('svg')).toBeTruthy();
   });
 
@@ -49,7 +49,7 @@ describe('StreamStatusPill', () => {
     renderRoute(<StreamStatusPill status="stopped" />);
     const el = screen.getByTestId('stream-status');
     expect(el.textContent).toBe('stopped');
-    expect(el.className).toMatch(/bg-gray-100/);
+    expect(el.className).toMatch(/bg-gray-800/);
     expect(el.querySelector('svg')).toBeTruthy();
   });
 });
@@ -70,7 +70,7 @@ describe('WorkspaceLayout', () => {
   it('shows the well header (name, field, provenance) and the tabs in journey order', async () => {
     renderWorkspace();
     expect(await screen.findByRole('heading', { name: ACTIVE_WELL.well_name })).toBeTruthy();
-    expect(screen.getByText(`Field: ${ACTIVE_WELL.field}`)).toBeTruthy();
+    expect(screen.getByText(ACTIVE_WELL.field)).toBeTruthy();
     expect(screen.getByTestId('provenance-badge').textContent).toBe(ACTIVE_WELL.provenance.toUpperCase());
     const tabs = within(screen.getByRole('navigation', { name: 'Well workspace' })).getAllByRole('link');
     expect(tabs.map((t) => t.textContent)).toEqual(['Map', 'Formation & events', 'Correlation', 'Risk ahead', 'Alerts']);
@@ -80,23 +80,23 @@ describe('WorkspaceLayout', () => {
 
   it('header shows bit depth and formation from RPC formation_at_md, and follows stream_state Realtime updates', async () => {
     renderWorkspace();
-    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toMatch(/Bit: \d+\.\d m/));
-    await waitFor(() => expect(screen.getByTestId('header-formation').textContent).toBe('Formation: Barail'));
+    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toMatch(/Bit \d+\.\d m/));
+    await waitFor(() => expect(screen.getByTestId('header-formation').textContent).toBe('Formation Barail'));
     const initialBit = screen.getByTestId('header-bit').textContent;
 
     // exactly what DevPanel "Advance bit 5 m" does: mutate the row and re-emit the same object
     const row = { wellbore_id: ACTIVE_WELLBORE_ID, status: 'live', bit_md_m: 2405, last_sample_at: new Date().toISOString() };
     act(() => db.emitChange('stream_state', row));
-    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toBe('Bit: 2405.0 m'));
+    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toBe('Bit 2405.0 m'));
     row.bit_md_m += 5;
     act(() => db.emitChange('stream_state', row));
-    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toBe('Bit: 2410.0 m'));
+    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toBe('Bit 2410.0 m'));
     expect(initialBit).toBeTruthy();
 
     // bit crosses into the next formation: the RPC is re-run and the header changes
     row.bit_md_m = 2950;
     act(() => db.emitChange('stream_state', row));
-    await waitFor(() => expect(screen.getByTestId('header-formation').textContent).toBe('Formation: Kopili'));
+    await waitFor(() => expect(screen.getByTestId('header-formation').textContent).toBe('Formation Kopili'));
 
     // status change updates the pill
     act(() => db.emitChange('stream_state', { ...row, status: 'lost', last_sample_at: new Date(Date.now() - 300000).toISOString() }));
@@ -106,7 +106,7 @@ describe('WorkspaceLayout', () => {
 
   it('ignores stream_state changes of other wellbores', async () => {
     renderWorkspace();
-    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toMatch(/Bit: \d/));
+    await waitFor(() => expect(screen.getByTestId('header-bit').textContent).toMatch(/Bit \d/));
     const before = screen.getByTestId('header-bit').textContent;
     act(() => db.emitChange('stream_state', { wellbore_id: 'some-other-wellbore', status: 'live', bit_md_m: 1 }));
     expect(screen.getByTestId('header-bit').textContent).toBe(before);

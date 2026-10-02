@@ -29,3 +29,9 @@ export function formatFieldValue(v) {
   if (raw !== null) return show(raw);
   return null;
 }
+
+/** The "assign a well to this document" field raised when no well matched (contract amendment, reason unmatched_well). */
+export const isWellAssignment = (field) => field?.entity === 'well_header' && field?.field === 'well_id';
+
+/** True while the reviewer has not chosen a well: the stored value only holds the name read from the report. */
+export const needsWellChoice = (field) => isWellAssignment(field) && parseFieldValue(field.value).value == null;

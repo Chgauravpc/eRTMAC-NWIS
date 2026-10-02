@@ -62,7 +62,7 @@ function UploadRow({ entry, onRetryUpload, onRetryRegister }) {
           )}
 
           {entry.status === 'error' && (
-            <div role="alert" className="flex items-start gap-2 rounded border border-red-100 bg-red-50 p-3 text-sm font-bold text-red-600">
+            <div role="alert" className="flex items-start gap-2 rounded border border-red-100 bg-red-50 p-3 text-sm font-bold text-red-700">
               <XCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <span>Error: {entry.errorMsg}</span>
             </div>

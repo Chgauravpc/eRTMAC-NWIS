@@ -23,7 +23,7 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
             <button
               key={i}
               onClick={() => setActiveSource(citation)}
-              className="inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-700 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"
+              className="inline-flex items-center justify-center w-5 h-5 ml-1 mr-0.5 text-[10px] font-bold rounded-full bg-indigo-100 text-indigo-800 hover:bg-indigo-200 hover:ring-2 hover:ring-indigo-300 transition-all align-super cursor-pointer"
               title={`${citation.doc_title}, Page ${citation.page}`}
             >
               {n}
@@ -31,7 +31,7 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
           );
         }
         // Unknown number
-        return <span key={i} className="text-slate-400">{part}</span>;
+        return <span key={i} className="text-slate-600">{part}</span>;
       }
       return <span key={i}>{part}</span>;
     });
@@ -40,7 +40,7 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
   if (evidence === 'insufficient') {
     return (
       <div className="bg-slate-50 rounded-2xl border border-slate-200 p-8 text-center">
-        <Info className="w-10 h-10 text-slate-400 mx-auto mb-4" />
+        <Info className="w-10 h-10 text-slate-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-slate-800 mb-2">Not enough evidence</h3>
         <p className="text-slate-600 mb-6 max-w-lg mx-auto">
           We could not find sufficient information in the offset well reports to answer this question confidently. 
@@ -57,13 +57,13 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
                 <div>
                   <div className="font-medium text-slate-800 group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                     {c.doc_title}
-                    <ProvenanceBadge provenance={c.provenance} />
+                    <ProvenanceBadge provenance={c.provenance} light />
                   </div>
                   <div className="text-xs text-slate-500 mt-1">
                     Page {c.page}
                   </div>
                 </div>
-                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-indigo-500" />
+                <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-indigo-600" />
               </button>
             ))}
           </div>
@@ -111,7 +111,7 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
 
         {/* Footer Meta */}
         {(provider || cached) && (
-          <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-end gap-3 text-xs text-slate-400">
+          <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-end gap-3 text-xs text-slate-600">
             {provider && <span>Provider: {provider}</span>}
             {cached && <span className="bg-slate-100 px-2 py-0.5 rounded">cached</span>}
           </div>
@@ -135,7 +135,7 @@ export function AnswerView({ answer_md, citations, evidence, provider, cached })
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors flex items-center gap-2">
                     {c.doc_title}
-                    <ProvenanceBadge provenance={c.provenance} />
+                    <ProvenanceBadge provenance={c.provenance} light />
                   </div>
                   <div className="text-xs text-slate-500 mt-1 line-clamp-2">
                     {c.snippet}

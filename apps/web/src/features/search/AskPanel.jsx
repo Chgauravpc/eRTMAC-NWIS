@@ -10,15 +10,46 @@ const EXAMPLES = [
   "Cement problems behind 9-5/8 casing?"
 ];
 
+const HISTORY_KEY = 'nwis_ask_history';
+
+/** Last questions of this browser (a per-user convenience only: storage can be blocked or hold junk). */
+function readHistory() {
+  try {
+    const v = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    return Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, 10) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Request body for /api/ask (contract §9.2). */
+export function buildAskBody(question, filters = {}) {
+  return {
+    question,
+    filters: {
+      formation: filters.formation || null,
+      event_type: filters.event_type || null,
+      field: filters.field || null,
+      md_from: filters.md_from ? Number(filters.md_from) : null,
+      md_to: filters.md_to ? Number(filters.md_to) : null,
+    },
+    wellbore_id: null,
+  };
+}
+
 export function AskPanel({ filters }) {
   const [query, setQuery] = useState('');
-  const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem('nwis_ask_history') || '[]'));
+  const [history, setHistory] = useState(readHistory);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    localStorage.setItem('nwis_ask_history', JSON.stringify(history));
+    try {
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    } catch {
+      /* storage unavailable: history just is not kept */
+    }
   }, [history]);
 
   const handleSubmit = async (q) => {
@@ -37,18 +68,8 @@ export function AskPanel({ filters }) {
     });
 
     try {
-      const body = {
-        question: text,
-        filters: {
-          formation: filters.formation || null,
-          event_type: filters.event_type || null,
-          field: filters.field || null,
-          md_from: filters.md_from ? Number(filters.md_from) : null,
-          md_to: filters.md_to ? Number(filters.md_to) : null,
-        },
-        wellbore_id: null
-      };
-      
+      const body = buildAskBody(text, filters);
+
       const res = await apiFetch('/api/ask', {
         method: 'POST',
         body: JSON.stringify(body)
@@ -69,18 +90,20 @@ export function AskPanel({ filters }) {
           className="relative flex items-center p-2"
           onSubmit={e => { e.preventDefault(); handleSubmit(); }}
         >
-          <Sparkles className="w-5 h-5 text-indigo-400 ml-3 shrink-0" />
+          <Sparkles className="w-5 h-5 text-indigo-600 ml-3 shrink-0" />
           <input
             type="text"
+            aria-label="Ask a question"
             placeholder="Ask a question about offset wells..."
-            className="flex-1 bg-transparent border-0 ring-0 focus:ring-0 text-slate-800 text-lg px-4 py-3 placeholder:text-slate-400"
+            className="flex-1 bg-transparent border-0 ring-0 focus:ring-0 text-slate-800 text-lg px-4 py-3 placeholder:text-slate-500"
             value={query}
             onChange={e => setQuery(e.target.value)}
           />
           <button 
             type="submit"
+            aria-label="Ask"
             disabled={!query.trim() || loading}
-            className="p-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 disabled:opacity-50 disabled:hover:bg-indigo-50 transition-colors"
+            className="p-3 bg-indigo-50 text-indigo-700 rounded-xl hover:bg-indigo-100 disabled:opacity-50 disabled:hover:bg-indigo-50 transition-colors"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <ArrowRight className="w-5 h-5" />}
           </button>
@@ -91,7 +114,7 @@ export function AskPanel({ filters }) {
       {!result && !loading && (
         <div className="space-y-6">
           <div>
-            <h3 className="text-sm font-medium text-slate-500 mb-3 uppercase tracking-wider">Examples</h3>
+            <h3 className="text-sm font-medium text-slate-600 mb-3 uppercase tracking-wider">Examples</h3>
             <div className="flex flex-wrap gap-2">
               {EXAMPLES.map(ex => (
                 <button
@@ -107,7 +130,7 @@ export function AskPanel({ filters }) {
 
           {history.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-slate-500 mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-slate-600 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" /> Recent Questions
               </h3>
               <div className="flex flex-col gap-1">
@@ -128,7 +151,7 @@ export function AskPanel({ filters }) {
 
       {/* States */}
       {loading && (
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+        <div role="status" aria-label="Looking for an answer" className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
           <div className="space-y-4 animate-pulse">
             <div className="h-4 bg-slate-100 rounded w-3/4"></div>
             <div className="h-4 bg-slate-100 rounded w-full"></div>
@@ -138,7 +161,7 @@ export function AskPanel({ filters }) {
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-xl border border-red-100">
+        <div role="alert" className="p-4 bg-red-50 text-red-800 rounded-xl border border-red-200">
           Error: {error}
         </div>
       )}

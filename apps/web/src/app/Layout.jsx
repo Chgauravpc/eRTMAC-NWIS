@@ -8,6 +8,7 @@ import { useWellSummary } from '../lib/hooks/wells';
 import { AlertBanner } from '../features/alerts/AlertBanner';
 import { useAlerts } from '../features/alerts/AlertProvider';
 import { isUnacked } from '../features/alerts/alertUtils';
+import { useRealtimeConnected } from '../lib/hooks/alerts';
 import { navItemsFor } from './nav';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -24,6 +25,7 @@ export function SoundMount() {
   );
 }
 
+// @surface #11161d (the dark sidebar)
 export function UserBar({ className }) {
   const { profile, signOut } = useProfile();
   const navigate = useNavigate();
@@ -68,6 +70,7 @@ export function UserBar({ className }) {
   );
 }
 
+// @surface #11161d (the dark sidebar)
 export function SidebarProfile() {
   const { profile, signOut } = useProfile();
   const navigate = useNavigate();
@@ -92,35 +95,37 @@ export function SidebarProfile() {
       title="Sign out"
     >
       <div className="flex items-center gap-3 min-w-0">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-[#d97706] text-xs font-bold text-white shadow-sm">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-amber-700 text-xs font-bold text-white shadow-sm">
           {initials}
         </div>
         <div className="flex flex-col leading-tight truncate">
           <span className="font-medium text-sm text-gray-200 truncate" data-testid="user-name">
             {profile.full_name || profile.email?.split('@')[0]}
           </span>
-          <span className="text-[10px] uppercase tracking-widest text-gray-500 truncate" data-testid="role-badge">
+          <span className="text-[10px] uppercase tracking-widest text-gray-400 truncate" data-testid="role-badge">
             {ROLE_LABELS[profile.role] || profile.role}
           </span>
         </div>
       </div>
-      <ChevronRight className="h-4 w-4 text-gray-500 shrink-0" />
+      <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />
     </div>
   );
 }
 
+// @surface light (the white top bar)
 export function TopNav() {
   const { profile } = useProfile();
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   const { alerts = [] } = useAlerts();
+  const connected = useRealtimeConnected();
   const unacked = alerts.filter(isUnacked).length;
   const initials = profile ? (profile.full_name || profile.email || 'U').charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="flex items-center gap-6">
       <div className="hidden lg:flex items-center bg-gray-50 border border-gray-200 rounded px-3 py-1.5 w-64">
-        <Search className="h-4 w-4 text-gray-400 mr-2" />
+        <Search className="h-4 w-4 text-gray-600 mr-2" />
         <input
           type="text"
           value={q}
@@ -128,47 +133,49 @@ export function TopNav() {
           onKeyDown={(e) => e.key === 'Enter' && navigate(q.trim() ? `/search?q=${encodeURIComponent(q.trim())}` : '/search')}
           aria-label="Search wells, events, documents"
           placeholder="Search wells, events, documents"
-          className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-400" />
-        <div className="border border-gray-200 rounded px-1.5 text-[10px] text-gray-400 ml-2">⌘ K</div>
+          className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder:text-gray-600" />
+        <div className="border border-gray-200 rounded px-1.5 text-[10px] text-gray-600 ml-2">⌘ K</div>
       </div>
       
-      <div className="hidden sm:flex items-center gap-2 text-sm">
-        <div className="h-2 w-2 rounded-full bg-emerald-500" />
-        <span className="text-gray-600">Connected <span className="text-[10px] text-gray-400">10Hz</span></span>
+      <div className="hidden sm:flex items-center gap-2 text-sm" role="status" data-testid="realtime-status">
+        <div className={`h-2 w-2 rounded-full ${connected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+        <span className="text-gray-700">{connected ? 'Live updates on' : 'Reconnecting…'}</span>
       </div>
       
       <button className="relative text-gray-600 hover:text-gray-900 transition-colors" aria-label="Alerts" onClick={() => navigate('/alerts')}>
         <Bell className="h-5 w-5" />
         {unacked > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white border-2 border-white">{unacked > 9 ? '9+' : unacked}</span>
+          <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-700 text-[8px] font-bold text-white border-2 border-white">{unacked > 9 ? '9+' : unacked}</span>
         )}
       </button>
       
-      <div className="h-8 w-8 rounded bg-[#d97706] text-white flex items-center justify-center text-xs font-bold shadow-sm">
+      <div className="h-8 w-8 rounded bg-amber-700 text-white flex items-center justify-center text-xs font-bold shadow-sm">
         {initials}
       </div>
     </div>
   );
 }
 
+// @surface light (the white top bar)
 function WellContext({ wellboreId }) {
   const { data: well } = useWellSummary(wellboreId);
   if (!well) return null;
   return (
     <span className="hidden md:flex items-center gap-2 text-sm" data-testid="well-context">
       <span className="text-gray-600">/</span>
-      <span className="font-medium text-gray-300">{well.well_name}</span>
+      <span className="font-medium text-gray-900">{well.well_name}</span>
     </span>
   );
 }
 
+// @surface #11161d (the dark sidebar)
 function SideNav({ items, onNavigate }) {
   const groups = [...new Set(items.map((i) => i.group || ''))];
   return (
     <nav aria-label="Main" className="flex-1 overflow-y-auto px-4 py-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-800">
       {groups.map((group) => (
         <div key={group || 'main'} className="space-y-1">
-          {group && <div className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">{group}</div>}
+          {group && <div className="px-2 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{group}</div>}
           {items
             .filter((i) => (i.group || '') === group)
             .map(({ id, label, to, icon: Icon }) => (
@@ -218,7 +225,7 @@ export default function Layout() {
             <div className="h-4 w-1.5 rounded-sm bg-orange-400" />
           </div>
           <span className="text-sm font-bold tracking-wide text-white mr-2">NWIS</span>
-          <span className="text-[10px] text-gray-500 font-medium tracking-widest uppercase">Well Intelligence</span>
+          <span className="text-[10px] text-gray-400 font-medium tracking-widest uppercase">Well Intelligence</span>
         </div>
         <SideNav items={items} />
         
@@ -258,14 +265,14 @@ export default function Layout() {
               aria-label="Open menu"
               aria-expanded={open}
               aria-controls="mobile-nav"
-              className={cn('md:hidden rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-900', FOCUS_RING)}
+              className={cn('md:hidden rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900', FOCUS_RING)}
               onClick={() => setOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center text-sm">
               <span className="text-gray-500">Operations</span>
-              <span className="mx-2 text-gray-300">›</span>
+              <span aria-hidden="true" className="mx-2 text-gray-500">›</span>
               <span className="font-medium text-gray-900">wells</span>
               {wellMatch?.params.wellboreId && <WellContext wellboreId={wellMatch.params.wellboreId} />}
             </div>
@@ -278,8 +285,8 @@ export default function Layout() {
           <ErrorBoundary key={location.pathname}>
             <Suspense fallback={
               <div className="flex h-full items-center justify-center">
-                <div className="flex flex-col items-center gap-4 text-gray-500">
-                  <Spinner className="h-8 w-8 text-blue-500" />
+                <div className="flex flex-col items-center gap-4 text-gray-600">
+                  <Spinner className="h-8 w-8 text-blue-700" />
                   <span className="text-sm font-medium tracking-wide uppercase">Loading workspace</span>
                 </div>
               </div>

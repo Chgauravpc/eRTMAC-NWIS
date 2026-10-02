@@ -21,6 +21,7 @@ vi.mock('../lib/supabase', () => ({ supabase: h.supabase }));
 vi.mock('../lib/hooks/wells', () => ({ useWellSummary: () => ({ data: { well_name: 'SYN-TEST-01' } }) }));
 vi.mock('../features/alerts/AlertProvider', () => ({ AlertProvider: ({ children }) => children, useAlerts: () => ({ alerts: [], wellNames: {} }) }));
 vi.mock('../features/alerts/AlertBanner', () => ({ AlertBanner: () => <div data-testid="alert-banner" /> }));
+vi.mock('../features/search/SearchPage', () => ({ SearchPage: () => 'SEARCH PAGE' }));
 vi.mock('../features/wells/WellsPage', () => ({ WellsPage: () => 'WELLS PAGE' }));
 vi.mock('../features/rig/RigView', () => ({ RigView: () => 'RIG VIEW' }));
 vi.mock('../features/alerts/AlertsPage', () => ({ AlertsPage: () => 'ALERTS PAGE' }));
@@ -126,7 +127,7 @@ describe('role home pages via the mock role picker', () => {
 describe('guards', () => {
   it('unauthenticated users are sent to /login', async () => {
     renderApp('/wells');
-    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Sign in to NWIS' })).toBeInTheDocument();
     expect(screen.getByTestId('path')).toHaveTextContent('/login');
   });
 
@@ -204,7 +205,7 @@ describe('layout', () => {
     // TODO(FE-09): mount EnableSoundButton in the layout, then assert: expect(await screen.findByRole('button', { name: 'Enable alert sound' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Sign out' }));
-    expect(await screen.findByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Sign in to NWIS' })).toBeInTheDocument();
     expect(screen.getByTestId('path')).toHaveTextContent('/login');
     expect(window.localStorage.getItem(MOCK_SESSION_KEY)).toBeNull();
     expect(h.supabase.auth.signOut).toHaveBeenCalled();
@@ -215,7 +216,7 @@ describe('layout', () => {
     renderApp('/wells', { as: 'admin' });
     await screen.findByText('WELLS PAGE');
     await user.click(screen.getByRole('button', { name: 'Sign out' }));
-    await screen.findByRole('heading', { name: 'Welcome back' });
+    await screen.findByRole('heading', { name: 'Sign in to NWIS' });
     expect(screen.queryByText('WELLS PAGE')).toBeNull();
   });
 

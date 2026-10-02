@@ -1,3 +1,8 @@
+@page {
+  size: A4;
+  margin: 14mm;
+}
+
 @media print {
   /* Ensure background colors and images are printed */
   body {
@@ -22,6 +27,20 @@
     box-shadow: none !important;
     margin: 0 !important;
     padding: 0 !important;
+  }
+
+  /* The risk profile scrolls on screen; on paper it flows over as many pages as it needs */
+  .print-scroll {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* Three columns do not fit A4 portrait: stack them */
+  .brief-container > .grid {
+    display: block !important;
+  }
+  .brief-container > .grid > * {
+    margin-bottom: 8mm;
   }
 
   /* Prevent awkward page breaks */

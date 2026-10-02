@@ -6,6 +6,7 @@ import { bboxToPercentStyle } from './bbox';
  * The wrapper is exactly the size of the image (no border/padding, image is display:block), so the
  * percentage overlay (bbox fractions x 100) lines up with the text on the page at any zoom.
  */
+// @surface #1e1e1e (the dark image pane of the review page)
 export function PageViewer({ imageUrl, selectedField, loading = false }) {
   const [failed, setFailed] = useState(false);
   useEffect(() => setFailed(false), [imageUrl]);

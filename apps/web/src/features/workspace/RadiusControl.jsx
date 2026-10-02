@@ -45,7 +45,7 @@ export function RadiusControl({ params, onChange, maxDepth = 0, depth = 0, bitMd
           onChange={(e) => update('depth', Number(e.target.value))}
           className="w-full accent-blue-500"
         />
-        <div className="flex justify-between text-xs text-gray-500 mt-1">
+        <div className="flex justify-between text-xs text-gray-400 mt-1">
           <span>0 m</span>
           <span>{bitMd != null ? 'default: bit depth' : 'no live bit depth'}</span>
           <span>TD {fmtDepth(maxDepth)}</span>
@@ -58,37 +58,37 @@ export function RadiusControl({ params, onChange, maxDepth = 0, depth = 0, bitMd
       </div>
 
       <fieldset>
-        <legend className="mb-2 font-medium text-gray-200">Distance</legend>
+        <legend className="mb-2 font-medium text-gray-200">Distance mode</legend>
         <div className="flex gap-4 text-gray-300">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="map-mode" checked={params.mode === 'surface'} onChange={() => update('mode', 'surface')} className="text-blue-500 focus:ring-blue-500 bg-gray-800 border-gray-700" />
-            Surface
+            <input type="radio" name="map-mode" checked={params.mode === 'surface'} onChange={() => update('mode', 'surface')} className="text-blue-400 focus:ring-blue-500 bg-gray-800 border-gray-700" />
+            Distance at surface
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="radio" name="map-mode" checked={params.mode === 'depth'} onChange={() => update('mode', 'depth')} className="text-blue-500 focus:ring-blue-500 bg-gray-800 border-gray-700" />
-            Depth
+            <input type="radio" name="map-mode" checked={params.mode === 'depth'} onChange={() => update('mode', 'depth')} className="text-blue-400 focus:ring-blue-500 bg-gray-800 border-gray-700" />
+            Distance at depth
           </label>
         </div>
-        <p className="mt-2 text-xs text-gray-500">Deviated wells can be far apart at depth even when close at surface.</p>
+        <p className="mt-2 text-xs text-gray-400">Deviated wells can be far apart at depth even when close at surface.</p>
       </fieldset>
 
       <div className="grid grid-cols-1 gap-4">
         <div>
-          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-formation">Formation</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-400" htmlFor="map-formation">Formation</label>
           <select id="map-formation" className={SELECT} value={params.formation} onChange={(e) => update('formation', e.target.value)}>
             <option value="">All formations</option>
             {formations.map((f) => <option key={f} value={f}>{f}</option>)}
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-event-type">Event type</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-400" htmlFor="map-event-type">Event type</label>
           <select id="map-event-type" className={SELECT} value={params.eventType} onChange={(e) => update('eventType', e.target.value)}>
             <option value="">All event types</option>
             {EVENT_TYPES.map((t) => <option key={t} value={t}>{label(t)}</option>)}
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-500" htmlFor="map-provenance">Provenance</label>
+          <label className="mb-1 block text-[10px] font-bold uppercase tracking-widest text-gray-400" htmlFor="map-provenance">Provenance</label>
           <select id="map-provenance" className={SELECT} value={params.provenance} onChange={(e) => update('provenance', e.target.value)}>
             <option value="">All provenances</option>
             {PROVENANCES.map((p) => <option key={p} value={p}>{p.toUpperCase()}</option>)}

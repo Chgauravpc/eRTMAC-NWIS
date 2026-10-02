@@ -16,6 +16,7 @@ const LAYERS = [
 
 const human = (s) => String(s || '').replace(/_/g, ' ');
 
+// @surface light (inside the white interval card)
 function LayerBar({ name, value }) {
   const pct = value == null ? null : Math.round(value * 100);
   return (
@@ -62,7 +63,7 @@ export function IntervalDetail({ score }) {
 
   if (!score) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-400 p-8 text-center text-gray-700">
+      <div className="rounded-lg border border-dashed border-gray-400 bg-white p-8 text-center text-gray-700">
         Select a cell in the strip to see why it scores what it does.
       </div>
     );

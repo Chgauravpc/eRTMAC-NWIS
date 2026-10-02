@@ -36,15 +36,15 @@ export function OffsetList({ offsets, mode, isLoading, error, onRetry, radiusM, 
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs text-gray-400">
                   <div className={!depthMode ? 'font-semibold text-gray-200' : ''}>
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Surface</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Surface</span>
                     <span data-testid="surface-dist">{fmtDistance(o.surface_distance_m)}</span>
                   </div>
                   <div className={depthMode ? 'font-semibold text-gray-200' : ''}>
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Depth</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Depth</span>
                     <span data-testid="depth-dist">{o.depth_distance_m == null ? '-' : fmtDistance(o.depth_distance_m)}</span>
                   </div>
                   <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Events</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-1">Events</span>
                     <span className="font-medium text-gray-200">{o.event_count ?? 0}</span>
                   </div>
                 </div>

@@ -152,7 +152,7 @@ export function UploadDropzone({ onFilesAdded }) {
             e.target.value = '';
           }}
         />
-        <UploadCloud className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
+        <UploadCloud className="mx-auto mb-4 h-12 w-12 text-gray-600" aria-hidden="true" />
         <p className="font-bold text-gray-800 text-lg">Click to browse or drag and drop files here</p>
         <p className="text-sm text-gray-500 mt-2 font-medium uppercase tracking-wider">PDF, PNG, JPG, TIFF, CSV, XLSX, XML, LAS/TXT</p>
         <p className="text-xs text-gray-500 mt-1">Maximum size: 25 MB per file</p>

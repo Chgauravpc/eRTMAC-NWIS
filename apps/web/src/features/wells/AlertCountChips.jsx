@@ -8,13 +8,20 @@ const SEVERITIES = [
   { key: 'info', label: 'Info', Icon: Info, icon: 'text-sky-400', chip: 'bg-sky-500/10 border-sky-500/20 text-sky-100' },
 ];
 
+const LIGHT_CHIP = {
+  critical: 'bg-red-50 border-red-300 text-red-800',
+  warning: 'bg-orange-50 border-orange-300 text-orange-800',
+  watch: 'bg-amber-50 border-amber-300 text-amber-800',
+  info: 'bg-sky-50 border-sky-300 text-sky-800',
+};
+
 /** Open alert counts by severity: icon + word + number per non-zero severity. */
-export function AlertCountChips({ counts }) {
+export function AlertCountChips({ counts, light = false }) {
   const shown = SEVERITIES.filter((s) => (counts?.[s.key] ?? 0) > 0);
   if (shown.length === 0) {
     return (
-      <span data-testid="alert-counts" className="inline-flex items-center gap-1 text-xs text-gray-400">
-        <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5 text-emerald-400" />
+      <span data-testid="alert-counts" className={`inline-flex items-center gap-1 text-xs ${light ? 'text-gray-600' : 'text-gray-400'}`}>
+        <CheckCircle2 aria-hidden="true" className={`h-3.5 w-3.5 ${light ? 'text-emerald-700' : 'text-emerald-400'}`} />
         No open alerts
       </span>
     );
@@ -22,7 +29,7 @@ export function AlertCountChips({ counts }) {
   return (
     <ul data-testid="alert-counts" aria-label="Open alerts by severity" className="flex flex-wrap gap-1.5">
       {shown.map(({ key, label, Icon, icon, chip }) => (
-        <li key={key} data-severity={key} className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] font-medium tracking-wide uppercase ${chip}`}>
+        <li key={key} data-severity={key} className={`inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px] font-medium tracking-wide uppercase ${light ? LIGHT_CHIP[key] : chip}`}>
           <Icon aria-hidden="true" className={`h-3.5 w-3.5 ${icon}`} />
           {counts[key]} {label}
         </li>

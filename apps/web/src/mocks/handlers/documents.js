@@ -243,10 +243,11 @@ function reviewFieldRpc(body, request) {
   if (!['approve', 'edit', 'reject'].includes(action)) return pgError(`NWIS_BAD_REQUEST: invalid review action ${action ?? 'null'}`);
   const rec = db.get('extracted_fields', id);
   if (!rec) return pgError('NWIS_NOT_FOUND: extracted field not found');
-  if (rec.entity === 'well_header' && !WELL_HEADER_FIELDS.includes(rec.field)) {
+  const assignsWell = rec.entity === 'well_header' && rec.field === 'well_id';
+  if (rec.entity === 'well_header' && !assignsWell && !WELL_HEADER_FIELDS.includes(rec.field)) {
     return pgError(`NWIS_BAD_REQUEST: field ${rec.field} not allowed for well_header`);
   }
-  if (PROTECTED_COLUMNS.includes(rec.field)) {
+  if (!assignsWell && PROTECTED_COLUMNS.includes(rec.field)) {
     return pgError(`NWIS_BAD_REQUEST: column ${rec.field} is protected and cannot be reviewed`);
   }
   if (action !== 'reject' && rec.entity !== 'survey_station' && !rec.entity_id && rec.entity !== 'well_header') {
@@ -260,6 +261,13 @@ function reviewFieldRpc(body, request) {
     reviewed_at: now(),
   };
   if (action === 'edit') patch.value = value;
+  // Amended contract: approving or editing the well_id field assigns the document's well (and its primary wellbore).
+  if (assignsWell && action !== 'reject') {
+    const wellId = action === 'edit' ? (value?.value ?? value) : rec.value?.value;
+    const wellbore = wellsSeed.find((w) => w.well_id === wellId);
+    if (!wellId || !wellbore) return pgError('NWIS_BAD_REQUEST: choose a known well for well_id');
+    db.update('documents', rec.doc_id, { well_id: wellbore.well_id, wellbore_id: wellbore.wellbore_id });
+  }
   const updated = db.update('extracted_fields', id, patch);
 
   // events: reject marks the event rejected; otherwise, once every field of the event is reviewed, set its status.
@@ -448,5 +456,26 @@ export const handlers = [
     });
     runPipeline(doc, job, body.filename);
     return HttpResponse.json({ document_id: doc.id, job_id: job.id, duplicate: false }, { status: 202 });
+  }),
+  http.post('/api/documents/:docId/reprocess', ({ request, params }) => {
+    const role = callerRole(request);
+    if (!['reviewer', 'office_engineer', 'admin'].includes(role)) return nodeError('NWIS_FORBIDDEN', 'Your role cannot reprocess documents', 403);
+    const doc = db.get('documents', params.docId);
+    if (!doc) return nodeError('NWIS_NOT_FOUND', 'Document not found', 404);
+    const active = db.select('jobs', (j) => j.doc_id === doc.id && ['queued', 'running'].includes(j.status))[0];
+    if (active) return nodeError('NWIS_BAD_STATE', 'This document is already being processed', 409);
+    const job = db.insert('jobs', {
+      id: uuid(),
+      doc_id: doc.id,
+      status: 'queued',
+      stage: null,
+      progress: 0,
+      error: null,
+      created_by: callerId(request),
+      created_at: now(),
+      updated_at: now(),
+    });
+    runPipeline(doc, job, doc.title);
+    return HttpResponse.json({ document_id: doc.id, job_id: job.id }, { status: 202 });
   }),
 ];

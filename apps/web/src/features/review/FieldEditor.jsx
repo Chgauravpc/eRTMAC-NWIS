@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { EVENT_TYPES } from '../../lib/constants';
 import { useFormations } from '../../lib/hooks/review';
-import { parseFieldValue } from './value';
+import { useWellOptions } from '../../lib/hooks/documents';
+import { isWellAssignment, parseFieldValue } from './value';
 
 const inputClass =
   'w-full rounded-lg border border-gray-300 bg-white p-2.5 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500';
@@ -10,6 +11,7 @@ const EVENT_LABEL = (t) => t.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCa
 
 /** Which input a field gets: formation/event_type selects, otherwise typed by the current value / field name. */
 export function editorKind(field) {
+  if (isWellAssignment(field)) return 'well';
   const name = field.field;
   const current = parseFieldValue(field.value).value;
   if (name === 'formation') return 'formation';
@@ -51,6 +53,7 @@ export function FieldEditor({ field, onSave, onCancel, busy = false }) {
   const [draft, setDraft] = useState(() => initialDraft(field, kind));
   const [error, setError] = useState(null);
   const { data: formations, isLoading: formationsLoading, error: formationsError } = useFormations();
+  const { data: wellOptions, isLoading: wellsLoading, error: wellsError } = useWellOptions();
   const ref = useRef(null);
 
   useEffect(() => {
@@ -90,6 +93,15 @@ export function FieldEditor({ field, onSave, onCancel, busy = false }) {
           <option key={n} value={n}>{n}</option>
         ))}
         {draft && !names.includes(draft) && <option value={draft}>{draft}</option>}
+      </select>
+    );
+  } else if (kind === 'well') {
+    control = (
+      <select {...common}>
+        <option value="">{wellsLoading ? 'Loading wells…' : 'Select the well…'}</option>
+        {(wellOptions || []).map((w) => (
+          <option key={w.well_id} value={w.well_id}>{w.well_name}</option>
+        ))}
       </select>
     );
   } else if (kind === 'event_type') {
@@ -132,11 +144,14 @@ export function FieldEditor({ field, onSave, onCancel, busy = false }) {
       aria-label={`Edit ${field.field}`}
     >
       <label htmlFor={common.id} className="text-xs font-bold uppercase tracking-wider text-blue-800">
-        New value for {field.field}
+        {kind === 'well' ? 'Well for this document' : `New value for ${field.field}`}
       </label>
       {control}
       {formationsError && kind === 'formation' && (
         <p className="text-xs text-red-600">Could not load the formation list: {formationsError.message}</p>
+      )}
+      {wellsError && kind === 'well' && (
+        <p className="text-xs text-red-600">Could not load the well list: {wellsError.message}</p>
       )}
       {error && (
         <p id={`edit-err-${field.id}`} role="alert" className="text-sm font-medium text-red-600">{error}</p>

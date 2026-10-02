@@ -154,3 +154,8 @@ export async function getWellOptions() {
   if (error) throw error;
   return data || [];
 }
+
+/** POST /api/documents/{id}/reprocess (contract 9.2): read the stored file again with the document's current well. */
+export function reprocessDocument(docId) {
+  return api.post(`/documents/${docId}/reprocess`);
+}
