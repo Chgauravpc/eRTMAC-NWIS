@@ -78,7 +78,7 @@ FE-11 still needs the well select and the reprocess call (§5).
 ### 3a. Verified from the code (2 Oct)
 
 **Database, static check** of the contract's SQL against migrations `0001`–`0011` (a throwaway script, not committed):
-29 of 29 tables with 301 columns of identical name and base type; 17 of 17 enums with identical values; all 14 §7 functions
+29 of 29 tables with 301 columns of identical name and base type; 17 of 17 enums with identical values; all 13 §7 functions
 with the same parameter names; every contract index; RLS enabled on every table and a policy on each except `llm_cache`
 (as specified); the three buckets; realtime on the four tables; `handle_new_user` and `set_updated_at`; reference data
 19 formations / 36 synonyms / 34 IADC codes with trouble codes 3, 5, 19, 24, 27. Behaviours present in the SQL: rig engineers
@@ -96,9 +96,13 @@ limited to assigned wellbores, `depth_series` hidden below the bit, one open ale
 - **Invented numbers in the Wells table:** `WellsPage.jsx` shows `event_count || 18` and `npt_h_total || 6.4`, so a well with no events
   or no NPT displays 18 events or 6.4 h. This breaks the "no hardcoded values" rule. The summary tile "NPT this shift" also sums the
   all-time `npt_h_total`.
-- **PRD drift:** the Wells table has no Field or TD column (FE-04 lists name, field, status, TD, events, NPT total, provenance).
+- **PRD drift and dead controls:** the Wells table has no TD column (its "Bit Depth" column falls back to TD) and its Status / Risk / Provenance
+  dropdowns do nothing; `/alerts` lost grouping by well, the state filter and sort controls (FE-09).
 - **Fine:** all 18 PRD routes exist, and all 17 contract enums exist as frozen arrays with identical values.
 - **Not checked:** behaviour in a browser, the real-data (non-mock) path against a live Supabase, accessibility, performance.
+
+Full detail (each failing test with its error and cause, every lint error and hardcoded line, the per-table schema comparison, and
+corrections to earlier figures): [`AUDIT_2026-10-02.md`](AUDIT_2026-10-02.md).
 
 ## 4. Contract amendments merged
 
@@ -148,7 +152,7 @@ limited to assigned wellbores, `depth_series` hidden below the bit, one open ale
 3. Fix the DB-05 follow-up so the review flow works end to end.
 4. First deployment: Supabase (push `0001`–`0011`), then a health-only Space, then run one real upload through the pipeline.
 5. **Frontend clean-up (Person C):** remove the `|| 18` and `|| 6.4` fallbacks; fix the 7 lint errors; update or restore the 26 stale tests;
-   move the landing page's sample wells out of `src/features` (or exempt it explicitly); add Field and TD columns to the Wells table.
+   move the landing page's sample wells out of `src/features` (or exempt it explicitly); on the Wells page add a TD column, make the filters work or remove them, and restore the `/alerts` grouping and filters.
 6. **Database (Person A):** add `0012_views.sql`; the frontend and BE-13 depend on the views.
 
 ## 9. How to run things
