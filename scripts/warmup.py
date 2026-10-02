@@ -34,6 +34,21 @@ from typing import Any, Callable
 import httpx
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def load_repo_env(path: Path | None = None) -> None:
+    """Read <repo>/.env into os.environ without overriding variables that are already set."""
+    path = path or REPO_ROOT / ".env"
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key, value = key.strip(), value.strip().strip("\"'")
+        if key and value and key not in os.environ:
+            os.environ[key] = value
 SPACE_WAKE_TIMEOUT_S = 180.0
 SPACE_POLL_S = 5.0
 REQUEST_TIMEOUT_S = 90.0  # the first search loads the embedding model
@@ -253,6 +268,7 @@ def required_env(names: list[tuple[str, ...]]) -> tuple[dict[str, str], list[str
 
 
 def main(argv: list[str] | None = None) -> int:
+    load_repo_env()
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--ask", action="append", default=[], metavar="QUESTION", help="ask this scripted question once so its answer is cached (repeatable)")
     parser.add_argument("--query", default=DEFAULT_QUERY, help="the search used to load the embedding model")
