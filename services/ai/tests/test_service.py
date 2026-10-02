@@ -97,3 +97,38 @@ def test_lifespan_warms_up_in_background_and_closes_pool(monkeypatch):
         assert client.get("/v1/health").status_code == 200
     assert calls["closed"] == 1
     assert calls["warm"] <= 1  # scheduled as a background task, health did not wait on it
+
+
+def test_lifespan_starts_the_database_jobs_only_when_a_database_is_configured(monkeypatch):
+    from app.alerts import engine
+
+    started = {"engine": 0, "stopped": 0, "reset": 0, "models": 0}
+
+    async def noop():
+        return None
+
+    async def reset():
+        started["reset"] += 1
+
+    async def models():
+        started["models"] += 1
+
+    async def stop():
+        started["stopped"] += 1
+
+    monkeypatch.setattr(main_module, "_warm_up_models", noop)
+    monkeypatch.setattr(main_module, "close_pool", noop)
+    monkeypatch.setattr(main_module, "_reset_live_streams", reset)
+    monkeypatch.setattr(main_module, "_load_l2_models", models)
+    monkeypatch.setattr(engine, "start_engine", lambda: started.__setitem__("engine", started["engine"] + 1))
+    monkeypatch.setattr(engine, "stop_engine", stop)
+
+    monkeypatch.setattr(main_module.settings, "SUPABASE_DB_URL", "")
+    with TestClient(main_module.app):
+        pass
+    assert (started["engine"], started["reset"], started["models"]) == (0, 0, 0) and started["stopped"] == 1
+
+    monkeypatch.setattr(main_module.settings, "SUPABASE_DB_URL", "postgresql://example/db")
+    with TestClient(main_module.app):
+        pass
+    assert (started["engine"], started["reset"], started["models"]) == (1, 1, 1)

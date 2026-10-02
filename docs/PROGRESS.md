@@ -37,21 +37,26 @@ DB-10) are the bottleneck for most of the remaining backend work.
 | BE-07 | OCR pipeline | ✅ | PyMuPDF text layer, Docling + RapidOCR, Tesseract fallback below 0.60; 60 pages, 60 s per page |
 | BE-08 | LLM extraction, normalisation, validation | ✅ | Never run against a real LLM |
 | BE-09 | Chunking and indexing | ✅ | `python -m app.search.index --reindex-all` |
-| BE-10 | Search and Ask (RAG) | ⬜ | Ready to start, but real testing needs indexed data |
-| BE-11 | Lessons builder | ⛔ | Needs DB-09 |
-| BE-12 | Predicted tops (IDW) | ⛔ | Needs DB-09 |
-| BE-13 | Correlation endpoint | ⛔ | Needs BE-12, DB-12 |
-| BE-14 | Risk L1 (offset look-ahead) | ⛔ | Needs BE-12, DB-09 |
-| BE-15 | Risk L3 (live detectors) | ⬜ | Unblocked (needs only BE-02); its end-to-end check needs DB-09 |
-| BE-16 | Risk L2 (ML) | ⛔ | Needs DB-09, DB-10 |
-| BE-17 | Fusion and risk endpoint | ⛔ | Needs BE-14, BE-15 |
-| BE-18 | Stream replay | ⛔ | Needs DB-10 |
-| BE-19 | Alert engine | ⛔ | Needs BE-17, BE-18 |
-| BE-20 | Node API routes on Vercel | ⬜ | Unblocked. **Includes the new `documents/[documentId]/reprocess.js`** (see §5) |
-| BE-21 | Evaluation (OCR bake-off, extraction P/R) | ⛔ | Needs DB-14 |
-| BE-22 | Warm-up script and demo checklist | ⛔ | Needs BE-19, BE-20, DB-13 |
-| BE-23 | Planning brief | ⛔ | Needs BE-12, BE-14 |
-| BE-24 | Retrain endpoint | ⛔ | Needs BE-16, BE-20 |
+| BE-10 | Search and Ask (RAG) | ◐ | Built, tested with mocks; `MIN_RRF` raised to 0.0165 so off-topic questions are refused |
+| BE-11 | Lessons builder | ◐ | `python -m app.search.lessons --rebuild`; mocked DB and LLM |
+| BE-12 | Predicted tops (IDW) | ◐ | Mocked; leave-one-well-out coverage not measured (`python -m training.eval_tops`) |
+| BE-13 | Correlation endpoint | ◐ | Mocked; reads the base tables, so DB-12 views are not needed |
+| BE-14 | Risk L1 (offset look-ahead) | ◐ | `app/risk/config.py` has every §11 constant; mocked DB |
+| BE-15 | Risk L3 (live detectors) | ◐ | Six detectors on synthetic windows; thresholds untuned on real data |
+| BE-16 | Risk L2 (ML) | ◐ | Features, training, calibration, inference; only run on tiny in-memory wells |
+| BE-17 | Fusion and risk endpoint | ◐ | `POST /v1/wells/{id}/risk`; mocked DB |
+| BE-18 | Stream replay | ◐ | Fake-clock tests; never run against Supabase |
+| BE-19 | Alert engine | ◐ | In-memory store tests; auto-resolve on "bit past the zone" (contract §12 amended) |
+| BE-20 | Node API routes on Vercel | ◐ | 181 Node tests (`npm run test:api`); includes `documents/[documentId]/reprocess.js`; not deployed |
+| BE-21 | Evaluation (OCR bake-off, extraction P/R, alerts) | ◐ | Scripts and scoring tested; **nothing measured** (`docs/eval_results.md`) |
+| BE-22 | Warm-up script and demo checklist | ◐ | `scripts/warmup.py` tested on a fake stack; checklist never rehearsed |
+| BE-23 | Planning brief | ◐ | `POST /v1/planning/brief`; mocked DB |
+| BE-24 | Retrain endpoint | ◐ | `POST /v1/admin/retrain`; training mocked |
+
+**BE-10 to BE-24 were built after the 2 Oct report, in dependency order, with the database, storage, LLM and embedding model mocked.**
+Everything that needs a live Supabase project, the Hugging Face Space, Vercel or real data was skipped on purpose and is listed, with what
+to run in production, in [`SKIPPED_FOR_PRODUCTION.md`](SKIPPED_FOR_PRODUCTION.md). The evaluation numbers are in
+[`eval_results.md`](eval_results.md) (empty until the scripts are run) and the demo script is [`DEMO_CHECKLIST.md`](DEMO_CHECKLIST.md).
 
 Also built, not in the task list: `POST /v1/documents/{document_id}/reprocess`; a well is assigned from the
 name extraction reads, and the unmatched-well review row is raised only if that fails.
@@ -111,6 +116,8 @@ corrections to earlier figures): [`AUDIT_2026-10-02.md`](AUDIT_2026-10-02.md).
 2. **#11:** the same action also moves every row with the document's `doc_id` (events, formation_tops,
    hole_sections, cement_jobs, mud_records, time_log) to the new wellbore (source: `NWIS_PRD.md` W2, "all its
    records move with it"). New endpoint `POST /api/documents/{document_id}/reprocess` (§9.2).
+3. **Pending (made on 2026-10-04 in BE-19, not yet merged):** §12 auto-resolve no longer requires "fused score < band threshold" (scores behind the bit are not recomputed, so look-ahead alerts would never close). It now needs only `bit_md > zone_md_to + 25`, the acknowledgement rule for warning/critical, and a stream that is not `lost`. Per contract rule 2 this needs a `contract:` PR that the other two owners approve.
+4. **Also changed in BE-10 (a backend constant, not a contract name):** `MIN_RRF` 0.015 -> 0.0165 in `02_PRD_BACKEND.md` BE-10.
 
 ## 5. Handover: what other owners must do
 

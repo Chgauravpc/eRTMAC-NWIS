@@ -17,7 +17,7 @@ from app.config import get_settings
 from app.db import close_pool
 from app.errors import NwisError
 from app.logging import configure_logging, get_logger, request_id_var, user_id_var
-from app.routers import documents, health
+from app.routers import admin, ask, documents, health, planning, search, stream, wells
 
 settings = get_settings()
 configure_logging(settings.LOG_LEVEL)
@@ -34,13 +34,47 @@ async def _warm_up_models() -> None:
         logger.exception("model warm-up failed; models will load lazily on first use")
 
 
+async def _reset_live_streams() -> None:
+    """Replay tasks do not survive a restart: no stream may still say 'live' (BE-18)."""
+    try:
+        from app.stream import replay
+
+        await replay.reset_live_streams()
+    except Exception:  # never let a missing database take the service down
+        logger.exception("could not reset live streams on startup")
+
+
+async def _load_l2_models() -> None:
+    """Load the active L2 models (BE-16). With no models, or no database, the risk score is L1 + L3 only."""
+    try:
+        from app.risk import l2
+
+        await l2.load_active()
+    except Exception:  # never let a missing model take the service down
+        logger.exception("could not load L2 models on startup")
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
+    from app.alerts import engine
+    from app.stream import replay
+
     warmup = asyncio.create_task(_warm_up_models())
+    background = []
+    if settings.SUPABASE_DB_URL:
+        # these all need the database; without it (local runs, tests) they would only retry and log
+        background = [asyncio.create_task(_reset_live_streams()), asyncio.create_task(_load_l2_models())]
+        engine.start_engine()  # stream health, escalation and auto-resolve every ENGINE_TICK_S (BE-19)
+    else:
+        logger.warning("SUPABASE_DB_URL is not set: the alert engine, L2 models and stream reset are not started")
     try:
         yield
     finally:
         warmup.cancel()
+        for task in background:
+            task.cancel()
+        await engine.stop_engine()
+        await replay.registry.shutdown()
         await close_pool()
 
 
@@ -48,6 +82,12 @@ app = FastAPI(title="NWIS AI", version="0.1.0", lifespan=lifespan)
 
 app.include_router(health.router, prefix="/v1")
 app.include_router(documents.router, prefix="/v1")
+app.include_router(search.router, prefix="/v1")
+app.include_router(ask.router, prefix="/v1")
+app.include_router(wells.router, prefix="/v1")
+app.include_router(stream.router, prefix="/v1")
+app.include_router(planning.router, prefix="/v1")
+app.include_router(admin.router, prefix="/v1")
 
 
 def _error_body(code: str, message: str, details: dict | None = None) -> dict:

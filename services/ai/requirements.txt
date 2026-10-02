@@ -16,6 +16,9 @@ pandas
 openpyxl
 sentence-transformers
 numpy
+lightgbm
+scikit-learn
+joblib
 pytest
 pytest-asyncio
 respx
