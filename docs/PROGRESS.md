@@ -1,6 +1,7 @@
 # NWIS: progress report
 
-**As of 2 Oct 2026**, `main` at PR #11. Task IDs and sprints are the ones in
+**Updated 3 Oct 2026** (see [`HANDOFF.md`](HANDOFF.md) for the current state, open PRs and next steps; sections 3a and 7 below were written on 2 Oct and
+are partly superseded as noted). `main` includes PRs up to #14. Task IDs and sprints are the ones in
 [`team/00_SHARED_CONTRACTS.md`](team/00_SHARED_CONTRACTS.md) §14, which stays the source of truth.
 
 Legend: ✅ done and merged · ◐ present and checked from the code (see §3a), not run on a live system · 🟡 present, not checked · ⬜ not started · ⛔ blocked
@@ -21,6 +22,13 @@ DB-10) are the bottleneck for most of the remaining backend work.
 | --- | --- | --- |
 | #10 | 1 Oct | BE-05 upload / classify / pipeline, BE-06 parsers, frontend wiring to real data, contract: unmatched documents get a well through `review_field` |
 | #11 | 2 Oct | BE-07 OCR, BE-08 extraction, BE-09 indexing, contract: `review_field` moves a document's records + `POST /api/documents/{id}/reprocess`, well matching from the extracted name |
+| #12 | 2 Oct | This progress report and the audit |
+| #13 | 2-3 Oct | BE-10..BE-24 backend (search/ask, risk layers, replay, alerts, Node routes, evaluation) + the auto-resolve rule |
+| #14 | 3 Oct | Frontend aligned with the PRD, invented data removed, Search & Ask, `/sources`, contrast and bundle checks |
+| #15 | open | `0012_views.sql`, `0013_review_well_assignment.sql`, `db/scripts` (migrate, drift, SQL tests); already applied to the live project |
+| #16 | open | DB-08 trajectory builder, DB-09 synthetic dataset, live checks, `GO_LIVE.md` (stacked on #15) |
+| #17 | open | One repo-root `.env`; hermetic backend unit tests |
+| #18 | open | `HANDOFF.md` and this refresh (stacked on #16) |
 
 ## 3. Task status
 
@@ -76,9 +84,11 @@ name extraction reads, and the unmatched-well review row is raised only if that 
 
 ### Frontend (`apps/web`)
 
-FE-01 … FE-17 screens exist on `main` (a landing page was added by teammates). ◐ Checked from the code, and it is
-**not green**: failing tests, lint errors, the hardcoded-name check, and invented display numbers. Details in §3a.
-FE-11 still needs the well select and the reprocess call (§5).
+FE-01 … FE-17 screens exist on `main`. **Green since PR #14** (3 Oct): lint, `check:hardcoded`, `check:contrast` (new), all vitest files and the
+production build pass; the invented display numbers are gone; Search & Ask (was a placeholder), the `/sources/:docId` route, the planning
+brief, the admin retrain polling and the Analytics charts were completed against the PRD; FE-11 has the well select and the reprocess call.
+Also verified against the live Supabase project with `apps/web/scripts/live-smoke.mjs` (29 checks, each demo role). **Never opened in a
+browser.** The two paragraphs headed 'Frontend' in §3a and item 6 of §7 describe the state *before* #14.
 
 ### 3a. Verified from the code (2 Oct)
 
@@ -150,17 +160,13 @@ corrections to earlier figures): [`AUDIT_2026-10-02.md`](AUDIT_2026-10-02.md).
 4. **Docling is heavy.** Running it locally crashed a developer PC once. Its table extraction has not been verified (the one
    successful test page had no real table). The real Docling test only runs with `NWIS_RUN_DOCLING=1`.
 5. **Tesseract is not installed on the dev machine,** so its two real tests skip; the fallback logic is covered by mocks.
-6. **Frontend is not green** on `main`: 26 failing tests, 7 lint errors, a failing hardcoded-name check, and invented numbers in the Wells table (§3a).
+6. ~~Frontend is not green~~ fixed in #14 (3 Oct). Still open: the frontend has never run in a browser, and the demo loop (replay -> risk -> alerts -> Realtime) has never run end to end on the real database.
 
 ## 8. Recommended next steps
 
-1. **DB-08 → DB-09 (Person A):** they unblock BE-11, 12, 13, 14, 16 and the whole look-ahead and alert chain.
-2. **BE-20 (Node routes)** and **BE-15 (live detectors)** can start now.
-3. ~~Fix the DB-05 follow-up~~ done in `0013` (3 Oct). The review flow now works in SQL; the frontend side is PR #14.
-4. First deployment: Supabase (push `0001`–`0011`), then a health-only Space, then run one real upload through the pipeline.
-5. **Frontend clean-up (Person C):** remove the `|| 18` and `|| 6.4` fallbacks; fix the 7 lint errors; update or restore the 26 stale tests;
-   move the landing page's sample wells out of `src/features` (or exempt it explicitly); on the Wells page add a TD column, make the filters work or remove them, and restore the `/alerts` grouping and filters.
-6. **Database (Person A):** add `0012_views.sql`; the frontend and BE-13 depend on the views.
+Maintained in [`HANDOFF.md`](HANDOFF.md) section 4 (the order matters: prove the demo loop on the real project first). Done since the
+2 Oct list: DB-08, DB-09 parts 1 and 2, DB-12, the DB-05 follow-up, BE-20, the frontend clean-up, the first real runs of BE-12, BE-14, BE-16, BE-17.
+Production steps for Supabase, the Space and Vercel: [`GO_LIVE.md`](GO_LIVE.md).
 
 ## 9. How to run things
 
