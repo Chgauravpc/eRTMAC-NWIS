@@ -16,7 +16,7 @@ const STATUS_STYLE = {
 };
 
 function StatusBadge({ job }) {
-  if (!job) return <span className="text-xs text-gray-500">No job</span>;
+  if (!job) return <span className="text-xs text-gray-600">No job</span>;
   const style = STATUS_STYLE[job.status] || STATUS_STYLE.queued;
   const { Icon } = style;
   const label = JOB_STATUS_LABELS[job.status] || job.status;

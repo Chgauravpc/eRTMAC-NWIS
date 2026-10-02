@@ -10,7 +10,7 @@ export function ReviewQueue() {
   const isReadOnly = !(profile?.role === 'reviewer' || profile?.role === 'admin');
   const { data: queue, isLoading, error } = useReviewQueue();
 
-  if (isLoading) return <div className="p-10 text-center font-bold text-gray-500">Loading queue…</div>;
+  if (isLoading) return <div className="p-10 text-center font-bold text-gray-600">Loading queue…</div>;
   if (error) {
     return (
       <div role="alert" className="m-6 rounded-lg border border-red-200 bg-red-50 p-4 font-bold text-red-700">
@@ -68,8 +68,8 @@ export function ReviewQueue() {
             ))}
             {queue?.length === 0 && (
               <tr>
-                <td colSpan="6" className="p-16 text-center text-lg font-medium text-gray-500">
-                  <PartyPopper className="mx-auto mb-4 h-10 w-10 text-gray-400" aria-hidden="true" />
+                <td colSpan="6" className="p-16 text-center text-lg font-medium text-gray-700">
+                  <PartyPopper className="mx-auto mb-4 h-10 w-10 text-gray-600" aria-hidden="true" />
                   Queue is empty. All documents are reviewed.
                 </td>
               </tr>

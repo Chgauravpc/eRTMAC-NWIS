@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { Button, cn, FOCUS_RING } from '../../components/ui/Primitives';
+import { cn } from '../../components/ui/Primitives';
 import { ROLE_LABELS } from '../../lib/constants';
 import { useProfile } from './useProfile';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
@@ -87,12 +87,12 @@ export function LoginPage() {
             NWIS
           </div>
 
-          <div className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500">
+          <div className="mb-4 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
             NATIONAL WELL INTELLIGENCE SYSTEM • OIL INDIA LIMITED
           </div>
 
           <h1 className="mb-6 text-6xl font-medium tracking-tight">
-            Know what's ahead.<br />
+            Know what&apos;s ahead.<br />
             <span className="text-[#f1a260]">Before the bit gets<br />there.</span>
           </h1>
 
@@ -103,7 +103,7 @@ export function LoginPage() {
           </p>
         </div>
 
-        <div className="relative z-10 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-gray-500">
+        <div className="relative z-10 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-gray-400">
           <div className="flex items-center gap-3">
             <div className="h-[1px] w-8 bg-orange-400/50" />
             Systems nominal
@@ -122,7 +122,7 @@ export function LoginPage() {
             <ArrowLeft className="h-4 w-4" />
             <span>Back to Overview</span>
           </Link>
-          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+          <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600">
             <span>SECURE WORKSPACE</span>
             <HelpCircle className="h-3.5 w-3.5" />
           </div>
@@ -137,7 +137,7 @@ export function LoginPage() {
           </p>
 
           {error && (
-            <div role="alert" className="mb-6 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+            <div role="alert" className="mb-6 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               {error}
             </div>
           )}
@@ -150,7 +150,7 @@ export function LoginPage() {
 
           {mode === 'login' && isMock && (
             <section aria-label="Mock roles" className="mb-8">
-              <p className="text-xs uppercase font-bold tracking-wider text-gray-400 mb-3">
+              <p className="text-xs uppercase font-bold tracking-wider text-gray-600 mb-3">
                 Mock mode is active. Sign in as one of the demo users:
               </p>
               <div className="space-y-2.5">
@@ -168,7 +168,7 @@ export function LoginPage() {
                       </div>
                       <div className="text-xs text-gray-500">{p.full_name}</div>
                     </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-600">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -176,7 +176,7 @@ export function LoginPage() {
               </div>
               <div className="flex items-center my-6">
                 <div className="h-px flex-1 bg-gray-200"></div>
-                <span className="px-4 text-[10px] font-bold uppercase tracking-widest text-gray-400">Or use email</span>
+                <span className="px-4 text-[10px] font-bold uppercase tracking-widest text-gray-600">Or use email</span>
                 <div className="h-px flex-1 bg-gray-200"></div>
               </div>
             </section>
@@ -277,7 +277,7 @@ export function LoginPage() {
           )}
         </div>
 
-        <div className="mt-auto pt-8 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-gray-400">
+        <div className="mt-auto pt-8 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest text-gray-600">
           <div>OIL INDIA LIMITED · SIH26121</div>
           <div className="flex items-center gap-2">
             <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />

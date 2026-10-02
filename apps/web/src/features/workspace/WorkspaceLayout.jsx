@@ -36,7 +36,7 @@ export default function WorkspaceLayout() {
               className={({ isActive }) =>
                 cn(
                   'whitespace-nowrap border-b-2 px-1 py-3 text-sm font-medium transition-colors',
-                  isActive ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-500 hover:border-gray-700 hover:text-gray-300',
+                  isActive ? 'border-blue-500 text-blue-400' : 'border-transparent text-gray-400 hover:border-gray-700 hover:text-gray-300',
                 )
               }
             >

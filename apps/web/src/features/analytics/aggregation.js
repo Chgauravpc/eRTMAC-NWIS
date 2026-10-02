@@ -33,3 +33,21 @@ export function aggregateWellMetrics(wells, provenanceFilter = 'all') {
     byField: Object.values(fieldMap).sort((a, b) => b.npt_h_total - a.npt_h_total)
   };
 }
+
+/**
+ * v_npt_by_formation rows (formation x risk_type) -> one row per formation, largest NPT first,
+ * with the NPT per risk type kept for the stacked bar.
+ */
+export function aggregateByFormation(rows) {
+  const map = new Map();
+  for (const r of rows || []) {
+    if (!r?.formation) continue;
+    if (!map.has(r.formation)) map.set(r.formation, { formation: r.formation, event_count: 0, npt_h_total: 0, byRisk: {} });
+    const f = map.get(r.formation);
+    const npt = Number(r.npt_h_total) || 0;
+    f.event_count += Number(r.event_count) || 0;
+    f.npt_h_total += npt;
+    if (r.risk_type) f.byRisk[r.risk_type] = (f.byRisk[r.risk_type] || 0) + npt;
+  }
+  return [...map.values()].sort((a, b) => b.npt_h_total - a.npt_h_total || a.formation.localeCompare(b.formation));
+}

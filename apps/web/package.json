@@ -11,7 +11,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:api": "vitest run --config vitest.api.config.js",
-    "check:hardcoded": "node scripts/check-hardcoded.mjs"
+    "check:hardcoded": "node scripts/check-hardcoded.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check": "npm run lint && npm run check:hardcoded && npm run check:contrast"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",

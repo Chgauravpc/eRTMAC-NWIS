@@ -32,7 +32,7 @@ export function PlanningPage() {
       <PlanningForm onSubmit={handleSubmit} loading={loading} />
       
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-100 no-print">
+        <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-100 no-print">
           Error: {error}
         </div>
       )}

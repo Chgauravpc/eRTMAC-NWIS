@@ -22,211 +22,19 @@ import {
   Sliders,
   Zap,
   AlertTriangle,
-  Gauge,
   Cpu,
   Monitor,
   Tablet,
-  Search,
   FileCheck2,
   HardHat,
   ChevronDown,
   MapPin,
   Crosshair,
-  ExternalLink,
-  Navigation,
 } from 'lucide-react';
 import { useProfile } from '../auth/useProfile';
 import { roleHome } from '../auth/roleHome';
 
-// Regional offset wells in Upper Assam Basin (Duliajan Field Block)
-const REGIONAL_WELLS = [
-  {
-    id: 'SYN-DLJ-03',
-    name: 'SYN-DLJ-03',
-    role: 'Active Drilling Bit',
-    isActive: true,
-    lat: 27.3600,
-    lon: 95.3100,
-    md: 2845,
-    tvd: 2780,
-    formation: 'Barail Coal-Shale',
-    hazardType: 'Active Telemetry Stream',
-    riskLevel: 'Active',
-    riskScore: 76.5,
-    riskColor: '#10b981',
-    badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-300',
-    distanceKm: 0,
-    historicalSummary:
-      'Primary operational wellbore. Bit currently in Barail formation at 2,845 m MD with real-time gamma ray, ROP, and torque streaming.',
-    mitigation:
-      'Monitor for differential sticking and coal sloughing ahead of upcoming connection. Keep string rotating continuously.',
-  },
-  {
-    id: 'SYN-DLJ-05',
-    name: 'SYN-DLJ-05',
-    role: 'Historical Offset',
-    isActive: false,
-    lat: 27.3685,
-    lon: 95.2950,
-    md: 3120,
-    tvd: 3050,
-    formation: 'Tipam Sandstone / Barail',
-    hazardType: 'High Mud Losses',
-    riskLevel: 'Elevated',
-    riskScore: 58.2,
-    riskColor: '#f59e0b',
-    badgeColor: 'bg-amber-50 text-amber-800 border-amber-300',
-    distanceKm: 1.85,
-    historicalSummary:
-      'Encountered 15 m³/h partial mud losses at 2,425 m in porous Tipam interval during drilling in 2023.',
-    mitigation:
-      'Pre-treat active mud system with 30 m³ high-fluid LCM pill before bit passes 2,420 m.',
-  },
-  {
-    id: 'SYN-DLJ-02',
-    name: 'SYN-DLJ-02',
-    role: 'Historical Offset',
-    isActive: false,
-    lat: 27.3510,
-    lon: 95.3320,
-    md: 2980,
-    tvd: 2920,
-    formation: 'Barail Coal-Shale',
-    hazardType: 'Differential Sticking',
-    riskLevel: 'High',
-    riskScore: 78.4,
-    riskColor: '#ea580c',
-    badgeColor: 'bg-orange-50 text-orange-800 border-orange-300',
-    distanceKm: 2.42,
-    historicalSummary:
-      'String seized for 18 hours NPT at 2,892 m due to coal sloughing and overbalanced mud hydrostatic pressure.',
-    mitigation:
-      'Maintain drill string in continuous rotation; circulate bottoms up thoroughly before connections.',
-  },
-  {
-    id: 'SYN-DLJ-01',
-    name: 'SYN-DLJ-01',
-    role: 'Historical Offset',
-    isActive: false,
-    lat: 27.3390,
-    lon: 95.2920,
-    md: 2450,
-    tvd: 2410,
-    formation: 'Girujan Clay',
-    hazardType: 'Reactive Clay Swelling',
-    riskLevel: 'Low',
-    riskScore: 22.0,
-    riskColor: '#10b981',
-    badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-300',
-    distanceKm: 2.95,
-    historicalSummary:
-      'Minor reactive clay swelling observed in upper Girujan section. Successfully drilled without stuck pipe incident.',
-    mitigation:
-      'Maintain mud weight at 1.12 SG; monitor shaker screen cuttings integrity.',
-  },
-  {
-    id: 'SYN-DLJ-04',
-    name: 'SYN-DLJ-04',
-    role: 'Historical Offset',
-    isActive: false,
-    lat: 27.3820,
-    lon: 95.3340,
-    md: 3600,
-    tvd: 3510,
-    formation: 'Kopili Formation',
-    hazardType: 'Gas Kick Influx',
-    riskLevel: 'Moderate',
-    riskScore: 44.5,
-    riskColor: '#0284c7',
-    badgeColor: 'bg-sky-50 text-sky-800 border-sky-300',
-    distanceKm: 3.40,
-    historicalSummary:
-      'Overpressured gas pocket (+0.08 SG EMW) encountered at 3,450 m; 4 bbl kick promptly shut in at choke manifold.',
-    mitigation:
-      'Execute flow check before penetrating Kopili top. Ensure trip tank audio float alarm is armed.',
-  },
-  {
-    id: 'SYN-NHK-01',
-    name: 'SYN-NHK-01',
-    role: 'Regional Exploration',
-    isActive: false,
-    lat: 27.3320,
-    lon: 95.2610,
-    md: 3750,
-    tvd: 3640,
-    formation: 'Nahorkatiya Barail Deep',
-    hazardType: 'Torque & Drag Spikes',
-    riskLevel: 'High',
-    riskScore: 71.8,
-    riskColor: '#ea580c',
-    badgeColor: 'bg-orange-50 text-orange-800 border-orange-300',
-    distanceKm: 4.80,
-    historicalSummary:
-      'Excessive mechanical torque (>28 kNm) recorded through deep interbedded coal streaks.',
-    mitigation:
-      'Add lubricity copolymer beads to active mud system; perform wiper trip every 150 metres.',
-  },
-];
-
-// Formation horizons with Assam basin geological depth ranges and known offset hazards
-const FORMATION_PRESETS = [
-  {
-    name: 'Girujan Clay',
-    depth: 1850,
-    lithology: 'Claystone & Silt',
-    hazard: {
-      type: 'Borehole Stability',
-      risk: 22.4,
-      band: 'Low',
-      bandColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
-      evidence: 'Stable formation. Minor reactive clay swelling noted in offset SYN-DLJ-01 at 1,840 m.',
-      mitigation: 'Maintain mud weight at 1.12 SG; monitor shale shaker cuttings integrity.',
-    },
-    telemetry: { rop: 18.2, wob: 10.5, rpm: 120, spp: 2450 },
-  },
-  {
-    name: 'Tipam Sandstone',
-    depth: 2395,
-    lithology: 'Porous Sandstone',
-    hazard: {
-      type: 'High Mud Losses',
-      risk: 58.2,
-      band: 'Elevated',
-      bandColor: 'text-amber-800 bg-amber-50 border-amber-300',
-      evidence: 'Offset SYN-DLJ-05 (1.85 km away) encountered 15 m³/h partial losses at relative depth 0.62.',
-      mitigation: 'Pre-mix 30 m³ high-fluid LCM pill before bit reaches 2,425 m. Restrict pump rate to 2,400 L/min.',
-    },
-    telemetry: { rop: 14.8, wob: 12.8, rpm: 110, spp: 2680 },
-  },
-  {
-    name: 'Barail Coal-Shale',
-    depth: 2880,
-    lithology: 'Interbedded Coal & Shale',
-    hazard: {
-      type: 'Differential Sticking',
-      risk: 76.5,
-      band: 'High',
-      bandColor: 'text-orange-800 bg-orange-50 border-orange-300',
-      evidence: 'Offset BRL-04 suffered stuck pipe incident (18 hrs NPT) due to coal sloughing at 2,892 m.',
-      mitigation: 'Keep drill string in continuous rotation; circulate bottoms up before connections.',
-    },
-    telemetry: { rop: 8.4, wob: 16.2, rpm: 85, spp: 3100 },
-  },
-  {
-    name: 'Kopili Formation',
-    depth: 3450,
-    lithology: 'Carbonaceous Marl',
-    hazard: {
-      type: 'Gas Kick Influx',
-      risk: 44.0,
-      band: 'Moderate',
-      bandColor: 'text-sky-800 bg-sky-50 border-sky-300',
-      evidence: 'Overpressured gas pocket detected in offset KPL-02 (+0.08 SG equivalent mud weight).',
-      mitigation: 'Perform flow check prior to penetrating Kopili top. Have trip tank aligned with float sensor.',
-    },
-    telemetry: { rop: 6.1, wob: 18.0, rpm: 75, spp: 3350 },
-  },
-];
+import { REGIONAL_WELLS, FORMATION_PRESETS } from '../../mocks/fixtures/landingSample';
 
 function MapViewController({ targetWell, resetSignal }) {
   const map = useMap();
@@ -272,7 +80,7 @@ export function LandingPage() {
   // Interactive Map State
   const [mapLayerType, setMapLayerType] = useState('street'); // 'street' (real OSM) or 'satellite' (real Esri)
   const [selectedRadius, setSelectedRadius] = useState(3000); // 3.0 km default buffer
-  const [selectedWell, setSelectedWell] = useState(REGIONAL_WELLS[0]); // Default to SYN-DLJ-03
+  const [selectedWell, setSelectedWell] = useState(REGIONAL_WELLS[0]); // default: the active well
   const [mapTargetWell, setMapTargetWell] = useState(null);
   const [resetSignal, setResetSignal] = useState(0);
 
@@ -404,7 +212,7 @@ export function LandingPage() {
             >
               <MapPin className="h-4 w-4 text-neutral-700" />
               <span>Explore Field Map</span>
-              <ChevronDown className="h-4 w-4 text-neutral-400" />
+              <ChevronDown className="h-4 w-4 text-neutral-500" />
             </a>
           </div>
 
@@ -519,7 +327,7 @@ export function LandingPage() {
                   {/* Well Coordinates & Distance */}
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2.5 rounded-lg bg-white border border-neutral-200">
-                      <div className="text-[10px] text-neutral-400 font-medium">FORMATION & DEPTH</div>
+                      <div className="text-[10px] text-neutral-600 font-medium">FORMATION & DEPTH</div>
                       <div className="font-bold text-neutral-900 truncate mt-0.5">
                         {selectedWell.formation}
                       </div>
@@ -528,7 +336,7 @@ export function LandingPage() {
                       </div>
                     </div>
                     <div className="p-2.5 rounded-lg bg-white border border-neutral-200">
-                      <div className="text-[10px] text-neutral-400 font-medium">3D SPATIAL OFFSET</div>
+                      <div className="text-[10px] text-neutral-600 font-medium">3D SPATIAL OFFSET</div>
                       <div className="font-bold text-neutral-900 mt-0.5">
                         {selectedWell.isActive ? 'Active Center' : `${selectedWell.distanceKm} km`}
                       </div>
@@ -570,7 +378,7 @@ export function LandingPage() {
                 <div>
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">
                     <span>Field Wells List</span>
-                    <span className="text-[10px] font-normal text-neutral-400">Click to focus</span>
+                    <span className="text-[10px] font-normal text-neutral-600">Click to focus</span>
                   </div>
 
                   <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
@@ -616,7 +424,7 @@ export function LandingPage() {
                 className="w-full py-2.5 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-semibold flex items-center justify-center gap-2 transition-colors border border-neutral-200"
               >
                 <Crosshair className="h-4 w-4 text-neutral-700" />
-                <span>Refocus Active Well (SYN-DLJ-03)</span>
+                <span>Refocus Active Well ({REGIONAL_WELLS[0].name})</span>
               </button>
             </div>
 
@@ -687,7 +495,7 @@ export function LandingPage() {
                         <div className="p-2 space-y-1 text-xs min-w-[200px]">
                           <div className="font-bold text-neutral-950 font-display flex items-center justify-between">
                             <span>{w.name}</span>
-                            <span className="text-[10px] font-mono text-neutral-500">
+                            <span className="text-[10px] font-mono text-neutral-600">
                               {w.isActive ? 'ACTIVE' : `${w.distanceKm} km`}
                             </span>
                           </div>
@@ -810,7 +618,7 @@ export function LandingPage() {
                       : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50'
                   }`}
                 >
-                  <div className="text-[10px] font-mono text-neutral-500 uppercase">{item.depth} m</div>
+                  <div className="text-[10px] font-mono text-neutral-600 uppercase">{item.depth} m</div>
                   <div className="font-display font-semibold text-sm truncate">{item.name}</div>
                 </button>
               ))}
@@ -852,7 +660,7 @@ export function LandingPage() {
                     }}
                     className="w-full h-2 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-neutral-950"
                   />
-                  <div className="flex justify-between text-[11px] text-neutral-400 mt-1 font-mono">
+                  <div className="flex justify-between text-[11px] text-neutral-600 mt-1 font-mono">
                     <span>1,500 m</span>
                     <span>2,500 m</span>
                     <span>3,800 m</span>
@@ -863,7 +671,7 @@ export function LandingPage() {
                 <div className="p-4 rounded-xl border border-neutral-200 bg-neutral-50">
                   <div className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-3 flex items-center justify-between">
                     <span>Assam Basin Stratigraphy</span>
-                    <span className="text-[10px] font-mono text-neutral-400">PostGIS 3D Layer</span>
+                    <span className="text-[10px] font-mono text-neutral-600">PostGIS 3D Layer</span>
                   </div>
 
                   <div className="space-y-2">

@@ -131,6 +131,56 @@ describe('WellsPage', () => {
   });
 });
 
+describe('WellsPage: real values and working controls', () => {
+  it('shows what the data says: 0 events and 0 h NPT are shown as such, missing values as a dash (no invented numbers)', async () => {
+    server.use(
+      http.get(`${REST}/v_well_summary`, () =>
+        HttpResponse.json([
+          { ...wellsFixture[1], event_count: 0, npt_h_total: 0, td_md_m: null },
+          { ...wellsFixture[2], event_count: null, npt_h_total: null },
+        ]),
+      ),
+    );
+    renderPage();
+    const body = await screen.findByTestId('wells-table-body');
+    const [first, second] = within(body).getAllByRole('row');
+    const cells = (row) => within(row).getAllByRole('cell').map((c) => c.textContent);
+    expect(cells(first)[3]).toBe('-'); // TD missing
+    expect(cells(first)[4]).toBe('0');
+    expect(cells(first)[5]).toBe('0.0 h');
+    expect(cells(second)[4]).toBe('-');
+    expect(cells(second)[5]).toBe('-');
+    expect(body.textContent).not.toMatch(/(^|[^\d.])18([^\d]|$)|6\.4 h/);
+  });
+
+  it('has a TD column and filters by status, top risk and provenance', async () => {
+    renderPage();
+    expect(await screen.findByRole('columnheader', { name: 'TD' })).toBeTruthy();
+    const body = screen.getByTestId('wells-table-body');
+    const all = within(body).getAllByRole('row').length;
+
+    fireEvent.change(screen.getByLabelText('Filter by status'), { target: { value: 'completed' } });
+    const completed = wellsFixture.filter((w) => w.status === 'completed').length;
+    expect(within(body).getAllByRole('row')).toHaveLength(completed);
+    expect(completed).toBeLessThan(all);
+
+    fireEvent.change(screen.getByLabelText('Filter by status'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('Filter by provenance'), { target: { value: 'analog' } });
+    expect(within(body).queryAllByRole('row')).toHaveLength(wellsFixture.filter((w) => w.provenance === 'analog').length);
+
+    fireEvent.change(screen.getByLabelText('Filter by provenance'), { target: { value: '' } });
+    fireEvent.change(screen.getByLabelText('Filter by top risk'), { target: { value: 'losses' } });
+    expect(within(body).queryAllByRole('row')).toHaveLength(wellsFixture.filter((w) => w.top_risk_type === 'losses').length);
+  });
+
+  it('rows open the well workspace', async () => {
+    renderPage();
+    const body = await screen.findByTestId('wells-table-body');
+    const link = within(body).getAllByRole('link')[0];
+    expect(link.getAttribute('href')).toMatch(/^\/wells\/.+\/map$/);
+  });
+});
+
 describe('ProvenanceBadge', () => {
   it('renders the word in caps for each provenance and nothing when missing', () => {
     const { container, rerender } = renderRoute(<ProvenanceBadge provenance="synthetic" />);

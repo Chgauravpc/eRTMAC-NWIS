@@ -362,7 +362,7 @@ describe('WorkspaceMap: control state -> exact offsets_within RPC params', () =>
     // trajectories come from v_trajectory_geojson: active well in the accent colour, the others as one layer
     await waitFor(() => expect(screen.getAllByTestId('geojson').length).toBe(2));
     const layers = screen.getAllByTestId('geojson');
-    expect(layers.find((l) => l.dataset.color === '#1d4ed8')).toBeTruthy();
+    expect(layers.find((l) => l.dataset.color === '#3b82f6')).toBeTruthy();
     expect(layers.find((l) => l.dataset.features === String(MOCK_WELLS.length - 1))).toBeTruthy();
 
     // active well: larger marker with a ring, coloured by its top risk type; the others are canvas dots

@@ -77,9 +77,9 @@ export function Spinner({ className }) {
  */
 export function EmptyState({ message, title, icon: Icon = Inbox, action, className }) {
   return (
-    <div className={cn('flex flex-col items-center text-center py-12 px-4 text-gray-400', className)}>
+    <div className={cn('flex flex-col items-center text-center py-12 px-4 text-gray-700', className)}>
       <Icon className="h-10 w-10 mb-4 text-gray-600" aria-hidden="true" />
-      {title && <h2 className="text-lg font-semibold text-gray-200 mb-1 tracking-wide">{title}</h2>}
+      {title && <h2 className="text-lg font-semibold text-gray-900 mb-1 tracking-wide">{title}</h2>}
       <p className="text-sm">{message || 'No data available.'}</p>
       {action && <div className="mt-6">{action}</div>}
     </div>
@@ -89,14 +89,14 @@ export function EmptyState({ message, title, icon: Icon = Inbox, action, classNa
 /** Error state with an optional Retry button (onRetry). */
 export function ErrorState({ message, title, onRetry, className }) {
   return (
-    <div role="alert" className={cn('p-4 bg-red-950/30 text-red-400 rounded-lg border border-red-900/50', className)}>
+    <div role="alert" className={cn('p-4 bg-red-50 text-red-900 rounded-lg border border-red-300', className)}>
       <div className="flex items-start gap-3">
-        <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-red-500" aria-hidden="true" />
+        <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-red-700" aria-hidden="true" />
         <div>
-          {title && <div className="font-semibold text-red-300 mb-1">{title}</div>}
+          {title && <div className="font-semibold text-red-900 mb-1">{title}</div>}
           <div className="text-sm">{message || 'An error occurred.'}</div>
           {onRetry && (
-            <Button variant="outline" size="sm" className="mt-4 border-red-800 text-red-300 hover:bg-red-900/50" onClick={onRetry}>
+            <Button variant="outline" size="sm" className="mt-4 border-red-700 text-red-800 hover:bg-red-100" onClick={onRetry}>
               Retry
             </Button>
           )}

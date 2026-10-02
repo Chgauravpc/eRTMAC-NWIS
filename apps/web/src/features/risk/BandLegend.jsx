@@ -3,6 +3,7 @@ import { BAND_META, BAND_ORDER } from '../../lib/risk';
 import { BandIcon } from './BandBadge';
 
 /** Contract §11.1 bands with what each means for the engineer (NWIS_PRD F5 table). */
+// @surface light (inside a white card of the risk tab)
 export function BandLegend() {
   return (
     <section aria-label="Risk band legend" className="mt-4">

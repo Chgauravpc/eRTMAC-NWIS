@@ -20,9 +20,9 @@ export function WellHeader({ well, streamState, formation }) {
           <StreamStatusPill status={streamState?.status || 'stopped'} lastSampleAt={streamState?.last_sample_at} />
         </div>
         <div className="mt-2 flex flex-wrap gap-x-6 text-sm text-gray-400">
-          <span className="flex items-center gap-2"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Field</span> <span className="text-gray-200">{well?.field || '-'}</span></span>
-          <span className="flex items-center gap-2" data-testid="header-bit"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Bit</span> <span className="font-mono text-gray-200">{fmtDepth(streamState?.bit_md_m)}</span></span>
-          <span className="flex items-center gap-2" data-testid="header-formation"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Formation</span> <span className="text-gray-200">{formation?.formation || '-'}</span></span>
+          <span className="flex items-center gap-2"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Field</span> <span className="text-gray-200">{well?.field || '-'}</span></span>
+          <span className="flex items-center gap-2" data-testid="header-bit"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Bit</span> <span className="font-mono text-gray-200">{fmtDepth(streamState?.bit_md_m)}</span></span>
+          <span className="flex items-center gap-2" data-testid="header-formation"><span className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Formation</span> <span className="text-gray-200">{formation?.formation || '-'}</span></span>
         </div>
       </div>
       <div>

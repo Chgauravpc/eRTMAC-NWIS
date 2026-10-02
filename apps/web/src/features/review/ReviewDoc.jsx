@@ -6,6 +6,9 @@ import { PageViewer } from './PageViewer';
 import { FieldList } from './FieldList';
 import { useProfile } from '../auth/useProfile';
 import { getReviewQueue } from '../../lib/data/review';
+import { reprocessDocument } from '../../lib/data/documents';
+import { documentKeys } from '../../lib/hooks/documents';
+import { isWellAssignment, needsWellChoice } from './value';
 import { reviewKeys, useDocumentPages, usePageImageUrl, useReviewAction, useReviewFields } from '../../lib/hooks/review';
 
 const AUTO_NEXT_MS = 1500;
@@ -32,6 +35,7 @@ export function ReviewDoc() {
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState(null);
   const [reviewedCount, setReviewedCount] = useState(0);
+  const [reprocess, setReprocess] = useState(null); // {jobId} | {error} after a well was assigned
   const [nextDocId, setNextDocId] = useState(undefined); // undefined = not looked up yet, null = queue empty
   const cardRefs = useRef(new Map());
 
@@ -85,10 +89,24 @@ export function ReviewDoc() {
   const act = useCallback(
     async (field, action, value = null) => {
       if (isReadOnly || busy || !field) return;
+      if (action === 'approve' && needsWellChoice(field)) {
+        setActionError({ code: 'NWIS_BAD_REQUEST', message: 'Choose the well first (Edit), then approve.' });
+        return;
+      }
       setBusy(true);
       setActionError(null);
       try {
         await review(field, action, value);
+        if (isWellAssignment(field) && action !== 'reject') {
+          // The document now has a well: read the stored file again so its records are created.
+          try {
+            const job = await reprocessDocument(docId);
+            setReprocess({ jobId: job?.job_id ?? null });
+            qc.invalidateQueries({ queryKey: documentKeys.list });
+          } catch (e) {
+            setReprocess({ error: e?.message || 'Could not start reprocessing.' });
+          }
+        }
         setReviewedCount((n) => n + 1);
         setEditingId(null);
         const idx = fields.findIndex((f) => f.id === field.id);
@@ -101,7 +119,7 @@ export function ReviewDoc() {
         setBusy(false);
       }
     },
-    [isReadOnly, busy, review, fields, select]
+    [isReadOnly, busy, review, fields, select, docId, qc]
   );
 
   // Latest-state ref so the single window listener never sees stale closures.
@@ -165,6 +183,7 @@ export function ReviewDoc() {
     setActionError(null);
     setReviewedCount(0);
     setNextDocId(undefined);
+    setReprocess(null);
   }, [docId]);
 
   const goToPage = (p) => {
@@ -243,6 +262,19 @@ export function ReviewDoc() {
           {actionError && (
             <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700" data-error-code={actionError.code}>
               {actionError.message}
+            </div>
+          )}
+
+          {reprocess && (
+            <div role="status" data-testid="reprocess-status" className={`rounded-lg border p-3 text-sm font-bold ${reprocess.error ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-green-200 bg-green-50 text-green-800'}`}>
+              {reprocess.error ? (
+                <>Well assigned, but reprocessing did not start: {reprocess.error}</>
+              ) : (
+                <>
+                  Well assigned. The document is being read again so its records are created.{' '}
+                  <Link to="/documents" className="underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600">Follow progress on Documents</Link>
+                </>
+              )}
             </div>
           )}
 

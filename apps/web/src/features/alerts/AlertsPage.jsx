@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState } from 'react';
 import { useNow } from '../../lib/hooks/alerts';
-import { useWells } from '../../lib/hooks/wells';
 import { useAlerts } from './AlertProvider';
-import { SlidersHorizontal, AlertTriangle, ChevronRight } from 'lucide-react';
-import { compareBySeverityThenAge, depthPhrase, fmtAge, isUnacked } from './alertUtils';
+import { AlertRow } from './AlertRow';
+import { compareBySeverityThenAge, depthPhrase, isPinned, isUnacked } from './alertUtils';
 
-const SEVERITY_WORD = { critical: 'HIGH', warning: 'ELEVATED', watch: 'MODERATE', info: 'MODERATE' };
-const PROVENANCE_WORD = { synthetic: 'SYNTHETIC', analog: 'ANALOG', direct: 'DIRECT', volve: 'DIRECT', npd: 'DIRECT' };
-const CONFIDENCE_WORD = { high: 'High confidence', medium: 'Medium confidence', low: 'Low confidence' };
+// Open states only: resolved / feedback alerts live in each well's history tab.
+const OPEN_STATE_FILTERS = Object.freeze(['generated', 'sent', 'viewed', 'escalated', 'acknowledged']);
+const SORTS = Object.freeze({ severity: 'Severity', age: 'Age (oldest first)' });
+const byAge = (a, b) => Date.parse(a.created_at) - Date.parse(b.created_at);
 
 /** Mean time from creation to acknowledgement as "04m" / "1h 05m"; an em dash when nothing was acknowledged. */
 function avgResponse(alerts) {
@@ -23,14 +22,11 @@ function avgResponse(alerts) {
 }
 
 export function AlertsPage() {
-  const { alerts = [], wellNames = {} } = useAlerts();
-  const { data: wells } = useWells();
+  const { alerts = [], wellNames = {}, openAlert } = useAlerts();
   const now = useNow(1000);
+  const [states, setStates] = useState(() => new Set(OPEN_STATE_FILTERS));
+  const [sort, setSort] = useState('severity');
 
-  const provenanceByWellbore = useMemo(
-    () => Object.fromEntries((wells || []).map((w) => [w.wellbore_id, w.provenance])),
-    [wells]
-  );
   const open = useMemo(() => [...alerts].sort(compareBySeverityThenAge), [alerts]);
   const unacked = open.filter(isUnacked);
   const unackedWells = new Set(unacked.map((a) => a.wellbore_id)).size;
@@ -39,109 +35,109 @@ export function AlertsPage() {
   const response = avgResponse(alerts);
   const nameOf = (a) => wellNames[a.wellbore_id] || 'Unknown well';
 
+  // Unacknowledged warning/critical are pinned on top and never hidden by a filter.
+  const pinned = open.filter(isPinned);
+  const groups = useMemo(() => {
+    const cmp = sort === 'age' ? byAge : compareBySeverityThenAge;
+    const byWell = new Map();
+    for (const a of alerts) {
+      if (isPinned(a) || !states.has(a.state)) continue;
+      const name = wellNames[a.wellbore_id] || 'Unknown well';
+      if (!byWell.has(name)) byWell.set(name, []);
+      byWell.get(name).push(a);
+    }
+    return [...byWell.entries()].sort(([x], [y]) => x.localeCompare(y)).map(([name, list]) => [name, list.sort(cmp)]);
+  }, [alerts, states, sort, wellNames]);
+
+  const toggle = (state) =>
+    setStates((prev) => {
+      const next = new Set(prev);
+      if (next.has(state)) next.delete(state);
+      else next.add(state);
+      return next;
+    });
+
   return (
     <div className="mx-auto max-w-7xl">
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">
-            Operations / Response Center
-          </div>
-          <h1 className="text-5xl font-medium tracking-tight text-gray-900 mb-3">Open alerts</h1>
-          <p className="text-gray-500 text-lg">A calm view of signals that need an engineering decision.</p>
+      <div className="mb-8">
+        <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-600 mb-2">
+          Operations / Response Center
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded text-sm font-medium hover:bg-gray-50 transition-colors shadow-sm text-gray-900 mt-6">
-          <SlidersHorizontal className="h-4 w-4" /> Filter view
-        </button>
+        <h1 className="text-5xl font-medium tracking-tight text-gray-900 mb-3">Open alerts</h1>
+        <p className="text-gray-600 text-lg">A calm view of signals that need an engineering decision.</p>
       </div>
 
-      <div className="border-y border-gray-200 bg-gray-50/50 flex mb-12">
+      <div className="border-y border-gray-200 bg-gray-50/50 flex mb-8">
         <div className="flex-1 p-6 border-r border-gray-200">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Unacknowledged</div>
-          <div className="text-4xl font-medium text-[#d97706] mb-1">{String(unacked.length).padStart(2, '0')}</div>
-          <div className="text-sm text-gray-500">Across {unackedWells} {unackedWells === 1 ? 'well' : 'wells'}</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-600 mb-2">Unacknowledged</div>
+          <div className="text-4xl font-medium text-[#b45309] mb-1">{String(unacked.length).padStart(2, '0')}</div>
+          <div className="text-sm text-gray-600">Across {unackedWells} {unackedWells === 1 ? 'well' : 'wells'}</div>
         </div>
         <div className="flex-1 p-6 border-r border-gray-200">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">High severity</div>
-          <div className="text-4xl font-medium text-red-600 mb-1">{String(critical.length).padStart(2, '0')}</div>
-          <div className="text-sm text-gray-500">{topCritical ? `${nameOf(topCritical)} · ${depthPhrase(topCritical)}` : 'None open'}</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-600 mb-2">Critical</div>
+          <div className="text-4xl font-medium text-red-700 mb-1">{String(critical.length).padStart(2, '0')}</div>
+          <div className="text-sm text-gray-600">{topCritical ? `${nameOf(topCritical)} · ${depthPhrase(topCritical)}` : 'None open'}</div>
         </div>
         <div className="flex-1 p-6">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-2">Avg response</div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-600 mb-2">Avg response</div>
           <div className="text-4xl font-medium text-gray-900 mb-1">{response.label}</div>
-          <div className="text-sm text-gray-500">{response.n ? `Across ${response.n} acknowledged` : 'None acknowledged yet'}</div>
+          <div className="text-sm text-gray-600">{response.n ? `Across ${response.n} acknowledged` : 'None acknowledged yet'}</div>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded shadow-sm overflow-hidden">
-        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 bg-white">
-          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-400">Unacknowledged / Sorted by severity</div>
-          <div className="text-[10px] font-mono uppercase tracking-widest text-gray-400 mr-8">Age</div>
-        </div>
-        
-        <div className="divide-y divide-gray-100">
-          {open.map((a) => (
-            <AlertRow
-              key={a.id}
-              alertId={a.id}
-              wellboreId={a.wellbore_id}
-              severity={SEVERITY_WORD[a.severity] || 'MODERATE'}
-              title={a.title}
-              subtitle={`${nameOf(a)} · ${depthPhrase(a)}`}
-              provenance={PROVENANCE_WORD[provenanceByWellbore[a.wellbore_id]] || 'SYNTHETIC'}
-              confidence={CONFIDENCE_WORD[a.confidence] || 'Medium confidence'}
-              age={fmtAge(a.created_at, now)}
-            />
+      {alerts.length === 0 ? (
+        <p className="rounded border border-dashed border-gray-400 p-8 text-center text-gray-700">No open alerts. New alerts appear here as they are raised.</p>
+      ) : (
+        <>
+          <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <div role="group" aria-label="Filter by state" className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">State</span>
+              {OPEN_STATE_FILTERS.map((st) => (
+                <button
+                  key={st}
+                  type="button"
+                  aria-pressed={states.has(st)}
+                  onClick={() => toggle(st)}
+                  className={`rounded-full border px-3 py-1 text-sm font-medium ${states.has(st) ? 'border-gray-900 bg-gray-900 text-white' : 'border-gray-400 bg-white text-gray-700'}`}
+                >
+                  {st}
+                </button>
+              ))}
+            </div>
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+              Sort by
+              <select value={sort} onChange={(e) => setSort(e.target.value)} className="rounded border border-gray-400 bg-white px-2 py-1 text-sm">
+                {Object.entries(SORTS).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+              </select>
+            </label>
+          </div>
+
+          {pinned.length > 0 && (
+            <section aria-label="Needs acknowledgement" className="mb-8">
+              <h2 className="mb-2 text-xl font-bold text-red-800">Needs acknowledgement ({pinned.length})</h2>
+              <ul className="space-y-2">
+                {pinned.map((a) => (
+                  <AlertRow key={a.id} alert={a} wellName={nameOf(a)} now={now} onOpen={openAlert} pinned />
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {groups.map(([name, list]) => (
+            <section key={name} aria-label={`Alerts for ${name}`} className="mb-6">
+              <h2 className="mb-2 text-lg font-bold text-gray-900">{name} <span className="text-sm font-normal text-gray-600">({list.length})</span></h2>
+              <ul className="space-y-2">
+                {list.map((a) => (
+                  <AlertRow key={a.id} alert={a} wellName={name} now={now} onOpen={openAlert} />
+                ))}
+              </ul>
+            </section>
           ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AlertRow({ alertId, wellboreId, severity, title, subtitle, provenance, confidence, age }) {
-  const navigate = useNavigate();
-  const go = () => navigate(`/wells/${wellboreId}/alerts?alert=${alertId}`);
-  const isHigh = severity === 'HIGH';
-  const isElevated = severity === 'ELEVATED';
-  const iconColor = isHigh ? 'text-red-600' : isElevated ? 'text-[#d97706]' : 'text-gray-400';
-  const provBg = provenance === 'SYNTHETIC' ? 'bg-orange-50' : provenance === 'ANALOG' ? 'bg-blue-50' : 'bg-emerald-50';
-  const provText = provenance === 'SYNTHETIC' ? 'text-orange-600 border-orange-200' : provenance === 'ANALOG' ? 'text-blue-600 border-blue-200' : 'text-emerald-600 border-emerald-200';
-  
-  const confBg = confidence.includes('High') ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-orange-50 border-orange-200 text-orange-700';
-
-  return (
-    <div
-      role="link"
-      tabIndex={0}
-      data-testid="alert-row"
-      onClick={go}
-      onKeyDown={(e) => e.key === 'Enter' && go()}
-      className="flex items-center p-6 hover:bg-gray-50 cursor-pointer transition-colors group"
-    >
-      <div className={`w-40 flex items-center gap-2 ${iconColor}`}>
-        <AlertTriangle className="h-4 w-4" />
-        <span className="font-bold text-xs tracking-wide uppercase">{severity}</span>
-      </div>
-      
-      <div className="flex-1">
-        <div className="font-bold text-gray-900 mb-1">{title}</div>
-        <div className="text-sm text-gray-500">{subtitle}</div>
-      </div>
-      
-      <div className="flex items-center gap-4">
-        <div className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded border ${provBg} ${provText}`}>
-          {provenance}
-        </div>
-        <div className={`text-xs font-medium px-3 py-1 rounded-full border ${confBg}`}>
-          {confidence}
-        </div>
-        <div className="w-24 text-right font-mono text-sm text-gray-600">
-          {age}
-        </div>
-        <div className="w-8 flex justify-end">
-          <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
-        </div>
-      </div>
+          {pinned.length === 0 && groups.length === 0 && (
+            <p className="rounded border border-dashed border-gray-400 p-8 text-center text-gray-700">No alerts match the selected states.</p>
+          )}
+        </>
+      )}
     </div>
   );
 }

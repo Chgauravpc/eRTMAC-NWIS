@@ -6,6 +6,7 @@ const Plot = React.lazy(async () => {
   return { default: createPlotlyComponent(plotly.default ?? plotly) };
 });
 
+// @surface light (always inside a white chart card)
 export default function PlotlyChart(props) {
   return (
     <Suspense fallback={<div role="status" className="flex h-full items-center justify-center text-sm text-gray-500">Loading chart…</div>}>

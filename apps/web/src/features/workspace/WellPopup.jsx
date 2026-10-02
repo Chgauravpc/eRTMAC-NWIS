@@ -6,6 +6,7 @@ import { ProvenanceBadge } from '../wells/ProvenanceBadge';
 import { countByRisk, riskLabel } from './mapGeo';
 
 /** Popup body: name, field, TD, status, casing (hole_sections), event counts by risk type, workspace link. */
+// @surface light (a Leaflet popup is white)
 export function WellPopup({ well }) {
   const { data: sections, isLoading: loadingCasing } = useHoleSections(well.wellbore_id);
   const { data: events, isLoading: loadingEvents } = useWellEvents(well.wellbore_id);

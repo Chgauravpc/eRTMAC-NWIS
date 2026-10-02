@@ -7,6 +7,7 @@ import { RISK_LABELS } from '../../lib/constants';
 
 const PlotlyChart = React.lazy(() => import('./PlotlyChart'));
 
+// @surface light (inside the white plot card)
 export function CorrelationPlot({ data, channels, flatten, bitMd }) {
   const { traces, layout } = useMemo(() => buildCorrelationFigure(data, channels, { bitMd }), [data, channels, bitMd]);
   const warning = flattenWarning(data.wells, flatten);
