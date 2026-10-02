@@ -39,11 +39,11 @@ DB-10) are the bottleneck for most of the remaining backend work.
 | BE-09 | Chunking and indexing | ✅ | `python -m app.search.index --reindex-all` |
 | BE-10 | Search and Ask (RAG) | ◐ | Built, tested with mocks; `MIN_RRF` raised to 0.0165 so off-topic questions are refused |
 | BE-11 | Lessons builder | ◐ | `python -m app.search.lessons --rebuild`; mocked DB and LLM |
-| BE-12 | Predicted tops (IDW) | ◐ | Mocked; leave-one-well-out coverage not measured (`python -m training.eval_tops`) |
+| BE-12 | Predicted tops (IDW) | ✅ | Run against the real database (3 Oct): leave-one-well-out 81 % of tops within the stated uncertainty (target 80 %), mean error 41.7 m, 26 wells, synthetic data |
 | BE-13 | Correlation endpoint | ◐ | Mocked; reads the base tables, so DB-12 views are not needed |
 | BE-14 | Risk L1 (offset look-ahead) | ◐ | `app/risk/config.py` has every §11 constant; mocked DB |
 | BE-15 | Risk L3 (live detectors) | ◐ | Six detectors on synthetic windows; thresholds untuned on real data |
-| BE-16 | Risk L2 (ML) | ◐ | Features, training, calibration, inference; only run on tiny in-memory wells |
+| BE-16 | Risk L2 (ML) | ◐ | First real run (3 Oct) on the 26 completed synthetic wells, leave-one-well-out: PR-AUC L2 vs L1-only 0.200 / 0.082 losses, 0.159 / 0.098 stuck pipe, 0.044 / 0.034 kick, 0.054 / 0.010 torque, 0.027 / 0.033 cementing (not activated). Precision and recall at the `high` band are very low (recall 0.00-0.03), so the models rarely reach it: see `services/ai/training/results.md`. Synthetic data only |
 | BE-17 | Fusion and risk endpoint | ◐ | `POST /v1/wells/{id}/risk`; mocked DB |
 | BE-18 | Stream replay | ◐ | Fake-clock tests; never run against Supabase |
 | BE-19 | Alert engine | ◐ | In-memory store tests; auto-resolve on "bit past the zone" (contract §12 amended) |
@@ -66,8 +66,8 @@ name extraction reads, and the unmatched-well review row is raised only if that 
 | ID | Task | Status |
 | --- | --- | --- |
 | DB-01 … DB-07 | project, schema, reference data, geo and search functions, RLS and RPCs, storage, realtime | ◐ migrations `0001`–`0011` match the contract exactly (§3a); the SQL has never been run in this report, and there is no live Supabase project from the backend's side |
-| DB-08 | Trajectory builder (Minimum Curvature) | ⬜ **critical path** |
-| DB-09 | Synthetic Assam dataset | ⬜ **critical path** (blocked by DB-08) |
+| DB-08 | Trajectory builder (Minimum Curvature) | ✅ `db/loaders/trajectories.py` + `common.py`; exact on a circular build arc; the line agrees with `well_position_at_md`; `db/tests/test_trajectories.py` 8 tests |
+| DB-09 | Synthetic Assam dataset | ✅ parts 1 and 2 (wells, trajectories, tops, casing, cement, mud, events, depth series, truth files): `python -m db.loaders.synth_assam --reset`, `db/tests/test_synth.py` 21 tests, loaded into the live project and checked with `db/scripts/verify_synthetic.py` (35 of 35). **Part 3 (fake DDR / WCR PDFs, `synth_docs.py`) is not written.** Two deviations from the PRD, both in `db/data/synth_config.yaml`: TD is set by target TVD (3,800-4,150 m) because TD 3,200-4,200 m MD cannot give every well its 8 tops; the near-horizontal wells kick off at 2,500-3,100 m because a 1,000 m KOP with ~4,000 m TVD would be over 10 km long |
 | DB-10 | Volve loader | ⬜ (BE-06 is ready for it) |
 | DB-11 | NPD loader | ⬜ |
 | DB-12 | Views (`0012_views.sql`) | ✅ all five contract views, `security_invoker`; `db/tests/test_views.sql` passes; applied to the live project and served by its REST API (empty until DB-09 data exists) |

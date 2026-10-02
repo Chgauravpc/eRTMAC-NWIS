@@ -83,6 +83,27 @@ Environment variables used by the database loaders and services:
    ```
    Expected result: 3 rows returned (`postgis`, `vector`, `pg_trgm`).
 
+## Loading the synthetic Assam dataset (DB-08, DB-09)
+
+```bash
+# from the repo root, with the backend's virtualenv (services/ai/.venv) and SUPABASE_DB_URL in .env
+python -m db.loaders.synth_assam --dry-run        # generate and print the summary, touch nothing
+python -m db.loaders.synth_assam --reset          # delete provenance = 'synthetic' rows, load a fresh set (one transaction, about 90 s)
+python -m db.loaders.trajectories --all           # rebuild every trajectory from the survey stations (the loader already does this)
+python -m db.loaders.check_signatures             # do the injected hazards trip the live detectors?  (about 2 minutes)
+python db/scripts/verify_synthetic.py             # the loaded data against the DB-09 criteria
+services/ai/.venv/Scripts/python -m pytest db/tests/test_trajectories.py db/tests/test_synth.py
+```
+
+Everything is in `db/data/synth_config.yaml` (30 wells in three clusters, tops, hazards, casing, mud) and
+`db/loaders/templates/event_text.yaml`; the same seed gives the same data. The three drilling wells
+(`SYN-DLJ-03`, `SYN-NHK-03`, `SYN-MRN-03`) hold a hazard each below their bit depth: those events are **not** in `events`,
+they are in `db/data/synth_truth/<well>.json` so a demo can show an alert arriving before something that really happens.
+Row level security hides `depth_series` below `stream_state.bit_md_m`; the stream replay (BE-18) reveals it.
+
+On Windows the backend's async database code needs the selector event loop
+(`asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())`) when run by hand; the Linux Space does not.
+
 ## Test accounts and roles
 
 New sign-ups get the default role `office_engineer` (trigger `handle_new_user`). Create five accounts in

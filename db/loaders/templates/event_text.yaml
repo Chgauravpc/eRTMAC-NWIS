@@ -1,0 +1,288 @@
+# Text for synthetic events. Placeholders: {md} {formation} {vol} {npt} {mw}. Five variants of each field per event type;
+# the generator picks one of each at random, so the same event type does not always read the same.
+
+loss_partial:
+  description:
+    - "Partial mud losses of about {vol} m3 at {md} m in the {formation}."
+    - "Lost circulation (partial) while drilling {formation} at {md} m; {vol} m3 of mud lost to the formation."
+    - "Flow out dropped below flow in at {md} m ({formation}); estimated loss {vol} m3."
+    - "Seepage to partial losses started at {md} m, {formation}, pit volume fell by {vol} m3."
+    - "Drilling break in the {formation} at {md} m followed by partial returns; {vol} m3 lost."
+  cause:
+    - "Porous, under-pressured sandstone in the {formation}."
+    - "Mud weight of {mw} SG above the pore pressure of a depleted sand."
+    - "Natural fractures in the {formation} opened by the mud column."
+    - "High permeability streak; filter cake did not seal."
+    - "Overbalance across a thick sand interval."
+  action:
+    - "Pumped LCM pill (medium nut plug) and reduced pump rate."
+    - "Reduced mud weight by 0.02 SG and spotted a 30 m3 LCM pill."
+    - "Stopped drilling, pulled back into the shoe and built the LCM concentration to 60 kg/m3."
+    - "Drilled ahead with LCM in the active system at a reduced flow rate."
+    - "Spotted a high-fluid-loss squeeze pill across the loss zone."
+  outcome:
+    - "Losses cured after the second pill; drilling resumed."
+    - "Losses reduced to seepage rate and drilling continued with LCM."
+    - "Returns restored after the pill; {npt} h lost."
+    - "Cured; no further losses to section TD."
+    - "Partly cured; losses continued at a low rate until casing point."
+
+loss_total:
+  description:
+    - "Total loss of returns at {md} m in the {formation}; {vol} m3 lost before the well was static."
+    - "Complete lost circulation at {md} m ({formation}); no flow out, pits dropping."
+    - "Sudden loss of all returns while drilling {formation} at {md} m, {vol} m3 gone in under an hour."
+    - "Total losses at {md} m; well on the vacuum with water to keep the annulus full."
+    - "Lost returns completely at {md} m in the {formation}; fluid level fell below the flowline."
+  cause:
+    - "Open fractures or a vug system in the {formation}."
+    - "Induced fracture from the equivalent circulating density of {mw} SG."
+    - "Highly permeable, unconsolidated sandstone."
+    - "Faulted zone with open fractures."
+    - "Depleted interval with a very low fracture gradient."
+  action:
+    - "Pulled out to the shoe, spotted a cement plug and drilled out after waiting on cement."
+    - "Pumped a 50 m3 high-strength LCM plug and filled the annulus with water."
+    - "Set a balanced cement plug across the loss zone."
+    - "Drilled blind with water and sweeps to casing point, then ran casing."
+    - "Pumped gunk squeeze, waited 6 h and re-established circulation in steps."
+  outcome:
+    - "Circulation restored after the plug; {npt} h non-productive."
+    - "Losses cured after cement; drilling resumed with reduced mud weight."
+    - "Partial returns regained; section completed at reduced rate."
+    - "Section drilled blind; casing ran to bottom without problems."
+    - "Well controlled; losses continued at about 5 m3/h until TD."
+
+kick:
+  description:
+    - "Kick taken at {md} m in the {formation}: pit gain of {vol} m3, well shut in."
+    - "Flow check positive at {md} m ({formation}); pits gained {vol} m3 before shut-in."
+    - "Gas-cut mud and a pit gain of {vol} m3 at {md} m in the {formation}; well shut in on the annular."
+    - "Well flowed at {md} m ({formation}) after a connection; shut in with {vol} m3 gain."
+    - "Increasing flow out and gas at {md} m, {formation}; shut in after a {vol} m3 pit gain."
+  cause:
+    - "Overpressured gas-bearing sand in the {formation}; mud weight {mw} SG too low."
+    - "Underbalance after a connection with the pumps off."
+    - "Swabbing while pulling the string off bottom."
+    - "Transition zone with rising formation pressure not recognised in time."
+    - "Gas-charged interval with low permeability that bled into the annulus."
+  action:
+    - "Shut in, recorded SIDPP and SICP, weighted up to kill weight and circulated with the driller's method."
+    - "Circulated the kick out through the choke with the wait-and-weight method."
+    - "Increased mud weight by 0.08 SG and circulated bottoms up through the degasser."
+    - "Closed the BOP, monitored pressures and killed the well with a 1.5 SG kill mud."
+    - "Bullheaded a small influx back and weighted up before opening the well."
+  outcome:
+    - "Well killed and drilling resumed with higher mud weight; {npt} h lost."
+    - "Influx circulated out; no pressure left at the surface."
+    - "Normal operations after a flow check; mud weight raised to {mw} SG."
+    - "Kill completed in 6 h; trip gas monitored for the next 3 connections."
+    - "Well secured; kick tolerance reduced for the rest of the section."
+
+stuck_pipe_diff:
+  description:
+    - "Differential sticking at {md} m in the {formation} after a connection; string could not be moved."
+    - "Pipe stuck while stationary at {md} m ({formation}); no circulation restrictions."
+    - "Stuck at {md} m after a survey; full circulation but no pipe movement."
+    - "Bottom hole assembly stuck against permeable sand at {md} m ({formation})."
+    - "String stuck at {md} m, {formation}, with free circulation after a long connection."
+  cause:
+    - "High overbalance across permeable sandstone with a thick filter cake."
+    - "Mud weight of {mw} SG with high solids and a poor filter cake."
+    - "String left stationary too long opposite a permeable zone."
+    - "Coal and sand interbeds with a heavy overbalance."
+    - "Low-gravity-solids control let the cake thicken."
+  action:
+    - "Spotted a pipe-release pill and worked the string with torque and jar."
+    - "Reduced hydrostatic with a base-oil pill and jarred down."
+    - "Applied torque and jarred; spotted a surfactant pill and let it soak."
+    - "Worked pipe while reducing the mud weight stepwise."
+    - "Pumped a free-pipe spotting fluid and jarred for 8 h."
+  outcome:
+    - "Pipe freed after the pill soaked; {npt} h lost."
+    - "Freed with jars after 10 h; drilling resumed."
+    - "Pipe came free after the spotting fluid reached the sticking point."
+    - "Pipe freed; wiper trip made to condition the hole."
+    - "Not freed: backed off and the bottom hole assembly fished."
+
+stuck_pipe_mech:
+  description:
+    - "Mechanical sticking at {md} m in the {formation} while tripping out; string would not move up."
+    - "String stuck at {md} m ({formation}) during a wiper trip, circulation restricted."
+    - "Pipe stuck at {md} m while backreaming, {formation}; pump pressure rose."
+    - "Stuck at {md} m on bottom with partial circulation in the {formation}."
+    - "Pack of cuttings and caving shale stuck the string at {md} m ({formation})."
+  cause:
+    - "Sloughing shale and caving in the {formation}."
+    - "Undergauge hole with a ledge at {md} m."
+    - "Cuttings bed in a deviated section with poor hole cleaning."
+    - "Unstable coal beds collapsing into the hole."
+    - "Key seat formed in the dogleg."
+  action:
+    - "Worked the string up and down with limited circulation and reduced pump rate."
+    - "Jarred up and down, circulated high-viscosity sweeps."
+    - "Applied torque and jarred down; pumped hole-cleaning sweeps."
+    - "Backreamed carefully and weighted the mud for shale stability."
+    - "Rotated and reciprocated while sweeping the hole clean."
+  outcome:
+    - "Freed after 14 h; the section was reamed to bottom."
+    - "Pipe free; wiper trip repeated to condition the hole."
+    - "Freed after jarring; {npt} h lost."
+    - "Not freed: backed off and sidetracked."
+    - "Freed with sweeps and backreaming; drilling resumed at a lower rate."
+
+tight_hole:
+  description:
+    - "Tight hole at {md} m in the {formation} with 15 t overpull on the trip out."
+    - "Overpull of 20 t at {md} m ({formation}) while pulling out; hole tight."
+    - "Tight spots between {md} m and the shoe; reaming needed on the trip."
+    - "Tight connection at {md} m, {formation}; string worked free."
+    - "Excess drag and overpull at {md} m while backreaming in the {formation}."
+  cause:
+    - "Swelling clay in the {formation}."
+    - "Reactive claystone reducing the hole diameter."
+    - "Insufficient inhibition in the mud system."
+    - "Undergauge section after a bit change."
+    - "Cuttings accumulating over a ledge."
+  action:
+    - "Backreamed the tight interval and increased the inhibitor concentration."
+    - "Circulated and conditioned the mud, then reamed through."
+    - "Raised the viscosity and swept the hole."
+    - "Worked through the tight spot with reduced pull speed."
+    - "Added potassium chloride and reamed twice."
+  outcome:
+    - "Hole cleaned; trip completed after {npt} h of reaming."
+    - "Tight spot passed; no further problems on the trip."
+    - "Cleared by backreaming; wiper trip planned before the next run."
+    - "Passed with rotation; hole conditioned to bottom."
+    - "Continued with careful tripping speeds."
+
+pack_off:
+  description:
+    - "Pack-off at {md} m in the {formation}: pump pressure rose and returns stopped."
+    - "Sudden stand-pipe pressure spike at {md} m ({formation}) while circulating; flow out reduced."
+    - "Hole packed off at {md} m ({formation}) during a connection."
+    - "Cuttings pack-off at {md} m with a torque increase."
+    - "Annulus packed off at {md} m, {formation}; circulation lost for a short time."
+  cause:
+    - "Caving shale falling into the annulus in the {formation}."
+    - "Inadequate hole cleaning after a ROP increase."
+    - "Unstable coal beds."
+    - "Settled cuttings in a high-angle section."
+    - "Reactive claystone sloughing."
+  action:
+    - "Reduced the pump rate, worked the string and restored circulation in stages."
+    - "Released trapped pressure and circulated at low rate."
+    - "Backreamed and pumped weighted sweeps."
+    - "Pulled up while circulating at a low rate."
+    - "Circulated bottoms up with a high-viscosity sweep."
+  outcome:
+    - "Circulation re-established; {npt} h lost."
+    - "Pack-off cleared; hole cleaned."
+    - "Cleared after two attempts."
+    - "Returns restored; drilling resumed at a reduced rate."
+    - "Cleared; mud properties adjusted for cleaning."
+
+hole_instability:
+  description:
+    - "Hole instability at {md} m in the {formation}: caving and shale returns over the shakers."
+    - "Large cavings from the {formation} at {md} m; hole condition deteriorating."
+    - "Sloughing shale at {md} m ({formation}) with torque and drag increasing."
+    - "Washout and cavings at {md} m, {formation}, tight spots on trips."
+    - "Unstable hole at {md} m: coal and shale fragments at surface."
+  cause:
+    - "Mud weight of {mw} SG too low to hold the shale and coal."
+    - "Reactive shale with inadequate inhibition."
+    - "Stress concentration in a dipping, fractured formation."
+    - "Coal beds destabilised by the mud filtrate."
+    - "Long open-hole time after drilling."
+  action:
+    - "Raised the mud weight and improved inhibition."
+    - "Added shale stabiliser and sealing agents to the mud."
+    - "Circulated and conditioned, then drilled ahead at a controlled rate."
+    - "Ran a wiper trip and increased the mud weight by 0.05 SG."
+    - "Minimised connection times and kept the string moving."
+  outcome:
+    - "Hole stabilised; drilled to section TD."
+    - "Cavings reduced; {npt} h lost to hole cleaning."
+    - "Stable after the mud weight increase."
+    - "Section completed with a higher mud weight."
+    - "Stability improved; casing ran without problems."
+
+torque_spike:
+  description:
+    - "Torque spike to 28 kN.m at {md} m in the {formation}."
+    - "Erratic high torque at {md} m ({formation}) while drilling through coal."
+    - "Torque rose sharply at {md} m, {formation}, with stalling of the top drive."
+    - "Torque increased by 60 % at {md} m ({formation}); drilling parameters reduced."
+    - "Stick-slip with torque peaks at {md} m in the {formation}."
+  cause:
+    - "Coal streaks sloughing around the string."
+    - "Poor lubricity of the mud and a tight annulus."
+    - "Stick-slip from a hard interval."
+    - "Hole irregularities in the {formation}."
+    - "Cuttings bed increasing the drag."
+  action:
+    - "Added lubricant to the mud and reduced the weight on bit."
+    - "Reduced the RPM and cleaned the hole with a sweep."
+    - "Picked up off bottom and raised the flow rate."
+    - "Added lubricity beads and a wiper trip every 150 m."
+    - "Changed the drilling parameters to damp the stick-slip."
+  outcome:
+    - "Torque normalised after the sweep."
+    - "Returned to normal; drilling resumed."
+    - "No lost time apart from {npt} h of reduced rates."
+    - "Torque stayed elevated until the next formation."
+    - "Resolved after the lubricant reached the bit."
+
+cement_failure:
+  description:
+    - "Poor cement job on the 9-5/8 in casing at {md} m: the CBL showed weak bond."
+    - "Losses during displacement of the 9-5/8 in cement; top of cement below plan."
+    - "Cement did not circulate to the planned height behind the casing at {md} m."
+    - "Remedial cementing needed after a poor bond across the {formation}."
+    - "Channelling suspected behind casing at {md} m; the log showed free pipe."
+  cause:
+    - "Losses to the {formation} during the cement job."
+    - "Poor mud removal and a thick filter cake."
+    - "Low centraliser standoff in a deviated section."
+    - "Gas migration while waiting on cement."
+    - "Slurry design not suited to the thief zone."
+  action:
+    - "Squeeze cementing through perforations above the zone."
+    - "Ran a cement bond log and set a remedial squeeze."
+    - "Perforated and squeezed; tested to the leak-off pressure."
+    - "Ran a second stage collar and recemented."
+    - "Accepted the job after a positive pressure test with a reduced casing shoe test."
+  outcome:
+    - "Squeeze successful; casing test passed after {npt} h."
+    - "Bond improved after the squeeze."
+    - "Pressure test passed; well continued."
+    - "Remedial work completed over two attempts."
+    - "Job accepted with a reduced test pressure."
+
+fishing:
+  description:
+    - "Fishing operation at {md} m in the {formation} after the string was parted."
+    - "Bottom hole assembly left in hole at {md} m; fishing started."
+    - "Fish (drill collars) left at {md} m in the {formation}; fishing with an overshot."
+    - "Fishing for a lost cone at {md} m ({formation})."
+    - "Fishing job at {md} m following a failed jarring attempt."
+  cause:
+    - "String backed off after sticking."
+    - "Twist-off at a worn connection."
+    - "Bit cone lost after high torque."
+    - "Part of the BHA left after the back-off."
+    - "Fatigue failure in a pin connection."
+  action:
+    - "Ran an overshot with a grapple and jars to recover the fish."
+    - "Milled over the fish and retrieved it with a spear."
+    - "Ran a junk basket and magnets to recover the cone."
+    - "Washed over and latched the fish with an overshot."
+    - "Set a cement plug and sidetracked above the fish."
+  outcome:
+    - "Fish recovered in full after {npt} h."
+    - "Fish retrieved; drilling resumed after a clean-out run."
+    - "Junk recovered; hole cleaned."
+    - "Fishing unsuccessful: sidetrack drilled."
+    - "Partially recovered; remainder milled."
