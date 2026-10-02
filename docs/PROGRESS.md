@@ -70,9 +70,9 @@ name extraction reads, and the unmatched-well review row is raised only if that 
 | DB-09 | Synthetic Assam dataset | ⬜ **critical path** (blocked by DB-08) |
 | DB-10 | Volve loader | ⬜ (BE-06 is ready for it) |
 | DB-11 | NPD loader | ⬜ |
-| DB-12 | Views (`0012_views.sql`) | ⬜ all five contract views are missing; the frontend reads `v_well_summary`, `v_open_alerts`, ... |
+| DB-12 | Views (`0012_views.sql`) | ✅ all five contract views, `security_invoker`; `db/tests/test_views.sql` passes; applied to the live project and served by its REST API (empty until DB-09 data exists) |
 | DB-13, DB-14 | Reset scripts, evaluation set | ⬜ |
-| **DB-05 follow-up** | `review_field`: assign a well and move the records | ⬜ `0009_review_rpcs.sql` line 67 still blocks `well_id` |
+| **DB-05 follow-up** | `review_field`: assign a well and move the records | ✅ `0013_review_well_assignment.sql` (also carries the 0009 hardening); `db/tests/test_review_well_assignment.sql` passes; applied to the live project |
 
 ### Frontend (`apps/web`)
 
@@ -156,7 +156,7 @@ corrections to earlier figures): [`AUDIT_2026-10-02.md`](AUDIT_2026-10-02.md).
 
 1. **DB-08 → DB-09 (Person A):** they unblock BE-11, 12, 13, 14, 16 and the whole look-ahead and alert chain.
 2. **BE-20 (Node routes)** and **BE-15 (live detectors)** can start now.
-3. Fix the DB-05 follow-up so the review flow works end to end.
+3. ~~Fix the DB-05 follow-up~~ done in `0013` (3 Oct). The review flow now works in SQL; the frontend side is PR #14.
 4. First deployment: Supabase (push `0001`–`0011`), then a health-only Space, then run one real upload through the pipeline.
 5. **Frontend clean-up (Person C):** remove the `|| 18` and `|| 6.4` fallbacks; fix the 7 lint errors; update or restore the 26 stale tests;
    move the landing page's sample wells out of `src/features` (or exempt it explicitly); on the Wells page add a TD column, make the filters work or remove them, and restore the `/alerts` grouping and filters.
