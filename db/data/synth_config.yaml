@@ -1,0 +1,87 @@
+# Synthetic Upper Assam dataset (DB-09). Every well is labelled SYN-*, provenance 'synthetic', operator 'SYNTHETIC'.
+# Deterministic: `python -m db.loaders.synth_assam --seed 42` always produces the same data.
+
+seed: 42
+basin: Upper Assam
+operator: SYNTHETIC
+
+# Three clusters inside lat 26.9-27.6 N, lon 94.8-95.6 E. `field` is the cluster name.
+# The drilling wells are the demo's active wells (one per cluster); each carries one hazard that the
+# stream replay will reach (its events below the start depth go to db/data/synth_truth/<well>.json).
+clusters:
+  - {code: DLJ, field: SYN-Duliajan,    lat: 27.360, lon: 95.310, wells: 12, spread_km: 2.4}
+  - {code: NHK, field: SYN-Naharkatiya, lat: 27.200, lon: 95.150, wells: 10, spread_km: 2.4}
+  - {code: MRN, field: SYN-Moran,       lat: 27.100, lon: 94.920, wells: 8,  spread_km: 2.4}
+
+# well number (1-based, inside its cluster) -> role
+drilling:   {DLJ: 3, NHK: 3, MRN: 3}
+planned:    {MRN: 8}
+# the hazard each drilling well will meet below its start depth
+demo_hazard:
+  DLJ: {event_type: loss_partial,    formation: Tipam,  where: lower_third}
+  NHK: {event_type: stuck_pipe_diff, formation: Barail, where: middle}
+  MRN: {event_type: kick,            formation: Kopili, where: middle}
+# distance of the first demo hazard below the start depth: 120-260 m, so look-ahead scores
+# (which start 50 m ahead of the bit) can warn before it
+hazard_ahead_m: [120, 260]
+
+# trajectory mix over the 29 wells that are drilled or completed (the planned well is vertical)
+trajectory_mix: {vertical: 0.40, deviated: 0.50, horizontal: 0.10}
+deviated:   {kop_m: [800, 1500], build_deg_per_30m: [2.0, 3.0], max_inc_deg: [20, 45], azimuth_deg: [0, 360]}
+# NOTE: the PRD gives KOP 800-1500 m for these too, but with the TD fixed at about 4,000 m TVD a well that holds 70-80 degrees from
+# 1,000 m would be more than 10 km long, so the near-horizontal wells kick off deeper.
+horizontal: {kop_m: [2500, 3100], build_deg_per_30m: [3.0, 3.5], max_inc_deg: [70, 80]}
+survey_step_m: 30
+# TD is set by target TVD (below), so that every well crosses at least 8 tops. NOTE: the PRD asks for TD 3,200-4,200 m MD
+# AND at least 8 tops per well; a vertical well that is only 3,200 m deep cannot cross the 9th formation, so the
+# target depth is the fixed quantity and MD follows from the trajectory.
+td_tvd_m: [3800, 4150]
+
+# regional tops (TVD below KB), dip and noise
+kb_elev_m: [95, 125]
+tops:
+  Alluvium:   {tvd: 0,    lithology: {sandstone: 0.5, shale: 0.5}}
+  Dhekiajuli: {tvd: 250,  lithology: {sandstone: 0.5, shale: 0.5}}
+  Namsang:    {tvd: 900,  lithology: {sandstone: 0.7, shale: 0.3}}
+  Girujan:    {tvd: 1300, lithology: {shale: 0.8, sandstone: 0.2}}
+  Tipam:      {tvd: 2200, lithology: {sandstone: 0.75, shale: 0.25}}
+  Barail:     {tvd: 2850, lithology: {shale: 0.45, sandstone: 0.30, coal: 0.25}}
+  Kopili:     {tvd: 3500, lithology: {shale: 0.85, sandstone: 0.15}}
+  Sylhet:     {tvd: 3700, lithology: {limestone: 0.6, shale: 0.4}}
+  Langpar:    {tvd: 3900, lithology: {shale: 0.6, sandstone: 0.3, limestone: 0.1}}
+dip_m_per_km_se: 40
+top_noise_sigma_m: 15
+min_thickness_m: 40
+
+# hazards: probability per well, modulated by a smooth random field per cluster (nearby wells share hazards)
+hazards:
+  tipam_losses:       {p: 0.55, total_share: 0.18, where: lower_third}   # partial 45 % / total 10 % of all wells
+  girujan_tight_hole: {p: 0.30}
+  barail_stuck_pipe:  {p: 0.35, diff_share: 0.6}
+  barail_pack_off:    {p: 0.15}
+  barail_torque:      {p: 0.25}
+  barail_instability: {p: 0.20}
+  deep_kick:          {p: 0.15, kopili_share: 0.6}
+  sylhet_losses:      {p: 0.20}
+  cement_failure_after_tipam_losses: {p: 0.35}
+  fishing_after_stuck: {p: 0.25}
+cluster_multiplier: {MRN: {deep_kick: 1.8}}
+field: {bumps: 5, width_km: [2.0, 4.0], floor: 0.35, gain: 1.3}   # p_eff = clip(p * (floor + gain * field))
+npt_median_h: 6.0
+npt_sigma: 0.8
+
+# casing program: depth by TVD of the shoe, and the production string
+casing:
+  surface:      {hole_in: 17.5,  od_in: 13.375, ppf: 54.5, grade: K-55,  shoe_tvd_m: 350}
+  intermediate: {hole_in: 12.25, od_in: 9.625,  ppf: 47.0, grade: N-80,  above_tipam_m: 30}
+  production:   {hole_in: 8.5,   options: [{od_in: 7.0, ppf: 29.0, grade: P-110}, {od_in: 5.5, ppf: 17.0, grade: P-110}], liner_share: 0.6}
+
+# mud weight rises with TVD; extra weight in Kopili / Sylhet
+mud: {mw_start_sg: 1.05, mw_end_sg: 1.60, deep_extra_sg: [0.05, 0.10], record_every_m: 100}
+
+# depth series
+series:
+  step_m: 0.5
+  stand_m: 28.5          # one connection (pumps off) per stand
+  connection_s: 300
+  start_year: [2019, 2024]
