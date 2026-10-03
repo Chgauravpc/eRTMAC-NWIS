@@ -15,6 +15,7 @@ spec = importlib.util.spec_from_file_location("warmup", SCRIPT)
 warmup = importlib.util.module_from_spec(spec)
 sys.modules["warmup"] = warmup
 spec.loader.exec_module(warmup)
+_REAL_LOAD = warmup.load_repo_env
 
 API = "https://site.test/api"
 SB = "https://ref.supabase.test"
@@ -231,6 +232,31 @@ def test_the_checklist_is_green_or_red_with_a_verdict_and_optional_colour():
     assert plain.endswith("NOT READY: 1 of 2 checks failed") and "\033[" not in plain
     assert "\033[32m[ OK ]" in warmup.render(checks, colour=True) and "\033[31m[FAIL]" in warmup.render(checks, colour=True)
     assert warmup.render(checks[:1], colour=False).endswith("READY: all 1 checks passed")
+
+
+@pytest.fixture(autouse=True)
+def _no_real_dotenv(monkeypatch):
+    """main() reads <repo>/.env; the tests must not depend on a developer's real file."""
+    monkeypatch.setattr(warmup, "load_repo_env", lambda path=None: None)
+
+
+def test_load_repo_env_reads_the_file_without_overriding_what_is_set(tmp_path, monkeypatch):
+    env = tmp_path / ".env"
+    lines = ["# comment", "", "A_KEY=from-file", 'B_KEY="quoted value"', "EMPTY=", "C_KEY=file", "not a line"]
+    env.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    for name in ("A_KEY", "B_KEY", "EMPTY"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("C_KEY", "already-set")
+    # the fixture replaced the loader in the module; the real one is restored for this test
+    monkeypatch.setattr(warmup, "load_repo_env", _REAL_LOAD)
+    warmup.load_repo_env(env)
+    import os
+
+    assert os.environ["A_KEY"] == "from-file"
+    assert os.environ["B_KEY"] == "quoted value"
+    assert "EMPTY" not in os.environ
+    assert os.environ["C_KEY"] == "already-set"
+    warmup.load_repo_env(tmp_path / "missing.env")  # a missing file is fine
 
 
 def test_main_stops_early_without_configuration(monkeypatch, capsys):

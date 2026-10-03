@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // One env file for the whole repo: <repo>/.env. Only VITE_* variables are exposed to the browser.
+  envDir: '../..',
   build: {
     rollupOptions: {
       output: {
