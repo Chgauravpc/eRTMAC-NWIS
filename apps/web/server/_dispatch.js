@@ -59,10 +59,14 @@ export function resolve(segments) {
 
 export default async function dispatch(req, res) {
   const url = new URL(req.url, 'http://localhost');
-  const segments = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean);
+  // On Vercel the rewrite in vercel.json hands the original path over as ?__path=...; the local dev server passes the URL itself.
+  const forwarded = url.searchParams.get('__path');
+  const path = forwarded !== null ? `/api/${forwarded}` : url.pathname;
+  url.searchParams.delete('__path');
+  const segments = path.replace(/^\/api\/?/, '').split('/').filter(Boolean);
   const route = resolve(segments);
   if (!route) {
-    return res.status(404).json({ error: { code: 'NWIS_NOT_FOUND', message: `No route ${url.pathname}`, details: {} } });
+    return res.status(404).json({ error: { code: 'NWIS_NOT_FOUND', message: `No route ${path}`, details: {} } });
   }
   // the handlers read their path parameters from req.query, as they did when each was its own file
   const query = { ...Object.fromEntries(url.searchParams), ...route.params };

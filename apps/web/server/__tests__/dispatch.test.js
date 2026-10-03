@@ -7,7 +7,7 @@ import adminUsersId from '../_routes/admin/users/[id].js';
 import adminUsersInvite from '../_routes/admin/users/invite.js';
 import wellsRisk from '../_routes/wells/[wellboreId]/risk.js';
 
-const apiDir = resolvePath(dirname(fileURLToPath(import.meta.url)), '..');
+const apiDir = resolvePath(dirname(fileURLToPath(import.meta.url)), '../../api'); // the only directory Vercel turns into functions
 
 function functionFiles(dir, base = '') {
   return readdirSync(dir).flatMap((name) => {
@@ -19,7 +19,7 @@ function functionFiles(dir, base = '') {
 
 describe('one serverless function for every route', () => {
   it('deploys exactly one function (the Hobby plan allows 12; there are 17 routes)', () => {
-    expect(functionFiles(apiDir)).toEqual(['[...path].js']);
+    expect(functionFiles(apiDir)).toEqual(['dispatch.js']);
     expect(ROUTES).toHaveLength(17);
   });
 

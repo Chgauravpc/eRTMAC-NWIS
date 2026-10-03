@@ -20,7 +20,7 @@ if (existsSync(envFile)) {
   }
 }
 
-const { default: dispatch } = await import(pathToFileURL(resolve(here, '../api/_dispatch.js')).href);
+const { default: dispatch } = await import(pathToFileURL(resolve(here, '../server/_dispatch.js')).href);
 
 function readBody(req) {
   return new Promise((done) => {
