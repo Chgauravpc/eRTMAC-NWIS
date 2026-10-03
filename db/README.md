@@ -99,10 +99,33 @@ update profiles set role = 'rig_engineer',  full_name = 'Test Rig',
  where id = (select id from auth.users where email = 'rig@nwis.test');
 ```
 
+## Applying migrations without the Supabase CLI
+
+`db/scripts/` has small Python tools that need only `SUPABASE_DB_URL` (from the environment or the repo-root `.env`)
+and the backend's virtualenv (`psycopg`). They use the same history table as the CLI
+(`supabase_migrations.schema_migrations`), so `supabase db push` and these scripts agree.
+
+```bash
+cd db/scripts
+python migrate.py                          # status: which files are applied, which are pending
+python migrate.py --apply                  # apply every pending file, one transaction each (a failure rolls back and stops)
+python migrate.py --apply 0012 0013        # only these
+python migrate.py --mark-applied 0008      # record a file that was applied by hand (nothing is run)
+python check_drift.py                      # compare every function in the migrations with the live database
+python run_sql_tests.py                    # run db/tests/*.sql, prove the row counts are unchanged afterwards
+python run_sql_tests.py views              # one test (test_views.sql)
+```
+
+State of the shared Supabase project (3 Oct 2026): `0001`-`0013` are applied and recorded, `check_drift.py` reports all
+15 functions equal to the repo, and `run_sql_tests.py` passes all 10 scripts. `0008`-`0011` had been applied by hand
+before and were recorded with `--mark-applied` after `check_drift.py` and the tests confirmed they match.
+`0007` was applied again because the live `hybrid_search` was an older variant (no top-50 shortlist, no id tie-break).
+
 ## Running the SQL tests
 
 Every file in `db/tests/` is a self-contained script that ends in `rollback;` and raises an exception on
-any failed assertion. Apply migrations `0001`-`0010` and `seed.sql` first, then run each file, e.g.
+any failed assertion. `python db/scripts/run_sql_tests.py` (above) runs them all. With `psql`: apply migrations
+`0001`-`0013` and `seed.sql` first, then run each file, e.g.
 
 ```bash
 for t in db/tests/*.sql; do psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$t" || break; done
