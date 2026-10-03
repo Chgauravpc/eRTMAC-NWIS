@@ -5,7 +5,7 @@ import askData from '../fixtures/ask_answers.json';
 import correlationData from '../fixtures/correlation.json';
 import planningData from '../fixtures/planning_brief.json';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+import { SUPABASE_URL } from '../../lib/supabaseUrl';
 
 export const handlers = [
   // --- VERCEL NODE ROUTES (/api/*) ---

@@ -10,7 +10,8 @@ import eventsData from '../fixtures/events.json';
 import lessonsData from '../fixtures/lessons.json';
 import correlationCfg from '../fixtures/correlation.json';
 
-export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+import { SUPABASE_URL } from '../../lib/supabaseUrl';
+export { SUPABASE_URL };
 const REST = `${SUPABASE_URL}/rest/v1`;
 
 /* ------------------------------------------------------------------ PostgREST emulation */
