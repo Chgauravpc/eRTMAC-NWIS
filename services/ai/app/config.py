@@ -25,11 +25,17 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_DB_URL: str = ""
     SERVICE_TOKEN: str = ""
+    DB_POOL_MAX: int = 8  # connections; the risk computation runs its queries concurrently
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "openai/gpt-oss-20b"
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = ""
     EMBED_MODEL: str = "BAAI/bge-small-en-v1.5"
+    # "local" loads the model in this process (sentence-transformers + torch, about 1.5 GB of RAM);
+    # "hf_api" calls the Hugging Face Inference API with HF_TOKEN (same model, same 384-d vectors): the slim profile.
+    EMBED_BACKEND: str = "local"
+    HF_TOKEN: str = ""
+    L2_ENABLED: bool = True  # False: no ML layer (risk = L1 + L3), no lightgbm / offset-pool memory: the slim profile
     OCR_ENGINE: str = "rapidocr"
     LOG_LEVEL: str = "INFO"
 

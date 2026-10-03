@@ -87,6 +87,7 @@ class ReplayRegistry:
         self.clock = clock or Clock()
         self.tasks: dict[str, asyncio.Task] = {}
         self.state: dict[str, ReplayState] = {}
+        self.risk_tasks: dict[str, asyncio.Task] = {}  # the risk + alert step in flight, one per wellbore
 
     # ---------------------------------------------------------- control
 
@@ -99,10 +100,12 @@ class ReplayRegistry:
     async def _cancel(self, wellbore_id: str) -> None:
         task = self.tasks.pop(wellbore_id, None)
         self.state.pop(wellbore_id, None)
-        if task is not None and not task.done():
-            task.cancel()
-            with contextlib.suppress(asyncio.CancelledError, Exception):
-                await task
+        risk = self.risk_tasks.pop(wellbore_id, None)
+        for pending in (task, risk):
+            if pending is not None and not pending.done():
+                pending.cancel()
+                with contextlib.suppress(asyncio.CancelledError, Exception):
+                    await pending
 
     async def start(self, wellbore_id: str, source: str, speed: int, start_md_m: float | None) -> dict[str, str]:
         if start_md_m is None:
@@ -174,15 +177,23 @@ class ReplayRegistry:
         previous, previous_md = None, start_md_m
         batch: list[dict[str, Any]] = []
         waiting = 0.0
+        publish_s = 0.0  # wall time the last publish took: a distant database makes it 0.5 s or more
         try:
             for index, sample in enumerate(samples):
                 waiting += sample_duration_s(previous, previous_md, sample) / state.speed
                 batch.append(sample)
                 previous, previous_md = sample, sample["md_m"]
-                if waiting >= UPDATE_INTERVAL_S or index == len(samples) - 1:
-                    await self.clock.sleep(waiting)
+                # Batch at least as much time as a publish takes, and count that time as part of the wait, so
+                # the replay keeps its speed (otherwise 300x ran at 130x, bounded by one database write per cycle).
+                if waiting >= max(UPDATE_INTERVAL_S, publish_s) or index == len(samples) - 1:
+                    await self.clock.sleep(max(0.0, waiting - publish_s))
+                    started = self.clock.now()
                     await self._publish(wellbore_id, batch, state, bank, progress)
+                    publish_s = (self.clock.now() - started).total_seconds()
                     batch, waiting = [], 0.0
+            risk = self.risk_tasks.get(wellbore_id)
+            if risk is not None:
+                await asyncio.wait({risk})  # the last scores and alerts still count
             logger.info("replay_reached_td wellbore_id=%s md=%.1f", wellbore_id, previous_md)  # stop at TD
             await self._set_stopped(wellbore_id)
         except asyncio.CancelledError:
@@ -222,8 +233,13 @@ class ReplayRegistry:
         fired = frozenset(r.name for r in bank.latest if r.fired)
         due = progress["last_risk_md"] is None or last["md_m"] - progress["last_risk_md"] >= RISK_EVERY_M
         if due or fired != progress["fired"]:
+            running = self.risk_tasks.get(wellbore_id)
+            if running is not None and not running.done():
+                return  # one risk computation at a time; the next batch asks again (progress is unchanged)
             progress["last_risk_md"], progress["fired"] = last["md_m"], fired
-            await self._risk_hook(wellbore_id, bank)
+            # In the background: a computation takes seconds on a distant database, and the stream
+            # (and the stale/lost detection that watches it) must not wait for it.
+            self.risk_tasks[wellbore_id] = asyncio.create_task(self._risk_hook(wellbore_id, bank))
 
     async def _risk_hook(self, wellbore_id: str, bank: l3.DetectorBank) -> None:
         """Recompute and store risk, then let the alert engine react. Failures never stop the replay."""

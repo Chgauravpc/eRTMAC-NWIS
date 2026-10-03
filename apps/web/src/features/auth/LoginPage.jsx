@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '../../components/ui/Primitives';
 import { ROLE_LABELS } from '../../lib/constants';
+import { demoAllowed, setDemoMode } from '../../lib/demoMode';
 import { useProfile } from './useProfile';
 import { ArrowLeft, HelpCircle } from 'lucide-react';
 
@@ -148,11 +149,32 @@ export function LoginPage() {
             </div>
           )}
 
+          {mode === 'login' && !isMock && demoAllowed() && (
+            <section aria-label="Demo mode" className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
+              <p className="text-sm font-semibold text-gray-900">Just looking around?</p>
+              <p className="mt-1 text-xs text-gray-600">
+                Explore every screen with built-in sample data and demo logins. No account and no server needed.
+              </p>
+              <button
+                type="button"
+                onClick={() => setDemoMode(true)}
+                className="mt-3 w-full rounded-lg border border-gray-900 bg-white px-4 py-3 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-900 hover:text-white"
+              >
+                Explore with sample data
+              </button>
+            </section>
+          )}
+
           {mode === 'login' && isMock && (
             <section aria-label="Mock roles" className="mb-8">
               <p className="text-xs uppercase font-bold tracking-wider text-gray-600 mb-3">
-                Mock mode is active. Sign in as one of the demo users:
+                Demo mode (sample data). Sign in as one of the demo users:
               </p>
+              {import.meta.env.VITE_USE_MOCKS !== 'true' && (
+                <button type="button" onClick={() => setDemoMode(false)} className="mb-3 text-xs font-semibold text-gray-700 underline">
+                  Leave demo mode and use the live system
+                </button>
+              )}
               <div className="space-y-2.5">
                 {mockProfiles.map((p) => (
                   <button

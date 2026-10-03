@@ -29,10 +29,11 @@ logger = get_logger(__name__)
 
 SHAP_TOP_N = 5
 LOOKBACK_M = 200.0  # depth_series read below the bit for the trailing statistics and latest mud values
-POOL_TTL_S = 600.0
+POOL_TTL_S = 3600.0  # completed wells do not change while the service runs
 
 _models: dict[str, dict[str, Any]] = {}
 _pool: tuple[float, list[Any], dict[str, int]] | None = None
+_pool_task: asyncio.Task | None = None
 
 
 # ---------------------------------------------------------------- loading
@@ -91,15 +92,38 @@ def predict_features(risk_type: str, feature_row: dict[str, float]) -> tuple[flo
     return probability, shap, artifact["version"]
 
 
-async def _offset_pool() -> tuple[list[Any], dict[str, int]]:
-    """Completed wells for the offset-based features (cached: loading them reads every depth series)."""
+async def _reload_pool() -> None:
     global _pool
-    if _pool is None or time.monotonic() - _pool[0] > POOL_TTL_S:
-        from training import features
+    from training import features
 
-        wells, strat_order = await features.load_wells()
-        _pool = (time.monotonic(), wells, strat_order)
+    wells, strat_order = await features.load_wells()
+    _pool = (time.monotonic(), wells, strat_order)
+
+
+def _log_refresh_failure(task: asyncio.Task) -> None:
+    if not task.cancelled() and task.exception() is not None:
+        logger.warning("l2_pool_refresh_failed: %s", task.exception())
+
+
+async def _offset_pool() -> tuple[list[Any], dict[str, int]]:
+    """Completed wells for the offset-based features. Loading them reads every depth series (80 s over a
+    slow link), so one load is shared by concurrent callers, and a stale copy is served while a background
+    task refreshes it: a risk computation never waits for a refresh."""
+    global _pool_task
+    running = _pool_task is not None and not _pool_task.done()
+    if _pool is None:
+        if not running:
+            _pool_task = asyncio.create_task(_reload_pool())
+        await asyncio.shield(_pool_task)
+    elif time.monotonic() - _pool[0] > POOL_TTL_S and not running:
+        _pool_task = asyncio.create_task(_reload_pool())
+        _pool_task.add_done_callback(_log_refresh_failure)
     return _pool[1], _pool[2]
+
+
+async def preload() -> None:
+    """Load the offset pool now (called at startup, so the first risk computation of a demo is fast)."""
+    await _offset_pool()
 
 
 async def current_features(wellbore_id: str, bit_md_m: float) -> dict[str, dict[str, float]]:

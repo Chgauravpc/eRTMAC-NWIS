@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useParams, NavLink } from 'react-router-dom';
 import { WellHeader } from './WellHeader';
+import { ReplayPanel } from './ReplayPanel';
 import { useFormationAtMd, useStreamState, useWellSummary } from '../../lib/hooks/wells';
 import { cn } from '../../components/ui/Primitives';
 import { ErrorBlock } from '../wells/StateBlocks';
@@ -46,6 +47,7 @@ export default function WorkspaceLayout() {
         </nav>
       </div>
       <div className="relative z-0 flex-1 overflow-auto bg-[#0f172a] p-4 sm:p-6 lg:p-8">
+        <ReplayPanel wellboreId={wellboreId} streamState={streamState} source={well?.provenance === 'synthetic' ? 'synthetic' : 'volve'} />
         <Outlet />
       </div>
     </div>

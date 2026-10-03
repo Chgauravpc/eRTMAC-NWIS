@@ -6,6 +6,8 @@ export default defineConfig({
   plugins: [react()],
   // One env file for the whole repo: <repo>/.env. Only VITE_* variables are exposed to the browser.
   envDir: '../..',
+  // `npm run dev` with VITE_USE_MOCKS=false: /api goes to `node scripts/dev-api.mjs` (a local stand-in for `vercel dev`)
+  server: { proxy: { '/api': { target: `http://localhost:${process.env.DEV_API_PORT || 3001}`, changeOrigin: true } } },
   build: {
     rollupOptions: {
       output: {

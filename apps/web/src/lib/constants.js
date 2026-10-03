@@ -2,6 +2,7 @@
  * Hand copy of contract sections 5-9 (docs/team/00_SHARED_CONTRACTS.md). Any mismatch is a bug.
  * Field names are snake_case exactly as in the contract; nullable columns are marked `|null`.
  */
+import { isDemoActive } from './demoMode';
 
 /** Contract section 5 enums */
 export const USER_ROLES = Object.freeze(['rig_engineer', 'rtoc_engineer', 'office_engineer', 'reviewer', 'admin']);
@@ -59,7 +60,7 @@ export const ROLE_LABELS = Object.freeze({
 export const SEVERITY_LABELS = Object.freeze({ info: 'Info', watch: 'Watch', warning: 'Warning', critical: 'Critical' });
 
 /** True when the app runs on MSW mocks (VITE_USE_MOCKS === 'true'). Evaluated at call time. */
-export const isMockMode = () => import.meta.env.VITE_USE_MOCKS === 'true';
+export const isMockMode = () => isDemoActive();
 
 /**
  * Table profiles (contract 6).

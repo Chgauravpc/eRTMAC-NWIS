@@ -1,0 +1,29 @@
+# Slim image for a free 512 MB host (Render free web service, Koyeb free): no torch and no Docling.
+#   embeddings  -> Hugging Face Inference API (EMBED_BACKEND=hf_api, needs HF_TOKEN)
+#   OCR         -> PyMuPDF text layer, Tesseract for scans (OCR_ENGINE=tesseract)
+#   ML layer    -> off (L2_ENABLED=false): the risk score is the offset look-ahead (L1) + live detectors (L3)
+# The full image is Dockerfile (needs about 2 GB of RAM).
+FROM python:3.11-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tesseract-ocr libglib2.0-0 poppler-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd --create-home --uid 1000 appuser
+WORKDIR /app
+
+COPY requirements-slim.txt .
+RUN pip install --no-cache-dir -r requirements-slim.txt
+
+COPY . .
+RUN chown -R appuser:appuser /app
+USER appuser
+
+ENV PYTHONUNBUFFERED=1 \
+    EMBED_BACKEND=hf_api \
+    OCR_ENGINE=tesseract \
+    L2_ENABLED=false \
+    DB_POOL_MAX=5
+
+# one worker: the stream replay and the alert engine live in this process's memory. $PORT is set by Render; 7860 elsewhere.
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-7860} --workers 1"]

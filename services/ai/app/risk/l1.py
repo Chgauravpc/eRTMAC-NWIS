@@ -7,6 +7,7 @@ how far (in depth) each offset is. `compute_l1` is pure; `l1_scores` gathers the
 
 from __future__ import annotations
 
+import asyncio
 import math
 from dataclasses import dataclass, field
 from typing import Any
@@ -151,33 +152,40 @@ async def l1_scores(
     n_intervals: int = config.LOOKAHEAD_INTERVALS,
 ) -> list[L1Result]:
     """L1 for `n_intervals` 25 m intervals from `bit_md_m` (default: the 12 of the look-ahead), every risk type."""
-    results: list[L1Result] = []
-    events_by_formation: dict[str, list[dict[str, Any]]] = {}
-    for k in range(n_intervals):
+    # Every database call of the intervals runs concurrently (three stages, each a gather): a round trip
+    # to a distant region can take 0.5 s, and about 40 sequential calls made one computation take 20 s.
+
+    async def locate(k: int) -> dict[str, Any]:
         md_from = bit_md_m + k * config.INTERVAL_M
         md_to = md_from + config.INTERVAL_M
         md_mid = (md_from + md_to) / 2
         position = await db.call_fn("formation_at_md", p_wellbore=wellbore_id, p_md=md_mid)
         here = position[0] if position else {}
-        formation = here.get("formation")
-        interval = {
-            "md_from_m": md_from, "md_to_m": md_to, "md_mid_m": md_mid, "formation": formation,
+        return {
+            "md_from_m": md_from, "md_to_m": md_to, "md_mid_m": md_mid, "formation": here.get("formation"),
             "relative_depth": here.get("relative_depth"), "top_md_m": here.get("top_md_m"),
         }  # fmt: skip
-        if formation is None:
-            results += compute_l1(interval, [], [], risk_types)
-            continue
 
-        if formation not in events_by_formation:
-            events_by_formation[formation] = await _formation_events(wellbore_id, formation)
-        events = events_by_formation[formation]
+    async def offsets_of(interval: dict[str, Any]) -> list[dict[str, Any]]:
+        if interval["formation"] is None:
+            return []
         offsets = await db.call_fn(
-            "offsets_within", p_wellbore=wellbore_id, p_radius_m=config.RADIUS_M, p_md=md_mid, p_mode="depth"
+            "offsets_within", p_wellbore=wellbore_id, p_radius_m=config.RADIUS_M, p_md=interval["md_mid_m"], p_mode="depth"
         )
-        tops = await _actual_tops(formation, [str(o["wellbore_id"]) for o in offsets])
-        enriched = [
+        tops = await _actual_tops(interval["formation"], [str(o["wellbore_id"]) for o in offsets])
+        return [
             {**o, "drilled": str(o["wellbore_id"]) in tops, "top_md_m": tops.get(str(o["wellbore_id"]))}
             for o in offsets
         ]
-        results += compute_l1(interval, enriched, events, risk_types)
+
+    intervals = list(await asyncio.gather(*(locate(k) for k in range(n_intervals))))
+    formations = sorted({iv["formation"] for iv in intervals if iv["formation"] is not None})
+    event_lists = await asyncio.gather(*(_formation_events(wellbore_id, f) for f in formations))
+    events_by_formation = dict(zip(formations, event_lists))
+    enriched = await asyncio.gather(*(offsets_of(iv) for iv in intervals))
+
+    results: list[L1Result] = []
+    for interval, offsets in zip(intervals, enriched):
+        events = events_by_formation.get(interval["formation"], [])
+        results += compute_l1(interval, offsets, events, risk_types)
     return results

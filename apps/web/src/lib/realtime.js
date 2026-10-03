@@ -1,8 +1,9 @@
 import { supabase } from './supabase';
 import { db } from '../mocks/db';
+import { isDemoActive } from './demoMode';
 
-/** Read at call time so tests can stub the env. */
-export const isMockMode = () => import.meta.env.VITE_USE_MOCKS === 'true';
+/** Read at call time so tests can stub the env. True on the mocks: built that way, or demo mode is on (lib/demoMode.js). */
+export const isMockMode = () => isDemoActive();
 
 // ---------- filter matching (mock bus) ----------
 // Supports the PostgREST-style filters Supabase Realtime accepts: col=eq.x, col=neq.x, col=in.(a,b),

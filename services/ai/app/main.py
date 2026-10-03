@@ -25,6 +25,9 @@ logger = get_logger(__name__)
 
 async def _warm_up_models() -> None:
     """Load heavy models off the event loop so /v1/health answers immediately."""
+    if settings.EMBED_BACKEND.strip().lower() == "hf_api":
+        logger.info("embeddings come from the Hugging Face Inference API: no local model to warm up")
+        return
     try:
         from app.search import embed
 
@@ -46,10 +49,15 @@ async def _reset_live_streams() -> None:
 
 async def _load_l2_models() -> None:
     """Load the active L2 models (BE-16). With no models, or no database, the risk score is L1 + L3 only."""
+    if not settings.L2_ENABLED:
+        logger.info("L2_ENABLED is off: the risk score is L1 + L3 only")
+        return
     try:
         from app.risk import l2
 
-        await l2.load_active()
+        if await l2.load_active():
+            await l2.preload()  # the offset wells the features need (slow: do it before the first risk call)
+            logger.info("l2 offset pool loaded")
     except Exception:  # never let a missing model take the service down
         logger.exception("could not load L2 models on startup")
 

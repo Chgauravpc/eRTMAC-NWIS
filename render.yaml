@@ -1,0 +1,32 @@
+# Render blueprint for the slim backend (free plan, no card): Dashboard -> New -> Blueprint -> pick this repo.
+# The secrets (sync: false) are asked for once in the dashboard; copy the values from the repo-root .env.
+services:
+  - type: web
+    name: nwis-ai
+    runtime: docker
+    plan: free
+    dockerContext: ./services/ai
+    dockerfilePath: ./services/ai/Dockerfile.slim
+    healthCheckPath: /v1/health
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_DB_URL
+        sync: false
+      - key: SERVICE_TOKEN
+        sync: false
+      - key: HF_TOKEN
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        sync: false
+      - key: OPENROUTER_MODEL
+        sync: false
+      - key: LOG_LEVEL
+        value: INFO

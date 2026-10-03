@@ -246,8 +246,10 @@ export default function WorkspaceMap() {
         <div className="relative flex-1 overflow-hidden rounded-xl border border-gray-800/60 shadow-lg shadow-black/20">
           <MapContainer center={[center.lat, center.lon]} zoom={11} preferCanvas className="h-full min-h-[440px] w-full">
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+              attribution="Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}"
+              maxNativeZoom={16}
+              maxZoom={18}
             />
             <MapController center={center} radiusM={qRadius} target={target} />
 
