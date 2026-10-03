@@ -204,13 +204,13 @@ describe('vercel.json', () => {
   const config = JSON.parse(readRelative('../../vercel.json'));
 
   it('sets maxDuration for the functions and keeps the SPA rewrites', () => {
-    expect(config.functions['api/**/*.js'].maxDuration).toBeGreaterThan(0);
-    expect(config.functions['api/**/*.js'].maxDuration).toBeLessThanOrEqual(300); // Hobby limit with Fluid compute
+    expect(config.functions['api/dispatch.js'].maxDuration).toBeGreaterThan(0);
+    expect(config.functions['api/dispatch.js'].maxDuration).toBeLessThanOrEqual(300); // Hobby limit with Fluid compute
     expect(config.rewrites.at(-1)).toEqual({ source: '/(.*)', destination: '/index.html' });
   });
 
   it('keeps the forward timeout below the function limit', () => {
-    const limitMs = config.functions['api/**/*.js'].maxDuration * 1000;
+    const limitMs = config.functions['api/dispatch.js'].maxDuration * 1000;
     const source = readRelative('../_lib/forward.js');
     const defaultMs = Number(/DEFAULT_TIMEOUT_MS = ([\d_]+)/.exec(source)[1].replaceAll('_', ''));
     expect(defaultMs).toBeLessThan(limitMs);
