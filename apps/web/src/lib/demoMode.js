@@ -2,19 +2,22 @@
 // can offer judges "explore with sample data" next to the real sign-in. No Supabase, Space or network needed.
 //
 //   ?demo=1 in the URL (or the login-page button) turns it on and remembers it in this browser;
-//   ?demo=0 turns it off. VITE_DEMO_MODE=off removes the option from a build. VITE_USE_MOCKS=true still forces mocks.
+//   ?demo=0 turns it off (and remembers that too).
+//   VITE_DEMO_DEFAULT=on  a visitor with no remembered choice starts in demo mode (a public site without a backend);
+//   VITE_DEMO_MODE=off    removes the option from a build;  VITE_USE_MOCKS=true  forces mocks for everyone.
 const KEY = 'nwis.demo';
 
 export const demoAllowed = () => import.meta.env.VITE_DEMO_MODE !== 'off';
+const demoDefault = () => import.meta.env.VITE_DEMO_DEFAULT === 'on';
 
 function readFlag() {
   try {
     const param = new URLSearchParams(window.location.search).get('demo');
-    if (param === '1') window.localStorage.setItem(KEY, '1');
-    if (param === '0') window.localStorage.removeItem(KEY);
-    return window.localStorage.getItem(KEY) === '1';
+    if (param === '1' || param === '0') window.localStorage.setItem(KEY, param);
+    const stored = window.localStorage.getItem(KEY);
+    return stored === null ? demoDefault() : stored === '1';
   } catch {
-    return false; // storage blocked: demo mode needs the URL parameter each time, which also fails: stay real
+    return demoDefault(); // storage blocked: nothing can be remembered, so the build's default applies
   }
 }
 
@@ -23,8 +26,7 @@ export const isDemoActive = () => import.meta.env.VITE_USE_MOCKS === 'true' || (
 
 export function setDemoMode(on) {
   try {
-    if (on) window.localStorage.setItem(KEY, '1');
-    else window.localStorage.removeItem(KEY);
+    window.localStorage.setItem(KEY, on ? '1' : '0');
   } catch {
     /* nothing to remember */
   }

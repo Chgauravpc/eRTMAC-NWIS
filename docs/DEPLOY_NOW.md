@@ -13,7 +13,25 @@ Both modes live on one site: the **real** system (Supabase + Space) and **demo m
 3. Make one deployment secret and put it in `.env` as `SERVICE_TOKEN`:
    `python -c "import secrets; print(secrets.token_urlsafe(32))"` (the same value goes to the Space and to Vercel).
 
-## 1. Hugging Face Space (the backend, `services/ai`)
+## 1a. If Hugging Face only gives you the Static SDK (no Docker)
+
+A Static Space serves files only, so it cannot run `services/ai` (FastAPI, embeddings, OCR). Use it, if at all, as a **mirror of the demo-mode site**:
+choose the **Blank** template, then put the built site in it:
+```
+cd apps/web
+VITE_USE_MOCKS=true npm run build            # PowerShell: $env:VITE_USE_MOCKS='true'; npm run build
+# copy dist/* into the Space repo, with README.md starting with:  ---\ntitle: NWIS\nsdk: static\napp_file: index.html\n---
+```
+Limits: no `/api`, so only demo mode works there, and a page refresh on a deep link (e.g. /wells) is a 404 (a static host has no SPA rewrite):
+start from the root URL. **The primary public URL should be Vercel** (free, SPA rewrites, `/api` routes).
+
+The Python backend needs a host with about 2 GB RAM (torch, embeddings, OCR). No free host offers that, so until you have one:
+* Public site on Vercel with `VITE_DEMO_DEFAULT=on` (new visitors start in demo mode: every screen, Ask, upload and review work on sample data;
+  "Leave demo mode" on the login page switches to the real Supabase data: wells, map, risk, alerts; correlation and live replay need the backend).
+* For a live demo or recording with the real replay: run the backend on your PC and point Vercel's `AI_SERVICE_URL` at a free tunnel
+  (e.g. `cloudflared tunnel --url http://127.0.0.1:7860`); it works only while your PC and the tunnel are running.
+
+## 1. Hugging Face Space (the backend, `services/ai`; needs the Docker SDK, which you do not have)
 
 1. huggingface.co -> New Space -> name `nwis-ai`, SDK **Docker**, hardware **CPU basic (16 GB)**, **Public or Private** (Private needs the
    token on every call; use Public: the service token protects it).
