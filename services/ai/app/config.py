@@ -14,8 +14,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 # One env file for the whole repo: <repo>/.env (services/ai/app/config.py -> parents[3]).
-# A .env in the working directory still overrides it.
-REPO_ENV_FILE = Path(__file__).resolve().parents[3] / ".env"
+# A .env in the working directory still overrides it. In a container the code sits at /app/app/config.py, which has
+# no such parent (this raised IndexError at import and the service never started): there the settings come from the
+# environment only.
+_PARENTS = Path(__file__).resolve().parents
+REPO_ENV_FILE = _PARENTS[3] / ".env" if len(_PARENTS) > 3 else Path(".env")
 
 
 class Settings(BaseSettings):
