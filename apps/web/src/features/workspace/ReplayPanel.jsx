@@ -3,9 +3,13 @@ import { useProfile } from '../auth/useProfile';
 import { Button, Card, Spinner } from '../../components/ui/Primitives';
 import { apiFetch } from '../../lib/api';
 
-export function ReplayPanel({ wellboreId, streamState }) {
+// A demo pace: the hidden hazard of a drilling well is 100-200 m below its start depth.
+const START_SPEED = 300;
+
+export function ReplayPanel({ wellboreId, streamState, source = 'synthetic' }) {
   const { profile } = useProfile();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   if (!profile || !['rtoc_engineer', 'admin'].includes(profile.role)) {
     return null;
@@ -16,13 +20,15 @@ export function ReplayPanel({ wellboreId, streamState }) {
 
   const handleStart = async () => {
     setLoading(true);
+    setError(null);
     try {
-      await apiFetch('/api/stream/start', { 
-        method: 'POST', 
-        body: JSON.stringify({ wellbore_id: wellboreId, source: 'volve', speed: 10, start_md_m: null }) 
+      await apiFetch('/api/stream/start', {
+        method: 'POST',
+        body: JSON.stringify({ wellbore_id: wellboreId, source, speed: START_SPEED, start_md_m: null }),
       });
     } catch (e) {
       console.error('Failed to start stream', e);
+      setError(e?.message || 'The replay could not be started.');
     } finally {
       setLoading(false);
     }
@@ -102,6 +108,8 @@ export function ReplayPanel({ wellboreId, streamState }) {
           <option value={1}>1x</option>
           <option value={10}>10x</option>
           <option value={60}>60x</option>
+          <option value={300}>300x</option>
+          <option value={600}>600x</option>
         </select>
       </div>
 
@@ -114,6 +122,7 @@ export function ReplayPanel({ wellboreId, streamState }) {
         Drop 45s
       </Button>
 
+      {error && <span role="alert" className="text-sm text-red-700">{error}</span>}
       {loading && <Spinner className="w-4 h-4 ml-auto" />}
     </Card>
   );

@@ -158,10 +158,14 @@ class FakeDb:
     async def execute_many(self, sql, rows):
         self.stored.append((sql, rows))
 
+    async def execute(self, sql, params=None):
+        self.deleted.append((" ".join(sql.split()), params))
+
 
 @pytest.fixture
 def env(monkeypatch):
     fake = FakeDb()
+    fake.deleted = []
     calls = []
 
     async def l1_scores(wellbore_id, start, risk_types=l1_module.RISK_TYPES, n_intervals=config.LOOKAHEAD_INTERVALS):
@@ -170,6 +174,7 @@ def env(monkeypatch):
 
     monkeypatch.setattr(db, "fetch_one", fake.fetch_one)
     monkeypatch.setattr(db, "execute_many", fake.execute_many)
+    monkeypatch.setattr(db, "execute", fake.execute)
     monkeypatch.setattr(l1_module, "l1_scores", l1_scores)
     l3.reset_bank(WB)
     fake.l1_calls = calls
@@ -190,10 +195,33 @@ async def test_default_window_is_bit_to_plus_300_and_rows_are_upserted(env):
 
 
 @pytest.mark.asyncio
+async def test_default_window_sits_on_a_fixed_25_m_grid_so_rows_are_overwritten_not_piled_up(env):
+    """The key includes md_from_m: a grid that followed the bit wrote a new set of rows at every depth."""
+    env.bit = 2412.5
+    rows = await fuse.compute_and_store(WB)
+    assert env.l1_calls == [(WB, 2400.0, 13)]  # the cell holding the bit, up to bit + 300 m (2712.5 -> 2725)
+    assert min(r["md_from_m"] for r in rows) == 2400.0 and max(r["md_to_m"] for r in rows) == 2725.0
+    env.bit = 2424.0
+    await fuse.compute_and_store(WB)
+    assert env.l1_calls[-1][1] == 2400.0  # still the same cell: same keys, so the upsert overwrites
+
+
+@pytest.mark.asyncio
+async def test_default_run_drops_unrefreshed_rows_ahead_but_an_explicit_window_does_not(env):
+    await fuse.compute_and_store(WB)
+    sql, params = env.deleted[0]
+    assert sql.startswith("delete from risk_scores where wellbore_id = %(id)s and md_from_m >= %(start)s")
+    assert "computed_at < %(at)s" in sql and params["id"] == WB and params["start"] == 2400.0
+    env.deleted.clear()
+    await fuse.compute_and_store(WB, 2400.0, 2700.0)  # planning / what-if windows keep other rows
+    assert env.deleted == []
+
+
+@pytest.mark.asyncio
 async def test_bit_depth_falls_back_to_deepest_actual_top_plus_20(env):
     env.bit, env.deepest = None, 3100.0
     await fuse.compute_and_store(WB)
-    assert env.l1_calls[0][1] == 3120.0
+    assert env.l1_calls[0][1] == 3100.0  # the bit is 3120; the window starts at the 25 m cell that holds it
 
 
 @pytest.mark.asyncio

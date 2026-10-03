@@ -350,10 +350,10 @@ describe('WorkspaceMap: control state -> exact offsets_within RPC params', () =>
     expect(screen.getByRole('link', { name: /Open workspace/ }).getAttribute('href')).toBe(`/wells/${well.wellbore_id}/map`);
   });
 
-  it('draws OSM tiles with attribution, the radius circle, trajectories and a ringed active marker', async () => {
+  it('draws Esri dark basemap tiles with attribution, the radius circle, trajectories and a ringed active marker', async () => {
     renderMap();
     await screen.findAllByTestId('offset-row');
-    expect(screen.getByTestId('tile-layer').dataset.attribution).toMatch(/OpenStreetMap/);
+    expect(screen.getByTestId('tile-layer').dataset.attribution).toMatch(/Esri/); // Carto's dark tiles now demand an API key
     expect(screen.getByTestId('leaflet-map').dataset.preferCanvas).toBe('true');
     expect(screen.getByTestId('radius-circle').dataset.radius).toBe('10000');
     fireEvent.change(screen.getByLabelText(/Radius/), { target: { value: '18' } });

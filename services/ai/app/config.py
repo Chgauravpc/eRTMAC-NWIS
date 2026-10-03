@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str = ""
     SUPABASE_DB_URL: str = ""
     SERVICE_TOKEN: str = ""
+    DB_POOL_MAX: int = 8  # connections; the risk computation runs its queries concurrently
     GROQ_API_KEY: str = ""
     GROQ_MODEL: str = "openai/gpt-oss-20b"
     OPENROUTER_API_KEY: str = ""

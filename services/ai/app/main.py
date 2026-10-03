@@ -49,7 +49,9 @@ async def _load_l2_models() -> None:
     try:
         from app.risk import l2
 
-        await l2.load_active()
+        if await l2.load_active():
+            await l2.preload()  # the offset wells the features need (slow: do it before the first risk call)
+            logger.info("l2 offset pool loaded")
     except Exception:  # never let a missing model take the service down
         logger.exception("could not load L2 models on startup")
 

@@ -231,10 +231,23 @@ _UPSERT = """
 async def compute_and_store(
     wellbore_id: str, md_from: float | None = None, md_to: float | None = None
 ) -> list[dict[str, Any]]:
-    """Score the window (default: bit depth to +300 m), upsert risk_scores and return the rows."""
+    """Score the window (default: the 25 m grid cell of the bit to bit + 300 m), upsert risk_scores and return the rows.
+
+    The default window is anchored to multiples of INTERVAL_M, not to the bit: the primary key includes md_from_m,
+    so a grid that moves with the bit writes a new set of rows at every depth and never overwrites the old ones
+    (found on the first run against a real database: 268 distinct md_from_m for one well, overlapping and stale).
+    """
     bit = await bit_depth(wellbore_id)
-    start = bit if md_from is None else md_from
-    end = start + config.LOOKAHEAD_MAX_M if md_to is None else md_to
+    default_window = md_from is None and md_to is None
+    if md_from is None:
+        start = math.floor(bit / config.INTERVAL_M) * config.INTERVAL_M
+    else:
+        start = md_from
+    if md_to is None:
+        reach = bit if md_from is None else start  # the default window reaches LOOKAHEAD_MAX_M past the bit
+        end = start + math.ceil((reach + config.LOOKAHEAD_MAX_M - start) / config.INTERVAL_M) * config.INTERVAL_M
+    else:
+        end = md_to
     if end <= start or end - start > MAX_WINDOW_M:
         raise NwisError(
             "NWIS_BAD_REQUEST", f"md_to must be above md_from, at most {MAX_WINDOW_M:g} m apart", 400,
@@ -253,6 +266,12 @@ async def compute_and_store(
         await db.execute_many(
             _UPSERT,
             [{**row, "reasons": Jsonb(row["reasons"]), "computed_at": computed_at} for row in rows],
+        )
+    if default_window and rows:
+        # rows ahead of the window start that this run did not refresh come from an older grid or run: drop them
+        await db.execute(
+            "delete from risk_scores where wellbore_id = %(id)s and md_from_m >= %(start)s and computed_at < %(at)s",
+            {"id": wellbore_id, "start": start, "at": computed_at},
         )
     logger.info("risk_scores_stored wellbore_id=%s rows=%d bit=%.1f", wellbore_id, len(rows), bit)
     stamp = computed_at.isoformat()

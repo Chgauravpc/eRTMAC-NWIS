@@ -108,6 +108,8 @@ def build_candidates(
             continue
         severity = cap_severity(severity_for(band), row["confidence"], False)
         key = dedup_key(wellbore_id, row["risk_type"], row["md_from_m"])
+        if key in found and found[key].score >= row["fused"]:
+            continue  # two 25 m cells share a 50 m key: the alert describes the higher score (the shallower on a tie)
         found[key] = Candidate(
             "lookahead", row["risk_type"], severity, band, row["fused"], row["confidence"], row["md_from_m"],
             row["md_to_m"], (row["md_from_m"] + row["md_to_m"]) / 2, row.get("formation"), key, row=row,

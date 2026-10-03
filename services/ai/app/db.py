@@ -44,8 +44,9 @@ _pool_lock = asyncio.Lock()
 
 
 async def get_pool() -> AsyncConnectionPool:
-    """Lazily create and open the pool (min_size=1, max_size=5 — Supabase's
-    free tier has limited connections)."""
+    """Lazily create and open the pool (min_size=1, max_size=DB_POOL_MAX, default 8 — Supabase's
+    free tier has limited connections; the risk computation runs about 40 queries concurrently
+    because one round trip to a distant region can take half a second)."""
     global _pool
     if _pool is None:
         async with _pool_lock:
@@ -54,7 +55,7 @@ async def get_pool() -> AsyncConnectionPool:
                 pool = AsyncConnectionPool(
                     conninfo=settings.SUPABASE_DB_URL,
                     min_size=1,
-                    max_size=5,
+                    max_size=max(2, settings.DB_POOL_MAX),
                     kwargs={"row_factory": dict_row},
                     open=False,
                 )

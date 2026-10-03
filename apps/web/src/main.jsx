@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { App } from './app/App';
 import './index.css';
 
-const useMocks = import.meta.env.VITE_USE_MOCKS === 'true';
+import { isDemoActive } from './lib/demoMode';
+
+const useMocks = isDemoActive(); // built with mocks, or demo mode switched on in this browser (?demo=1 or the login button)
 
 // Only the API surfaces we mock are worth a warning when unhandled; static assets, Vite modules and
 // map tiles are same-origin/third-party requests that are supposed to pass through.
