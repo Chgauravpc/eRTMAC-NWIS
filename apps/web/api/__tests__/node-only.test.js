@@ -3,10 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@supabase/supabase-js', () => ({ createClient: vi.fn() }));
 
 import { createClient } from '@supabase/supabase-js';
-import invite from '../admin/users/invite.js';
-import patchUser from '../admin/users/[id].js';
-import health from '../health.js';
-import uploadUrl, { ALLOWED_MIME_TYPES, MAX_UPLOAD_BYTES, sanitiseFilename, validateUploadRequest } from '../documents/upload-url.js';
+import invite from '../_routes/admin/users/invite.js';
+import patchUser from '../_routes/admin/users/[id].js';
+import health from '../_routes/health.js';
+import uploadUrl, { ALLOWED_MIME_TYPES, MAX_UPLOAD_BYTES, sanitiseFilename, validateUploadRequest } from '../_routes/documents/upload-url.js';
 import { fakeSpace, fakeSupabase, mockReq, mockRes, ROLE_LIST, setEnv, USER_ID, WELLBORE_ID } from './helpers.js';
 
 function signIn(options) {

@@ -1,7 +1,7 @@
 // GET /api/wells/{wellboreId}/correlation?offsets=&flatten=&channels=: all roles -> Space (contract §9.2, §9.3)
-import { ROLES } from '../../_lib/auth.js';
-import { requireUuid } from '../../_lib/errors.js';
-import { proxyRoute } from '../../_lib/forward.js';
+import { ROLES } from '../../../_lib/auth.js';
+import { requireUuid } from '../../../_lib/errors.js';
+import { proxyRoute } from '../../../_lib/forward.js';
 
 export default proxyRoute({
   methods: 'GET',
