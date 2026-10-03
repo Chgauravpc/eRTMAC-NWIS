@@ -10,7 +10,7 @@
 import { http, HttpResponse } from 'msw';
 import { db } from '../db';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+import { SUPABASE_URL } from '../../lib/supabaseUrl';
 export const MOCK_TOKEN_PREFIX = 'mock-token.';
 export const BAD_PASSWORD = 'wrong-password';
 

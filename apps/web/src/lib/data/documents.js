@@ -2,7 +2,7 @@
 import { supabase } from '../supabase';
 import { api } from '../api';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+import { SUPABASE_URL } from '../supabaseUrl';
 
 const MIME_BY_EXT = {
   pdf: 'application/pdf',

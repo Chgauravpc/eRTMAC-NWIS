@@ -17,7 +17,7 @@ import fieldsSeed from '../fixtures/review_fields.json';
 import pagesSeed from '../fixtures/document_pages.json';
 import wellsSeed from '../fixtures/wells.json';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://localhost:54321';
+import { SUPABASE_URL } from '../../lib/supabaseUrl';
 const REST = `${SUPABASE_URL}/rest/v1`;
 const STORAGE = `${SUPABASE_URL}/storage/v1`;
 const MAX_BYTES = 25 * 1024 * 1024;
