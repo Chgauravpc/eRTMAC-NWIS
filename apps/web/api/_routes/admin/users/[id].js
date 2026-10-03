@@ -1,6 +1,6 @@
 // PATCH /api/admin/users/{id}: admin. Node only (contract §9.2). Changes role and/or assigned wellbores; audit row.
-import { requireUser, supabaseAdmin } from '../../_lib/auth.js';
-import { assertMethod, badRequest, notFound, requireUuid, sendError, upstream } from '../../_lib/errors.js';
+import { requireUser, supabaseAdmin } from '../../../_lib/auth.js';
+import { assertMethod, badRequest, notFound, requireUuid, sendError, upstream } from '../../../_lib/errors.js';
 import { validateAssignments, validateRole, writeAudit } from './invite.js';
 
 export default async function handler(req, res) {

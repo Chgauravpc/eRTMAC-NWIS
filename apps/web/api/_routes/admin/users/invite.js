@@ -1,7 +1,7 @@
 // POST /api/admin/users/invite: admin. Node only (contract §9.2).
 // Invites the user by e-mail, sets their role and assigned wellbores on `profiles`, and writes an audit row.
-import { requireUser, ROLES, supabaseAdmin } from '../../_lib/auth.js';
-import { ApiError, assertMethod, badRequest, isUuid, sendError, upstream } from '../../_lib/errors.js';
+import { requireUser, ROLES, supabaseAdmin } from '../../../_lib/auth.js';
+import { ApiError, assertMethod, badRequest, isUuid, sendError, upstream } from '../../../_lib/errors.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_NAME_CHARS = 200;

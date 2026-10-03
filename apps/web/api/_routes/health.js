@@ -1,6 +1,6 @@
 // GET /api/health: public. Its own ok plus the Space's health (5 s timeout). Contract §9.2.
-import { assertMethod, sendError } from './_lib/errors.js';
-import { forwardToSpace } from './_lib/forward.js';
+import { assertMethod, sendError } from '../_lib/errors.js';
+import { forwardToSpace } from '../_lib/forward.js';
 
 const SPACE_TIMEOUT_MS = 5000;
 

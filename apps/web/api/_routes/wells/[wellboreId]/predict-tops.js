@@ -1,6 +1,6 @@
 // POST /api/wells/{wellboreId}/predict-tops: rtoc_engineer, office_engineer, admin -> Space (contract §9.2)
-import { requireUuid } from '../../_lib/errors.js';
-import { proxyRoute } from '../../_lib/forward.js';
+import { requireUuid } from '../../../_lib/errors.js';
+import { proxyRoute } from '../../../_lib/forward.js';
 
 export default proxyRoute({
   methods: 'POST',

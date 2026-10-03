@@ -2,8 +2,8 @@
 // Hands out a signed upload URL for incoming/<upload_id>/<filename>; the file goes straight to Supabase Storage
 // (a Vercel function body is limited to about 4.5 MB), then the browser calls POST /api/documents.
 import { randomUUID } from 'node:crypto';
-import { requireUser, supabaseAdmin, UPLOAD_ROLES } from '../_lib/auth.js';
-import { assertMethod, badRequest, sendError, upstream } from '../_lib/errors.js';
+import { requireUser, supabaseAdmin, UPLOAD_ROLES } from '../../_lib/auth.js';
+import { assertMethod, badRequest, sendError, upstream } from '../../_lib/errors.js';
 
 export const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 export const MAX_FILENAME_CHARS = 120;
