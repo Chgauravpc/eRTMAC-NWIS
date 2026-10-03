@@ -1,74 +1,68 @@
-# Deploy now: Hugging Face Space + Vercel (the short version)
+# Deploy now, free and without a card: Render (backend) + Vercel (site) + Supabase (database)
 
-The long checklist is `GO_LIVE.md`. This is the order that gets a working public site, with what only you can do marked **YOU**.
-Both modes live on one site: the **real** system (Supabase + Space) and **demo mode** (sample data in the browser: the
-"Explore with sample data" button on the login page, or any link with `?demo=1`). Judges can always fall back to demo mode.
+The long checklist is `GO_LIVE.md`. **YOU** marks what needs your account. One site, two modes: the **real** system (Supabase + backend)
+and **demo mode** (sample data in the browser: "Explore with sample data" on the login page, or any link with `?demo=1`).
 
-## 0. Before anything public (YOU, 2 minutes)
+## What runs where
 
-1. Supabase dashboard, Authentication -> Sign In / Providers: **turn OFF "Allow new users to sign up"**. Today anyone who finds the
-   project URL can register and read all data.
-2. Get the two LLM keys (Groq, OpenRouter) and put them in the repo-root `.env` as `GROQ_API_KEY` and `OPENROUTER_API_KEY`
-   (they are empty there now). Without them Ask, document extraction and alert recommendations do not work.
-3. Make one deployment secret and put it in `.env` as `SERVICE_TOKEN`:
-   `python -c "import secrets; print(secrets.token_urlsafe(32))"` (the same value goes to the Space and to Vercel).
+| Part | Host | Notes |
+| --- | --- | --- |
+| Site + `/api` routes (`apps/web`) | **Vercel** (free) | the public URL |
+| Backend (`services/ai`, slim image) | **Render** free web service (no card) | 512 MB, sleeps after 15 min idle, wakes in about 1 minute |
+| Database, auth, storage | **Supabase** (already set up) | |
+| Optional mirror of the demo-mode site | **Hugging Face Static Space** | needs no backend, see the end |
 
-## 1a. If Hugging Face only gives you the Static SDK (no Docker)
+The slim backend (`services/ai/Dockerfile.slim`) differs from the full image: embeddings come from the Hugging Face Inference API (`EMBED_BACKEND=hf_api`,
+same bge-small model and vectors), scans go through Tesseract (`OCR_ENGINE=tesseract`; no Docling), and the ML layer is off (`L2_ENABLED=false`), so the
+risk score is the offset look-ahead + the live detectors (the alerts in the demo come from those). Measured: about 146 MB of RAM while replaying.
 
-A Static Space serves files only, so it cannot run `services/ai` (FastAPI, embeddings, OCR). Use it, if at all, as a **mirror of the demo-mode site**:
-choose the **Blank** template, then put the built site in it:
-```
-cd apps/web
-VITE_USE_MOCKS=true npm run build            # PowerShell: $env:VITE_USE_MOCKS='true'; npm run build
-# copy dist/* into the Space repo, with README.md starting with:  ---\ntitle: NWIS\nsdk: static\napp_file: index.html\n---
-```
-Limits: no `/api`, so only demo mode works there, and a page refresh on a deep link (e.g. /wells) is a 404 (a static host has no SPA rewrite):
-start from the root URL. **The primary public URL should be Vercel** (free, SPA rewrites, `/api` routes).
+## 0. Before anything public (YOU)
 
-The Python backend needs a host with about 2 GB RAM (torch, embeddings, OCR). No free host offers that, so until you have one:
-* Public site on Vercel with `VITE_DEMO_DEFAULT=on` (new visitors start in demo mode: every screen, Ask, upload and review work on sample data;
-  "Leave demo mode" on the login page switches to the real Supabase data: wells, map, risk, alerts; correlation and live replay need the backend).
-* For a live demo or recording with the real replay: run the backend on your PC and point Vercel's `AI_SERVICE_URL` at a free tunnel
-  (e.g. `cloudflared tunnel --url http://127.0.0.1:7860`); it works only while your PC and the tunnel are running.
+1. Supabase -> Authentication -> Sign In / Providers: **turn OFF "Allow new users to sign up"** (today anyone can register and read all data).
+2. Put these in the repo-root `.env`: `GROQ_API_KEY`, `OPENROUTER_API_KEY` (empty today), `HF_TOKEN` (huggingface.co -> Settings -> Access Tokens -> a **Read**
+   token; used for embeddings), and `SERVICE_TOKEN` (`python -c "import secrets; print(secrets.token_urlsafe(32))"`).
 
-## 1. Hugging Face Space (the backend, `services/ai`; needs the Docker SDK, which you do not have)
+## 1. Backend on Render (YOU)
 
-1. huggingface.co -> New Space -> name `nwis-ai`, SDK **Docker**, hardware **CPU basic (16 GB)**, **Public or Private** (Private needs the
-   token on every call; use Public: the service token protects it).
-2. Settings -> Access Tokens -> New token, role **Write**.
-3. Space -> Settings -> Variables and secrets, add these as **Secrets** (copy the values from `.env`):
-   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL` (the session pooler string), `SERVICE_TOKEN`, `GROQ_API_KEY`,
-   `OPENROUTER_API_KEY`, `GROQ_MODEL`, `OPENROUTER_MODEL`; as **Variables**: `LOG_LEVEL=INFO`, `OCR_ENGINE=rapidocr`
-   (use `tesseract` if the Space runs out of memory on a big scan).
-4. Push the service (from the repo root; the token is the write token, do not paste it into a chat):
-   ```
-   git remote add space https://<hf-user>:<write-token>@huggingface.co/spaces/<hf-user>/nwis-ai
-   git subtree push --prefix services/ai space main
-   ```
-   The first build takes 10-20 minutes (the models are baked into the image). Watch the Space's Logs tab.
-5. Check: `https://<hf-user>-nwis-ai.hf.space/v1/health` returns `{"ok":true,...,"models":{"l2":[...4 names...]}}`.
-   The first request after the build can take about 2 minutes while the L2 offset data loads from Supabase.
+1. render.com -> sign in with GitHub -> New -> **Blueprint** -> pick this repo and branch (it reads `render.yaml`) -> Apply.
+2. It asks for the secrets once (copy from `.env`): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL` (the session pooler string), `SERVICE_TOKEN`,
+   `HF_TOKEN`, `GROQ_API_KEY`, `OPENROUTER_API_KEY`, `GROQ_MODEL`, `OPENROUTER_MODEL`.
+3. Wait for the first build (about 5 minutes). Check `https://<name>.onrender.com/v1/health` -> `{"ok":true,...}`.
 
-## 2. Vercel (the site and `/api`, `apps/web`)
+## 2. Site on Vercel (YOU)
 
-1. vercel.com -> Add New Project -> import `Chgauravpc/eRTMAC-NWIS`, **Root Directory** `apps/web`, framework Vite.
-2. Environment variables (Production): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_BASE=/api`, `VITE_USE_MOCKS=false`,
-   `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `AI_SERVICE_URL=https://<hf-user>-nwis-ai.hf.space`, `SERVICE_TOKEN` (same as the Space).
-   (To make the whole site demo-only, e.g. while the Space is down, set `VITE_USE_MOCKS=true` and redeploy.)
-3. Deploy. Then Supabase -> Authentication -> URL Configuration: Site URL = the Vercel URL, and add it to Redirect URLs.
+1. vercel.com -> Add New Project -> import the repo, **Root Directory** `apps/web`, framework Vite.
+2. Environment variables: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_BASE=/api`, `VITE_USE_MOCKS=false`, **`VITE_DEMO_DEFAULT=on`** (new visitors start in demo
+   mode; they can switch to the real system on the login page), `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `AI_SERVICE_URL=https://<name>.onrender.com`, `SERVICE_TOKEN` (same value).
+3. Deploy. Then Supabase -> Authentication -> URL Configuration: Site URL = the Vercel URL (add it to Redirect URLs too).
 
-## 3. Check it (from this repo)
+## 3. Check it
 
 ```
-python scripts/warmup.py --skip-reset          # wakes the Space, loads models; prints READY
+python scripts/warmup.py --skip-reset          # wakes Render (up to 3 minutes), checks the stack; prints READY
 cd apps/web && node scripts/live-smoke.mjs     # the app's queries as each demo role against Supabase
 ```
-Then sign in on the site as `rtoc@nwis.test` (password: `DEMO_PASSWORD` in `.env`), open SYN-DLJ-03, press Start.
+Then on the site: "Leave demo mode" on the login page, sign in as `rtoc@nwis.test` (password `DEMO_PASSWORD` in `.env`), open SYN-DLJ-03, press Start.
+Keep a tab pinging `https://<site>/api/health` every 5 minutes (e.g. UptimeRobot, free) before a live demo so Render does not sleep.
 
-## What the deployed system does and does not have
+## What the real mode has and has not
 
-* Real mode: 30 synthetic wells, trajectories, offsets, correlation, risk, live replay and alerts. **No documents or lessons yet**:
-  Search/Ask have nothing to cite until documents are uploaded, and alert recommendations say "No recorded mitigation" until lessons exist.
-* Ingesting new data = upload a PDF on the Documents page (as `admin`, `reviewer` or `office` account; RTOC cannot). It runs
-  OCR -> LLM extraction -> review queue on the Space and needs the LLM keys. A large scan can take about a minute per page.
-* The replay lives in the Space's memory: a restart (or a sleeping free Space waking up) stops it. Press Start again.
+* Has: 30 synthetic wells, trajectories, offsets, correlation, risk, the live replay and alerts. Upload a PDF on the Documents page (as `admin`, `reviewer` or
+  `office`; RTOC cannot): text-layer PDFs and Tesseract-read scans go through extraction (needs the LLM keys) into the review queue.
+* Has not: documents or lessons yet (Search / Ask have nothing to cite until documents are uploaded; alert recommendations say "No recorded mitigation");
+  the ML layer; Docling table extraction; Tesseract is less accurate than the full OCR on poor scans. A free Render instance is slow (0.1 CPU): a big scan takes minutes.
+* The replay lives in the backend's memory: when Render sleeps and wakes, press Start again.
+
+## Optional: Hugging Face Static Space as a demo-mode mirror
+
+Create the Space with the **Blank** static template, then:
+```
+cd apps/web
+$env:VITE_USE_MOCKS='true'; npm run build        # bash: VITE_USE_MOCKS=true npm run build
+# copy dist/* into the Space repo; README.md must start with:  ---\ntitle: NWIS\nsdk: static\napp_file: index.html\n---
+```
+A static host has no SPA rewrite, so a refresh on a deep link (e.g. /wells) is a 404: share the root URL. The primary URL is the Vercel one.
+
+## The full image (Dockerfile) is for a host with about 2 GB RAM
+
+Embeddings in-process, Docling + RapidOCR, and the ML layer. Not needed for the demo.

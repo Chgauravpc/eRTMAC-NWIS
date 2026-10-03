@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL: str = ""
     EMBED_MODEL: str = "BAAI/bge-small-en-v1.5"
+    # "local" loads the model in this process (sentence-transformers + torch, about 1.5 GB of RAM);
+    # "hf_api" calls the Hugging Face Inference API with HF_TOKEN (same model, same 384-d vectors): the slim profile.
+    EMBED_BACKEND: str = "local"
+    HF_TOKEN: str = ""
+    L2_ENABLED: bool = True  # False: no ML layer (risk = L1 + L3), no lightgbm / offset-pool memory: the slim profile
     OCR_ENGINE: str = "rapidocr"
     LOG_LEVEL: str = "INFO"
 

@@ -18,7 +18,8 @@ from app.errors import NwisError
 from app.logging import get_logger
 from app.risk import l2
 from app.routers.search import parse_body
-from training import features, train_l2
+from app.config import get_settings
+from training import features  # numpy + pandas only; train_l2 (lightgbm, scikit-learn) is imported when a retrain runs
 
 logger = get_logger(__name__)
 
@@ -48,6 +49,9 @@ def resolve_risk_types(requested: list[str] | None) -> list[str]:
 
 async def _retrain(risk_types: list[str]) -> None:
     try:
+        from training import train_l2
+
+
         wells, strat_order = await features.load_wells()
         if len(wells) < 2:
             logger.warning("retrain_skipped completed_wells=%d", len(wells))
@@ -64,6 +68,8 @@ async def _retrain(risk_types: list[str]) -> None:
 def start_retrain(risk_types: list[str]) -> None:
     """Start the background retrain, or raise 409 if one is already running."""
     global _task
+    if not get_settings().L2_ENABLED:
+        raise NwisError("NWIS_BAD_STATE", "The ML layer is switched off on this deployment (L2_ENABLED)", 409)
     if retrain_running():
         raise NwisError("NWIS_BAD_STATE", "A retrain is already running", 409)
     _task = asyncio.create_task(_retrain(risk_types))
